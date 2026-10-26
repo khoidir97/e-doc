@@ -1,0 +1,3 @@
+{
+  "/(admin)/pegawai/page": "app/(admin)/pegawai/page.js"
+}

@@ -1,0 +1,20 @@
+{
+  "node": {
+    "4048c7d2bc7f2399643656eff17466b4fe8f795980": {
+      "workers": {
+        "app/harga-perkiraan-sendiri/print/[id]/page": {
+          "moduleId": 63068,
+          "async": false,
+          "exportedName": "getHargaPerkiraanSendiriWithDetailsAction",
+          "filename": "src/features/harga-perkiraan-sendiri/actions.ts"
+        }
+      },
+      "layer": {
+        "app/harga-perkiraan-sendiri/print/[id]/page": "action-browser"
+      },
+      "exportedName": "getHargaPerkiraanSendiriWithDetailsAction",
+      "filename": "src/features/harga-perkiraan-sendiri/actions.ts"
+    }
+  },
+  "edge": {}
+}

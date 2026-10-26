@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/(admin)/layout,_N_T_/(admin)/perusahaan/layout,_N_T_/(admin)/perusahaan/page,_N_T_/perusahaan"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/!KGFkbWluKQ/perusahaan/__PAGE__",
+    "/!KGFkbWluKQ/perusahaan",
+    "/!KGFkbWluKQ",
+    "/_index",
+    "/_head"
+  ]
+}

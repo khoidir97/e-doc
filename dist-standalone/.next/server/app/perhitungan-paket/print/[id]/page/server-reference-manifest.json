@@ -1,0 +1,20 @@
+{
+  "node": {
+    "407de8f9130415d7d0cfa23f161f1a0a91e74fd365": {
+      "workers": {
+        "app/perhitungan-paket/print/[id]/page": {
+          "moduleId": 67883,
+          "async": false,
+          "exportedName": "getPerhitunganPaketWithDetailsAction",
+          "filename": "src/features/perhitungan-paket/actions.ts"
+        }
+      },
+      "layer": {
+        "app/perhitungan-paket/print/[id]/page": "action-browser"
+      },
+      "exportedName": "getPerhitunganPaketWithDetailsAction",
+      "filename": "src/features/perhitungan-paket/actions.ts"
+    }
+  },
+  "edge": {}
+}

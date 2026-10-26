@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/(admin)/layout,_N_T_/(admin)/nota-pencairan-dana/layout,_N_T_/(admin)/nota-pencairan-dana/page,_N_T_/nota-pencairan-dana"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/!KGFkbWluKQ/nota-pencairan-dana/__PAGE__",
+    "/!KGFkbWluKQ/nota-pencairan-dana",
+    "/!KGFkbWluKQ",
+    "/_index",
+    "/_head"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/(admin)/layout,_N_T_/(admin)/berita-acara/layout,_N_T_/(admin)/berita-acara/page,_N_T_/berita-acara"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/!KGFkbWluKQ/berita-acara/__PAGE__",
+    "/!KGFkbWluKQ/berita-acara",
+    "/!KGFkbWluKQ",
+    "/_index",
+    "/_head"
+  ]
+}

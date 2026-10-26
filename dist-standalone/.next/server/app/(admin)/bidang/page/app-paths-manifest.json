@@ -1,0 +1,3 @@
+{
+  "/(admin)/bidang/page": "app/(admin)/bidang/page.js"
+}

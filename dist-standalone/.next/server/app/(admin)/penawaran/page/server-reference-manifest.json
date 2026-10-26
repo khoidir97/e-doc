@@ -1,0 +1,65 @@
+{
+  "node": {
+    "005222b4151ef445efdf628663fdbbc1eb5c29b62f": {
+      "workers": {
+        "app/(admin)/penawaran/page": {
+          "moduleId": 22805,
+          "async": false,
+          "exportedName": "getMasterDokumenOptionsAction",
+          "filename": "src/features/penawaran/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/penawaran/page": "action-browser"
+      },
+      "exportedName": "getMasterDokumenOptionsAction",
+      "filename": "src/features/penawaran/actions.ts"
+    },
+    "40fc0c70ae1cf46a0fc46bdecfc9df9da5162b0794": {
+      "workers": {
+        "app/(admin)/penawaran/page": {
+          "moduleId": 22805,
+          "async": false,
+          "exportedName": "getPenawaranByMasterDokumenAction",
+          "filename": "src/features/penawaran/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/penawaran/page": "action-browser"
+      },
+      "exportedName": "getPenawaranByMasterDokumenAction",
+      "filename": "src/features/penawaran/actions.ts"
+    },
+    "405d24948ee7e9b25b68823a37cb4bab0697aff572": {
+      "workers": {
+        "app/(admin)/penawaran/page": {
+          "moduleId": 22805,
+          "async": false,
+          "exportedName": "getRencanaAnggaranBiayaByMasterDokumenAction",
+          "filename": "src/features/penawaran/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/penawaran/page": "action-browser"
+      },
+      "exportedName": "getRencanaAnggaranBiayaByMasterDokumenAction",
+      "filename": "src/features/penawaran/actions.ts"
+    },
+    "401e36ba8de117654be2790f3e62ede53630129120": {
+      "workers": {
+        "app/(admin)/penawaran/page": {
+          "moduleId": 22805,
+          "async": false,
+          "exportedName": "savePenawaranBatchAction",
+          "filename": "src/features/penawaran/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/penawaran/page": "action-browser"
+      },
+      "exportedName": "savePenawaranBatchAction",
+      "filename": "src/features/penawaran/actions.ts"
+    }
+  },
+  "edge": {}
+}

@@ -1,0 +1,20 @@
+{
+  "node": {
+    "4005ee1ffe4e05518b84a8f4d1a0d7ab04e1807121": {
+      "workers": {
+        "app/nego/print/[id]/page": {
+          "moduleId": 62142,
+          "async": false,
+          "exportedName": "getNegoWithDetailsAction",
+          "filename": "src/features/nego/actions.ts"
+        }
+      },
+      "layer": {
+        "app/nego/print/[id]/page": "action-browser"
+      },
+      "exportedName": "getNegoWithDetailsAction",
+      "filename": "src/features/nego/actions.ts"
+    }
+  },
+  "edge": {}
+}

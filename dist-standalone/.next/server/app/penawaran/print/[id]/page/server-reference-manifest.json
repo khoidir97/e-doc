@@ -1,0 +1,20 @@
+{
+  "node": {
+    "40e1d04f6d5de0c69427087a86abff2d7e3baf96a8": {
+      "workers": {
+        "app/penawaran/print/[id]/page": {
+          "moduleId": 32255,
+          "async": false,
+          "exportedName": "getPenawaranWithDetailsAction",
+          "filename": "src/features/penawaran/actions.ts"
+        }
+      },
+      "layer": {
+        "app/penawaran/print/[id]/page": "action-browser"
+      },
+      "exportedName": "getPenawaranWithDetailsAction",
+      "filename": "src/features/penawaran/actions.ts"
+    }
+  },
+  "edge": {}
+}

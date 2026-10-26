@@ -1,0 +1,1 @@
+(globalThis.TURBOPACK||(globalThis.TURBOPACK=[])).push(["object"==typeof document?document.currentScript:void 0,85294,e=>{"use strict";var l=e.i(71645);e.s(["useModal",0,(e=!1)=>{let[a,t]=(0,l.useState)(e),o=(0,l.useCallback)(()=>t(!0),[]);return{isOpen:a,openModal:o,closeModal:(0,l.useCallback)(()=>t(!1),[]),toggleModal:(0,l.useCallback)(()=>t(e=>!e),[])}}])}]);

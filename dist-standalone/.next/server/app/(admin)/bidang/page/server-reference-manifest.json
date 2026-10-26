@@ -1,0 +1,65 @@
+{
+  "node": {
+    "70f14b051f937ba5721c611086356a205901417d13": {
+      "workers": {
+        "app/(admin)/bidang/page": {
+          "moduleId": 86564,
+          "async": false,
+          "exportedName": "getBidangListAction",
+          "filename": "src/features/bidang/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/bidang/page": "action-browser"
+      },
+      "exportedName": "getBidangListAction",
+      "filename": "src/features/bidang/actions.ts"
+    },
+    "40540d22e01644559289941159b5f3016ba6e3dd3c": {
+      "workers": {
+        "app/(admin)/bidang/page": {
+          "moduleId": 86564,
+          "async": false,
+          "exportedName": "createBidangAction",
+          "filename": "src/features/bidang/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/bidang/page": "action-browser"
+      },
+      "exportedName": "createBidangAction",
+      "filename": "src/features/bidang/actions.ts"
+    },
+    "40320b49a58007cd2d995a9fdd51608eb4cdde812c": {
+      "workers": {
+        "app/(admin)/bidang/page": {
+          "moduleId": 86564,
+          "async": false,
+          "exportedName": "updateBidangAction",
+          "filename": "src/features/bidang/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/bidang/page": "action-browser"
+      },
+      "exportedName": "updateBidangAction",
+      "filename": "src/features/bidang/actions.ts"
+    },
+    "40ca7c63108de115c0f1cb391a79ddb22577ef7639": {
+      "workers": {
+        "app/(admin)/bidang/page": {
+          "moduleId": 86564,
+          "async": false,
+          "exportedName": "deleteBidangAction",
+          "filename": "src/features/bidang/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/bidang/page": "action-browser"
+      },
+      "exportedName": "deleteBidangAction",
+      "filename": "src/features/bidang/actions.ts"
+    }
+  },
+  "edge": {}
+}

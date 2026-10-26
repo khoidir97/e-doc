@@ -1,0 +1,20 @@
+{
+  "node": {
+    "400a3927d19fbb63a84ec40aeaa55a6402ce2dc325": {
+      "workers": {
+        "app/faktur/print/[id]/page": {
+          "moduleId": 57404,
+          "async": false,
+          "exportedName": "getFakturWithDetailsAction",
+          "filename": "src/features/faktur/actions.ts"
+        }
+      },
+      "layer": {
+        "app/faktur/print/[id]/page": "action-browser"
+      },
+      "exportedName": "getFakturWithDetailsAction",
+      "filename": "src/features/faktur/actions.ts"
+    }
+  },
+  "edge": {}
+}

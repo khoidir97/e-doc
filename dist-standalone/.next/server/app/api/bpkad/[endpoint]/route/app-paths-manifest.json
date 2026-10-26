@@ -1,0 +1,3 @@
+{
+  "/api/bpkad/[endpoint]/route": "app/api/bpkad/[endpoint]/route.js"
+}

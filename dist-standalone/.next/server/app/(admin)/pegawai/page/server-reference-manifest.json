@@ -1,0 +1,65 @@
+{
+  "node": {
+    "70970ca61659dfad9e52e46a6fa3bc061388bdf54b": {
+      "workers": {
+        "app/(admin)/pegawai/page": {
+          "moduleId": 81385,
+          "async": false,
+          "exportedName": "getPegawaiListAction",
+          "filename": "src/features/pegawai/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/pegawai/page": "action-browser"
+      },
+      "exportedName": "getPegawaiListAction",
+      "filename": "src/features/pegawai/actions.ts"
+    },
+    "4036fe82b682ff515d85433cdcc4b2c52e38c15176": {
+      "workers": {
+        "app/(admin)/pegawai/page": {
+          "moduleId": 81385,
+          "async": false,
+          "exportedName": "createPegawaiAction",
+          "filename": "src/features/pegawai/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/pegawai/page": "action-browser"
+      },
+      "exportedName": "createPegawaiAction",
+      "filename": "src/features/pegawai/actions.ts"
+    },
+    "40fd9161378194e200a7e56a76833abe1f9c4212c7": {
+      "workers": {
+        "app/(admin)/pegawai/page": {
+          "moduleId": 81385,
+          "async": false,
+          "exportedName": "updatePegawaiAction",
+          "filename": "src/features/pegawai/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/pegawai/page": "action-browser"
+      },
+      "exportedName": "updatePegawaiAction",
+      "filename": "src/features/pegawai/actions.ts"
+    },
+    "403120fbda4db54a85d720a79a2d01ea268e63b6db": {
+      "workers": {
+        "app/(admin)/pegawai/page": {
+          "moduleId": 81385,
+          "async": false,
+          "exportedName": "deletePegawaiAction",
+          "filename": "src/features/pegawai/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/pegawai/page": "action-browser"
+      },
+      "exportedName": "deletePegawaiAction",
+      "filename": "src/features/pegawai/actions.ts"
+    }
+  },
+  "edge": {}
+}

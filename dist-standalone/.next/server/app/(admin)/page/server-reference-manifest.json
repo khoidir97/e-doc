@@ -1,0 +1,35 @@
+{
+  "node": {
+    "40a54d65ee4ee0a04732ac33f24a557384d01abddb": {
+      "workers": {
+        "app/(admin)/page": {
+          "moduleId": 51754,
+          "async": false,
+          "exportedName": "getDokumenByBidangAction",
+          "filename": "src/features/dashboard/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/page": "action-browser"
+      },
+      "exportedName": "getDokumenByBidangAction",
+      "filename": "src/features/dashboard/actions.ts"
+    },
+    "0090bc00a62504048f53460a527ec7fb7269040ac8": {
+      "workers": {
+        "app/(admin)/page": {
+          "moduleId": 51754,
+          "async": false,
+          "exportedName": "getDashboardDataAction",
+          "filename": "src/features/dashboard/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/page": "action-browser"
+      },
+      "exportedName": "getDashboardDataAction",
+      "filename": "src/features/dashboard/actions.ts"
+    }
+  },
+  "edge": {}
+}

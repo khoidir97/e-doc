@@ -1,0 +1,20 @@
+{
+  "node": {
+    "40e1524da6f7ccb8d38f73f4c30a4af8d5dc0cdb54": {
+      "workers": {
+        "app/rencana-anggaran-biaya/print/[id]/page": {
+          "moduleId": 5577,
+          "async": false,
+          "exportedName": "getRencanaAnggaranBiayaWithDetailsAction",
+          "filename": "src/features/rencana-anggaran-biaya/actions.ts"
+        }
+      },
+      "layer": {
+        "app/rencana-anggaran-biaya/print/[id]/page": "action-browser"
+      },
+      "exportedName": "getRencanaAnggaranBiayaWithDetailsAction",
+      "filename": "src/features/rencana-anggaran-biaya/actions.ts"
+    }
+  },
+  "edge": {}
+}

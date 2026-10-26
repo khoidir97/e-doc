@@ -1,0 +1,16 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/(admin)/layout,_N_T_/(admin)/harga-perkiraan-sendiri/layout,_N_T_/(admin)/harga-perkiraan-sendiri/page,_N_T_/harga-perkiraan-sendiri"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/!KGFkbWluKQ/harga-perkiraan-sendiri/__PAGE__",
+    "/!KGFkbWluKQ/harga-perkiraan-sendiri",
+    "/!KGFkbWluKQ",
+    "/_index",
+    "/_head"
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "node": {
+    "006b9a2ddcbe4f4a731d8395170e62bdd73121386d": {
+      "workers": {
+        "app/(admin)/nego/page": {
+          "moduleId": 22951,
+          "async": false,
+          "exportedName": "getMasterDokumenOptionsAction",
+          "filename": "src/features/nego/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/nego/page": "action-browser"
+      },
+      "exportedName": "getMasterDokumenOptionsAction",
+      "filename": "src/features/nego/actions.ts"
+    },
+    "4030557a1b766b6454938218f03aeb3be60046ef9a": {
+      "workers": {
+        "app/(admin)/nego/page": {
+          "moduleId": 22951,
+          "async": false,
+          "exportedName": "getNegoByMasterDokumenAction",
+          "filename": "src/features/nego/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/nego/page": "action-browser"
+      },
+      "exportedName": "getNegoByMasterDokumenAction",
+      "filename": "src/features/nego/actions.ts"
+    },
+    "407314eb4bc0374f34e0a91e31437624012da0ad64": {
+      "workers": {
+        "app/(admin)/nego/page": {
+          "moduleId": 22951,
+          "async": false,
+          "exportedName": "saveNegoBatchAction",
+          "filename": "src/features/nego/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/nego/page": "action-browser"
+      },
+      "exportedName": "saveNegoBatchAction",
+      "filename": "src/features/nego/actions.ts"
+    },
+    "4094dab23c278313625d1891b382a07c3a83ceeaec": {
+      "workers": {
+        "app/(admin)/nego/page": {
+          "moduleId": 22951,
+          "async": false,
+          "exportedName": "getHargaPerkiraanSendiriByMasterDokumenAction",
+          "filename": "src/features/harga-perkiraan-sendiri/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/nego/page": "action-browser"
+      },
+      "exportedName": "getHargaPerkiraanSendiriByMasterDokumenAction",
+      "filename": "src/features/harga-perkiraan-sendiri/actions.ts"
+    },
+    "40fc0c70ae1cf46a0fc46bdecfc9df9da5162b0794": {
+      "workers": {
+        "app/(admin)/nego/page": {
+          "moduleId": 22951,
+          "async": false,
+          "exportedName": "getPenawaranByMasterDokumenAction",
+          "filename": "src/features/penawaran/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/nego/page": "action-browser"
+      },
+      "exportedName": "getPenawaranByMasterDokumenAction",
+      "filename": "src/features/penawaran/actions.ts"
+    }
+  },
+  "edge": {}
+}

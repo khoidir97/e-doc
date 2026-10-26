@@ -1,0 +1,65 @@
+{
+  "node": {
+    "7033a413240da5062cf74c6d21cfced3d5a3106b03": {
+      "workers": {
+        "app/(admin)/perusahaan/page": {
+          "moduleId": 2648,
+          "async": false,
+          "exportedName": "getPerusahaanListAction",
+          "filename": "src/features/perusahaan/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/perusahaan/page": "action-browser"
+      },
+      "exportedName": "getPerusahaanListAction",
+      "filename": "src/features/perusahaan/actions.ts"
+    },
+    "40f25d896b810286fa12f8bf0a46b0a3e06bf509ab": {
+      "workers": {
+        "app/(admin)/perusahaan/page": {
+          "moduleId": 2648,
+          "async": false,
+          "exportedName": "createPerusahaanAction",
+          "filename": "src/features/perusahaan/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/perusahaan/page": "action-browser"
+      },
+      "exportedName": "createPerusahaanAction",
+      "filename": "src/features/perusahaan/actions.ts"
+    },
+    "400d71d5f75a82c26587e0e417889ea25037f4c733": {
+      "workers": {
+        "app/(admin)/perusahaan/page": {
+          "moduleId": 2648,
+          "async": false,
+          "exportedName": "updatePerusahaanAction",
+          "filename": "src/features/perusahaan/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/perusahaan/page": "action-browser"
+      },
+      "exportedName": "updatePerusahaanAction",
+      "filename": "src/features/perusahaan/actions.ts"
+    },
+    "409b92cacceb26cb3c6088a88e3443d0db609f1f98": {
+      "workers": {
+        "app/(admin)/perusahaan/page": {
+          "moduleId": 2648,
+          "async": false,
+          "exportedName": "deletePerusahaanAction",
+          "filename": "src/features/perusahaan/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/perusahaan/page": "action-browser"
+      },
+      "exportedName": "deletePerusahaanAction",
+      "filename": "src/features/perusahaan/actions.ts"
+    }
+  },
+  "edge": {}
+}

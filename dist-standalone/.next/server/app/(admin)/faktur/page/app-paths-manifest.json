@@ -1,0 +1,3 @@
+{
+  "/(admin)/faktur/page": "app/(admin)/faktur/page.js"
+}

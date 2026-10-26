@@ -1,0 +1,50 @@
+{
+  "node": {
+    "002e8c84f3f7f5ad7484c68dcc5785a1fbfe6d0f68": {
+      "workers": {
+        "app/(admin)/survey/page": {
+          "moduleId": 83463,
+          "async": false,
+          "exportedName": "getMasterDokumenOptionsAction",
+          "filename": "src/features/survey/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/survey/page": "action-browser"
+      },
+      "exportedName": "getMasterDokumenOptionsAction",
+      "filename": "src/features/survey/actions.ts"
+    },
+    "408f14fedf88a75b7fd0683de9b041c20c6b2f12b6": {
+      "workers": {
+        "app/(admin)/survey/page": {
+          "moduleId": 83463,
+          "async": false,
+          "exportedName": "getSurveyWithDetailsAction",
+          "filename": "src/features/survey/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/survey/page": "action-browser"
+      },
+      "exportedName": "getSurveyWithDetailsAction",
+      "filename": "src/features/survey/actions.ts"
+    },
+    "40c0d9c32e7bd8cd26af4f9e8d636726bc9bb05c04": {
+      "workers": {
+        "app/(admin)/survey/page": {
+          "moduleId": 83463,
+          "async": false,
+          "exportedName": "saveSurveyBatchAction",
+          "filename": "src/features/survey/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/survey/page": "action-browser"
+      },
+      "exportedName": "saveSurveyBatchAction",
+      "filename": "src/features/survey/actions.ts"
+    }
+  },
+  "edge": {}
+}

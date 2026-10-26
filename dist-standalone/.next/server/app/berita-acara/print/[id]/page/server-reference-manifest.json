@@ -1,0 +1,20 @@
+{
+  "node": {
+    "405aeabfb20a1c97acf5c4a495c6a90686b0860cbb": {
+      "workers": {
+        "app/berita-acara/print/[id]/page": {
+          "moduleId": 2608,
+          "async": false,
+          "exportedName": "getBeritaAcaraWithDetailsAction",
+          "filename": "src/features/berita-acara/actions.ts"
+        }
+      },
+      "layer": {
+        "app/berita-acara/print/[id]/page": "action-browser"
+      },
+      "exportedName": "getBeritaAcaraWithDetailsAction",
+      "filename": "src/features/berita-acara/actions.ts"
+    }
+  },
+  "edge": {}
+}

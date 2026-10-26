@@ -1,0 +1,381 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/api/bpkad/[endpoint]",
+      "regex": "^/api/bpkad/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPendpoint": "nxtPendpoint"
+      },
+      "namedRegex": "^/api/bpkad/(?<nxtPendpoint>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/berita-acara/print/[id]",
+      "regex": "^/berita\\-acara/print/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/berita\\-acara/print/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/faktur/print/[id]",
+      "regex": "^/faktur/print/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/faktur/print/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/harga-perkiraan-sendiri/print/[id]",
+      "regex": "^/harga\\-perkiraan\\-sendiri/print/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/harga\\-perkiraan\\-sendiri/print/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/kwitansi/print/[id]",
+      "regex": "^/kwitansi/print/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/kwitansi/print/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/master-dokumen/[id]",
+      "regex": "^/master\\-dokumen/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/master\\-dokumen/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/nego/print/[id]",
+      "regex": "^/nego/print/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/nego/print/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/nota-pencairan-dana/print/[id]",
+      "regex": "^/nota\\-pencairan\\-dana/print/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/nota\\-pencairan\\-dana/print/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/penawaran/print/[id]",
+      "regex": "^/penawaran/print/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/penawaran/print/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/perhitungan-paket/print/[id]",
+      "regex": "^/perhitungan\\-paket/print/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/perhitungan\\-paket/print/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/rencana-anggaran-biaya/print/[id]",
+      "regex": "^/rencana\\-anggaran\\-biaya/print/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/rencana\\-anggaran\\-biaya/print/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/survey/print/[id]",
+      "regex": "^/survey/print/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/survey/print/(?<nxtPid>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/alerts",
+      "regex": "^/alerts(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/alerts(?:/)?$"
+    },
+    {
+      "page": "/api/auth/change-password",
+      "regex": "^/api/auth/change\\-password(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/change\\-password(?:/)?$"
+    },
+    {
+      "page": "/api/auth/login",
+      "regex": "^/api/auth/login(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/login(?:/)?$"
+    },
+    {
+      "page": "/api/auth/logout",
+      "regex": "^/api/auth/logout(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/logout(?:/)?$"
+    },
+    {
+      "page": "/api/auth/me",
+      "regex": "^/api/auth/me(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/me(?:/)?$"
+    },
+    {
+      "page": "/api/auth/register",
+      "regex": "^/api/auth/register(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/auth/register(?:/)?$"
+    },
+    {
+      "page": "/avatars",
+      "regex": "^/avatars(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/avatars(?:/)?$"
+    },
+    {
+      "page": "/badge",
+      "regex": "^/badge(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/badge(?:/)?$"
+    },
+    {
+      "page": "/bar-chart",
+      "regex": "^/bar\\-chart(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bar\\-chart(?:/)?$"
+    },
+    {
+      "page": "/basic-tables",
+      "regex": "^/basic\\-tables(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/basic\\-tables(?:/)?$"
+    },
+    {
+      "page": "/berita-acara",
+      "regex": "^/berita\\-acara(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/berita\\-acara(?:/)?$"
+    },
+    {
+      "page": "/bidang",
+      "regex": "^/bidang(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/bidang(?:/)?$"
+    },
+    {
+      "page": "/blank",
+      "regex": "^/blank(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/blank(?:/)?$"
+    },
+    {
+      "page": "/buttons",
+      "regex": "^/buttons(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/buttons(?:/)?$"
+    },
+    {
+      "page": "/calendar",
+      "regex": "^/calendar(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/calendar(?:/)?$"
+    },
+    {
+      "page": "/error-404",
+      "regex": "^/error\\-404(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/error\\-404(?:/)?$"
+    },
+    {
+      "page": "/faktur",
+      "regex": "^/faktur(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/faktur(?:/)?$"
+    },
+    {
+      "page": "/favicon.ico",
+      "regex": "^/favicon\\.ico(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/favicon\\.ico(?:/)?$"
+    },
+    {
+      "page": "/form-elements",
+      "regex": "^/form\\-elements(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/form\\-elements(?:/)?$"
+    },
+    {
+      "page": "/harga-perkiraan-sendiri",
+      "regex": "^/harga\\-perkiraan\\-sendiri(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/harga\\-perkiraan\\-sendiri(?:/)?$"
+    },
+    {
+      "page": "/images",
+      "regex": "^/images(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/images(?:/)?$"
+    },
+    {
+      "page": "/kwitansi",
+      "regex": "^/kwitansi(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/kwitansi(?:/)?$"
+    },
+    {
+      "page": "/line-chart",
+      "regex": "^/line\\-chart(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/line\\-chart(?:/)?$"
+    },
+    {
+      "page": "/master-dokumen",
+      "regex": "^/master\\-dokumen(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/master\\-dokumen(?:/)?$"
+    },
+    {
+      "page": "/modals",
+      "regex": "^/modals(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/modals(?:/)?$"
+    },
+    {
+      "page": "/nego",
+      "regex": "^/nego(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/nego(?:/)?$"
+    },
+    {
+      "page": "/nota-pencairan-dana",
+      "regex": "^/nota\\-pencairan\\-dana(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/nota\\-pencairan\\-dana(?:/)?$"
+    },
+    {
+      "page": "/pegawai",
+      "regex": "^/pegawai(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/pegawai(?:/)?$"
+    },
+    {
+      "page": "/penawaran",
+      "regex": "^/penawaran(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/penawaran(?:/)?$"
+    },
+    {
+      "page": "/perhitungan-paket",
+      "regex": "^/perhitungan\\-paket(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/perhitungan\\-paket(?:/)?$"
+    },
+    {
+      "page": "/perusahaan",
+      "regex": "^/perusahaan(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/perusahaan(?:/)?$"
+    },
+    {
+      "page": "/profile",
+      "regex": "^/profile(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/profile(?:/)?$"
+    },
+    {
+      "page": "/rencana-anggaran-biaya",
+      "regex": "^/rencana\\-anggaran\\-biaya(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/rencana\\-anggaran\\-biaya(?:/)?$"
+    },
+    {
+      "page": "/signin",
+      "regex": "^/signin(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/signin(?:/)?$"
+    },
+    {
+      "page": "/signup",
+      "regex": "^/signup(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/signup(?:/)?$"
+    },
+    {
+      "page": "/survey",
+      "regex": "^/survey(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/survey(?:/)?$"
+    },
+    {
+      "page": "/videos",
+      "regex": "^/videos(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/videos(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}
