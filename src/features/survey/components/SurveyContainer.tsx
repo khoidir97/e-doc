@@ -37,7 +37,7 @@ export const SurveyContainer: React.FC<SurveyContainerProps> = ({
   const [selectedMdkId, setSelectedMdkId] = useState<number | ''>(initialMasterDokumenId || '');
   const [selectedMasterDokumen, setSelectedMasterDokumen] = useState<MasterDokumen | null>(null);
 
-  const todayYmd = new Date().toISOString().split('T')[0];
+  const todayYmd = formatDateYYYYMMDD(new Date());
 
   // Survey Header State
   const [headerState, setHeaderState] = useState<{
@@ -52,8 +52,8 @@ export const SurveyContainer: React.FC<SurveyContainerProps> = ({
     srv_nomor: '',
     srv_nama_kegiatan: '',
     srv_paket_pekerjaan: '',
-    srv_tanggal_mulai: '',
-    srv_tanggal_selesai: '',
+    srv_tanggal_mulai: todayYmd,
+    srv_tanggal_selesai: todayYmd,
     srv_nama_perusahaan: '',
     srv_alamat_perusahaan: '',
   });
@@ -139,8 +139,8 @@ export const SurveyContainer: React.FC<SurveyContainerProps> = ({
         srv_nomor: header?.srv_nomor || '',
         srv_nama_kegiatan: namaKegiatan,
         srv_paket_pekerjaan: paketPekerjaan,
-        srv_tanggal_mulai: formatDateYYYYMMDD(header?.srv_tanggal_mulai),
-        srv_tanggal_selesai: formatDateYYYYMMDD(header?.srv_tanggal_selesai),
+        srv_tanggal_mulai: formatDateYYYYMMDD(header?.srv_tanggal_mulai) || todayYmd,
+        srv_tanggal_selesai: formatDateYYYYMMDD(header?.srv_tanggal_selesai) || todayYmd,
         srv_nama_perusahaan: namaPerusahaan,
         srv_alamat_perusahaan: alamatPerusahaan,
       });
@@ -155,13 +155,19 @@ export const SurveyContainer: React.FC<SurveyContainerProps> = ({
           }))
         );
       } else {
-        setSurveyRows([{ dsrv_jenis_spesifikasi: '', dsrv_harga_survey: 0 }]);
+        setSurveyRows([{
+          dsrv_jenis_spesifikasi: effectiveMdk?.mdk_pekerjaan?.trim() || '',
+          dsrv_harga_survey: 0,
+        }]);
       }
     } else {
-      setSurveyRows([{ dsrv_jenis_spesifikasi: '', dsrv_harga_survey: 0 }]);
+      setSurveyRows([{
+        dsrv_jenis_spesifikasi: targetMdk?.mdk_pekerjaan?.trim() || '',
+        dsrv_harga_survey: 0,
+      }]);
     }
     setLoadingSurvey(false);
-  }, [selectedMasterDokumen]);
+  }, [selectedMasterDokumen, todayYmd]);
 
   useEffect(() => {
     if (selectedMdkId && typeof selectedMdkId === 'number') {
@@ -193,13 +199,13 @@ export const SurveyContainer: React.FC<SurveyContainerProps> = ({
         srv_nomor: '',
         srv_nama_kegiatan: '',
         srv_paket_pekerjaan: '',
-        srv_tanggal_mulai: '',
-        srv_tanggal_selesai: '',
+        srv_tanggal_mulai: todayYmd,
+        srv_tanggal_selesai: todayYmd,
         srv_nama_perusahaan: '',
         srv_alamat_perusahaan: '',
       });
     }
-  }, [selectedMdkId, masterDokumenList, loadSurveyForMdk]);
+  }, [selectedMdkId, masterDokumenList, loadSurveyForMdk, todayYmd]);
 
   // Handle Dynamic Rows
   const handleAddRow = () => {

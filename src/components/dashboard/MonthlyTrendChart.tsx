@@ -116,13 +116,13 @@ export const MonthlyTrendChart: React.FC<MonthlyTrendChartProps> = ({ data }) =>
   ];
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
+    <section className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900 md:p-6">
+      <div className="mb-5">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+          <h2 className="text-base font-semibold tracking-tight text-gray-900 dark:text-white md:text-lg">
             Tren Pagu & Dokumen Bulanan
-          </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          </h2>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Statistik akumulasi pagu dan pembuatan dokumen per bulan tahun berjalan
           </p>
         </div>
@@ -136,6 +136,6 @@ export const MonthlyTrendChart: React.FC<MonthlyTrendChartProps> = ({ data }) =>
           height={300}
         />
       </div>
-    </div>
+    </section>
   );
 };

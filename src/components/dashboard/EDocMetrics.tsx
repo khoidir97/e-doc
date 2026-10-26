@@ -22,14 +22,14 @@ export const EDocMetrics: React.FC<EDocMetricsProps> = ({ summary }) => {
       : "0";
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 md:gap-6">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {/* Metric 1: Total Pagu Anggaran */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-white/[0.03] md:p-6 transition-all hover:shadow-md">
+      <div className="group rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 md:p-6">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+          <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
             Total Pagu Anggaran
           </span>
-          <div className="flex items-center justify-center w-11 h-11 bg-blue-50 text-blue-600 rounded-xl dark:bg-blue-900/30 dark:text-blue-400">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
             <svg
               className="w-6 h-6"
               fill="none"
@@ -47,7 +47,7 @@ export const EDocMetrics: React.FC<EDocMetricsProps> = ({ summary }) => {
           </div>
         </div>
         <div className="mt-4">
-          <h4 className="font-bold text-gray-800 text-xl md:text-2xl dark:text-white/90">
+          <h4 className="break-words text-xl font-bold tracking-tight text-gray-900 dark:text-white md:text-2xl">
             {formatRupiah(summary.totalPagu)}
           </h4>
           <p className="mt-2 text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
@@ -58,12 +58,12 @@ export const EDocMetrics: React.FC<EDocMetricsProps> = ({ summary }) => {
       </div>
 
       {/* Metric 2: Total Realisasi Pencairan */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-white/[0.03] md:p-6 transition-all hover:shadow-md">
+      <div className="group rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 md:p-6">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+          <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
             Realisasi Pencairan
           </span>
-          <div className="flex items-center justify-center w-11 h-11 bg-emerald-50 text-emerald-600 rounded-xl dark:bg-emerald-900/30 dark:text-emerald-400">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
             <svg
               className="w-6 h-6"
               fill="none"
@@ -81,7 +81,7 @@ export const EDocMetrics: React.FC<EDocMetricsProps> = ({ summary }) => {
           </div>
         </div>
         <div className="mt-4">
-          <h4 className="font-bold text-gray-800 text-xl md:text-2xl dark:text-white/90">
+          <h4 className="break-words text-xl font-bold tracking-tight text-gray-900 dark:text-white md:text-2xl">
             {formatRupiah(summary.totalRealisasi)}
           </h4>
           <p className="mt-2 text-xs text-emerald-600 dark:text-emerald-400 font-medium flex items-center gap-1">
@@ -91,12 +91,12 @@ export const EDocMetrics: React.FC<EDocMetricsProps> = ({ summary }) => {
       </div>
 
       {/* Metric 3: Total Master Dokumen */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-white/[0.03] md:p-6 transition-all hover:shadow-md">
+      <div className="group rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 md:p-6">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+          <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
             Master Dokumen
           </span>
-          <div className="flex items-center justify-center w-11 h-11 bg-purple-50 text-purple-600 rounded-xl dark:bg-purple-900/30 dark:text-purple-400">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400">
             <svg
               className="w-6 h-6"
               fill="none"
@@ -114,7 +114,7 @@ export const EDocMetrics: React.FC<EDocMetricsProps> = ({ summary }) => {
           </div>
         </div>
         <div className="mt-4 flex items-baseline justify-between">
-          <h4 className="font-bold text-gray-800 text-2xl md:text-3xl dark:text-white/90">
+          <h4 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white md:text-3xl">
             {summary.totalDokumen}
           </h4>
           <span className="text-xs px-2.5 py-1 rounded-full bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300 font-semibold">
@@ -124,12 +124,12 @@ export const EDocMetrics: React.FC<EDocMetricsProps> = ({ summary }) => {
       </div>
 
       {/* Metric 4: Total Bidang & Mitra */}
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-white/[0.03] md:p-6 transition-all hover:shadow-md">
+      <div className="group rounded-2xl border border-gray-200 bg-white p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md dark:border-gray-800 dark:bg-gray-900 md:p-6">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
+          <span className="text-sm font-medium text-gray-600 dark:text-gray-300">
             Bidang & Perusahaan
           </span>
-          <div className="flex items-center justify-center w-11 h-11 bg-amber-50 text-amber-600 rounded-xl dark:bg-amber-900/30 dark:text-amber-400">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
             <svg
               className="w-6 h-6"
               fill="none"
@@ -148,22 +148,22 @@ export const EDocMetrics: React.FC<EDocMetricsProps> = ({ summary }) => {
         </div>
         <div className="mt-4 flex items-center justify-between">
           <div>
-            <span className="text-xs text-gray-400 block">Bidang</span>
-            <span className="font-bold text-gray-800 text-xl dark:text-white/90">
+            <span className="block text-xs text-gray-500 dark:text-gray-400">Bidang</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">
               {summary.totalBidang}
             </span>
           </div>
           <div className="h-8 w-px bg-gray-200 dark:bg-gray-700"></div>
           <div>
-            <span className="text-xs text-gray-400 block">Perusahaan</span>
-            <span className="font-bold text-gray-800 text-xl dark:text-white/90">
+            <span className="block text-xs text-gray-500 dark:text-gray-400">Perusahaan</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">
               {summary.totalPerusahaan}
             </span>
           </div>
           <div className="h-8 w-px bg-gray-200 dark:bg-gray-700"></div>
           <div>
-            <span className="text-xs text-gray-400 block">Pegawai</span>
-            <span className="font-bold text-gray-800 text-xl dark:text-white/90">
+            <span className="block text-xs text-gray-500 dark:text-gray-400">Pegawai</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-white">
               {summary.totalPegawai}
             </span>
           </div>

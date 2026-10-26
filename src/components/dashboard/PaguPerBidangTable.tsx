@@ -19,52 +19,52 @@ export const PaguPerBidangTable: React.FC<PaguPerBidangTableProps> = ({ data }) 
   };
 
   return (
-    <div className="rounded-2xl border border-gray-200 bg-white p-5 dark:border-gray-800 dark:bg-white/[0.03] md:p-6 shadow-sm">
-      <div className="flex items-center justify-between mb-4">
+    <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
+      <div className="border-b border-gray-100 px-5 py-4 dark:border-gray-800 md:px-6">
         <div>
-          <h3 className="text-lg font-semibold text-gray-800 dark:text-white/90">
+          <h2 className="text-base font-semibold tracking-tight text-gray-900 dark:text-white md:text-lg">
             Rincian Pagu Per Bidang
-          </h3>
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          </h2>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Detail alokasi anggaran dan jumlah dokumen per bidang (Klik jumlah dokumen untuk rincian)
           </p>
         </div>
       </div>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm">
+        <table className="w-full min-w-[520px] text-left text-sm">
           <thead>
-            <tr className="border-b border-gray-100 dark:border-gray-800 text-xs font-semibold uppercase text-gray-400">
-              <th className="pb-3 pl-1">Bidang</th>
-              <th className="pb-3 text-center">Dokumen</th>
-              <th className="pb-3 text-right">Total Pagu</th>
-              <th className="pb-3 text-right pr-1">Porsi</th>
+            <tr className="border-b border-gray-100 text-[11px] font-semibold uppercase tracking-wide text-gray-500 dark:border-gray-800 dark:text-gray-400">
+              <th scope="col" className="px-5 py-3">Bidang</th>
+              <th scope="col" className="px-3 py-3 text-center">Dokumen</th>
+              <th scope="col" className="px-3 py-3 text-right">Total Pagu</th>
+              <th scope="col" className="px-5 py-3 text-right">Porsi</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60">
             {data.length === 0 ? (
               <tr>
-                <td colSpan={4} className="py-6 text-center text-xs text-gray-400">
+                <td colSpan={4} className="px-5 py-10 text-center text-sm text-gray-500 dark:text-gray-400">
                   Data bidang belum tersedia.
                 </td>
               </tr>
             ) : (
               data.map((item, idx) => (
-                <tr key={item.bdg_id || idx} className="hover:bg-gray-50/50 dark:hover:bg-white/[0.02] transition-colors">
-                  <td className="py-3 pl-1 font-medium text-gray-800 dark:text-white/90">
+                <tr key={item.bdg_id || idx} className="transition-colors hover:bg-gray-50/70 dark:hover:bg-white/[0.02]">
+                  <td className="px-5 py-3.5 font-medium text-gray-800 dark:text-white/90">
                     <button
                       onClick={() => handleOpenModal(item)}
-                      className="flex items-center gap-2 hover:text-brand-600 dark:hover:text-brand-400 text-left transition-colors cursor-pointer"
+                      className="flex items-center gap-2 text-left transition-colors hover:text-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:hover:text-brand-400"
                       title={`Lihat rincian dokumen ${item.bdg_nama}`}
                     >
-                      <span className="inline-block w-2.5 h-2.5 rounded-full bg-blue-500/80"></span>
+                      <span aria-hidden="true" className="inline-block h-2 w-2 shrink-0 rounded-full bg-blue-500/80"></span>
                       <span>{item.bdg_nama}</span>
                     </button>
                   </td>
-                  <td className="py-3 text-center text-gray-600 dark:text-gray-300 font-medium">
+                  <td className="px-3 py-3.5 text-center font-medium text-gray-600 dark:text-gray-300">
                     <button
                       onClick={() => handleOpenModal(item)}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-brand-50 hover:bg-brand-100 text-brand-700 dark:bg-brand-950/40 dark:hover:bg-brand-900/60 dark:text-brand-300 text-xs font-bold transition-all cursor-pointer shadow-xs border border-brand-200/60 dark:border-brand-800/60"
+                      className="inline-flex items-center gap-1 rounded-lg border border-brand-200/60 bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 shadow-xs transition-colors hover:bg-brand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-brand-800/60 dark:bg-brand-950/40 dark:text-brand-300 dark:hover:bg-brand-900/60"
                       title={`Lihat rincian ${item.total_dokumen} dokumen ${item.bdg_nama}`}
                     >
                       <svg className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -74,18 +74,18 @@ export const PaguPerBidangTable: React.FC<PaguPerBidangTableProps> = ({ data }) 
                       <span>{item.total_dokumen} Dok</span>
                     </button>
                   </td>
-                  <td className="py-3 text-right font-semibold text-gray-800 dark:text-white/90">
+                  <td className="px-3 py-3.5 text-right font-semibold tabular-nums text-gray-800 dark:text-white/90">
                     {formatRupiah(item.total_pagu)}
                   </td>
-                  <td className="py-3 text-right pr-1">
+                  <td className="px-5 py-3.5">
                     <div className="flex items-center justify-end gap-2">
-                      <div className="w-16 bg-gray-100 rounded-full h-1.5 dark:bg-gray-800 overflow-hidden">
+                      <div className="h-1.5 w-16 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
                         <div
-                          className="bg-blue-600 h-1.5 rounded-full"
+                          className="h-full rounded-full bg-blue-600"
                           style={{ width: `${Math.min(item.persentase, 100)}%` }}
                         ></div>
                       </div>
-                      <span className="text-xs text-gray-500 font-medium w-10 text-right">
+                      <span className="w-10 text-right text-xs font-medium tabular-nums text-gray-500 dark:text-gray-400">
                         {item.persentase}%
                       </span>
                     </div>
@@ -104,6 +104,6 @@ export const PaguPerBidangTable: React.FC<PaguPerBidangTableProps> = ({ data }) 
         bdgId={selectedBidang?.id ?? null}
         bdgNama={selectedBidang?.nama ?? ''}
       />
-    </div>
+    </section>
   );
 };

@@ -1,5 +1,5 @@
 import pool, { initDatabase } from '@/lib/db';
-import { DashboardData, PaguPerBidang, RecentDokumen, MonthlyTrend } from './types';
+import { DashboardData, PaguPerBidang, PaguPerPptk, RecentDokumen, MonthlyTrend } from './types';
 
 const NAMA_BULAN = [
   'Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun',
@@ -23,7 +23,8 @@ export class DashboardRepository {
       [pegawaiRows],
       [paguBidangRows],
       [recentRows],
-      [trendRows]
+      [trendRows],
+      [pptkRows]
     ] = await Promise.all([
       // 1. Total Pagu & Count Master Dokumen
       pool.query<any[]>(
@@ -95,6 +96,30 @@ export class DashboardRepository {
          GROUP BY MONTH(mdk_created_at)
          ORDER BY bulan ASC`,
         [currentYear]
+      ),
+      // 10. Pagu and NPD realization per PPTK
+      pool.query<any[]>(
+        `SELECT
+           p.pgw_id,
+           p.pgw_nama,
+           COUNT(md.mdk_id) AS total_dokumen,
+           COALESCE(SUM(md.mdk_pagu_anggaran), 0) AS total_pagu,
+           COALESCE(SUM(npd.total_terpakai), 0) AS total_terpakai
+         FROM master_dokumen md
+         INNER JOIN pegawai p ON md.mdk_nama_pptk_id = p.pgw_id
+         LEFT JOIN (
+           SELECT
+             dpd_master_dokumen_id,
+             SUM(dpd_saatini_pembayaran) AS total_terpakai
+           FROM nota_pencairan_dana
+           WHERE dpd_deleted_at IS NULL
+           GROUP BY dpd_master_dokumen_id
+         ) npd ON npd.dpd_master_dokumen_id = md.mdk_id
+         WHERE md.mdk_deleted_at IS NULL
+           AND p.pgw_deleted_at IS NULL
+           AND UPPER(TRIM(p.pgw_jabatan)) = 'PPTK'
+         GROUP BY p.pgw_id, p.pgw_nama
+         ORDER BY total_pagu DESC, p.pgw_nama ASC`
       )
     ]);
 
@@ -173,6 +198,14 @@ export class DashboardRepository {
       };
     });
 
+    const paguPerPptk: PaguPerPptk[] = pptkRows.map((row) => ({
+      pgw_id: Number(row.pgw_id),
+      pgw_nama: row.pgw_nama || 'Tanpa Nama',
+      total_pagu: Number(row.total_pagu || 0),
+      total_terpakai: Number(row.total_terpakai || 0),
+      total_dokumen: Number(row.total_dokumen || 0),
+    }));
+
     return {
       summary: {
         totalPagu,
@@ -183,6 +216,7 @@ export class DashboardRepository {
         totalPegawai,
       },
       paguPerBidang,
+      paguPerPptk,
       recentDokumen,
       monthlyTrend,
     };

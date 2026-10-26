@@ -93,13 +93,7 @@ export default function SignInForm() {
   return (
     <div className="flex flex-col flex-1 lg:w-1/2 w-full">
       <div className="w-full max-w-md sm:pt-10 mx-auto mb-5">
-        <Link
-          href="/"
-          className="inline-flex items-center text-sm text-gray-500 transition-colors hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-        >
-          <ChevronLeftIcon />
-          Kembali ke Dashboard
-        </Link>
+
       </div>
       <div className="flex flex-col justify-center flex-1 w-full max-w-md mx-auto">
         <div>
@@ -184,11 +178,10 @@ export default function SignInForm() {
                         placeholder="Jawaban"
                         value={captchaInput}
                         onChange={(e) => { setCaptchaInput(e.target.value); setCaptchaError(false); }}
-                        className={`w-full px-4 py-2.5 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:bg-gray-800 dark:text-white ${
-                          captchaError
-                            ? "border-red-400 bg-red-50 dark:bg-red-900/20 dark:border-red-500"
-                            : "border-gray-300 bg-white dark:border-gray-700"
-                        }`}
+                        className={`w-full px-4 py-2.5 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:bg-gray-800 dark:text-white ${captchaError
+                          ? "border-red-400 bg-red-50 dark:bg-red-900/20 dark:border-red-500"
+                          : "border-gray-300 bg-white dark:border-gray-700"
+                          }`}
                       />
                     </div>
                     {/* Refresh button */}
@@ -227,7 +220,7 @@ export default function SignInForm() {
             </form>
 
             <div className="mt-5">
-              <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
+              {/* <p className="text-sm font-normal text-center text-gray-700 dark:text-gray-400 sm:text-start">
                 Belum punya akun pegawai?{" "}
                 <Link
                   href="/signup"
@@ -235,7 +228,7 @@ export default function SignInForm() {
                 >
                   Daftar di sini
                 </Link>
-              </p>
+              </p> */}
             </div>
           </div>
         </div>
