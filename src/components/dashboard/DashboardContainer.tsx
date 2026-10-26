@@ -16,6 +16,7 @@ interface DashboardContainerProps {
 export const DashboardContainer: React.FC<DashboardContainerProps> = ({ initialData }) => {
   const [dashboardData, setDashboardData] = useState<DashboardData>(initialData);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
 
   const fetchLatestData = useCallback(async (silent = true) => {
     if (!silent) setIsRefreshing(true);
@@ -23,6 +24,7 @@ export const DashboardContainer: React.FC<DashboardContainerProps> = ({ initialD
       const res = await getDashboardDataAction();
       if (res.success && res.data) {
         setDashboardData(res.data);
+        setLastUpdated(new Date());
       }
     } catch (err) {
       console.error("Failed to refresh dashboard data", err);
@@ -43,28 +45,60 @@ export const DashboardContainer: React.FC<DashboardContainerProps> = ({ initialD
     fetchLatestData(false);
   };
 
+  const formattedTime = lastUpdated.toLocaleTimeString("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  });
+
   return (
-    <div className="space-y-5 md:space-y-6">
-      <header className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900 sm:flex-row sm:items-center sm:justify-between md:p-6">
-        <div className="min-w-0">
-          <p className="mb-1 text-xs font-semibold uppercase tracking-[0.16em] text-blue-600 dark:text-blue-400">
-            Ringkasan
-          </p>
-          <h1 className="text-xl font-bold tracking-tight text-gray-900 dark:text-white md:text-2xl">
-            Dashboard e-Doc BPKAD
-          </h1>
-          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-            Ringkasan alokasi pagu anggaran, realisasi, dan dokumen terbaru
-          </p>
-        </div>
-        <button
+    <div className="space-y-6">
+      {/* ─── Header ─────────────────────────────────────────── */}
+      <header className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-600 via-brand-700 to-brand-900 p-6 shadow-theme-lg md:p-8">
+        {/* Decorative blobs */}
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -right-10 -top-10 h-52 w-52 rounded-full bg-white/5 blur-2xl"
+        />
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute -bottom-12 -left-8 h-48 w-48 rounded-full bg-white/5 blur-2xl"
+        />
+        <span
+          aria-hidden="true"
+          className="pointer-events-none absolute right-32 bottom-0 h-32 w-32 rounded-full bg-brand-400/20"
+        />
+
+        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          {/* Title block */}
+          <div className="min-w-0">
+            <div className="mb-2 flex items-center gap-2">
+              {/* Animated live dot */}
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-green-400" />
+              </span>
+              <p className="text-xs font-semibold uppercase tracking-widest text-white/60">
+                Live · Diperbarui {formattedTime}
+              </p>
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-white md:text-3xl">
+              Dashboard e-Doc BPKAD
+            </h1>
+            <p className="mt-1.5 max-w-md text-sm leading-relaxed text-white/65">
+              Ringkasan alokasi pagu anggaran, realisasi, dan dokumen aktif
+            </p>
+          </div>
+
+          {/* Refresh button */}
+          <button
             type="button"
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-xs transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+            className="inline-flex shrink-0 items-center justify-center gap-2 self-start rounded-xl border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50 disabled:cursor-not-allowed disabled:opacity-50 sm:self-auto"
           >
             <svg
-              className={`w-4 h-4 ${isRefreshing ? "animate-spin" : ""}`}
+              className={`h-4 w-4 ${isRefreshing ? "animate-spin" : ""}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -77,32 +111,29 @@ export const DashboardContainer: React.FC<DashboardContainerProps> = ({ initialD
               />
             </svg>
             {isRefreshing ? "Memuat..." : "Refresh Data"}
-        </button>
+          </button>
+        </div>
       </header>
 
-      {/* 1. Metric Cards */}
+      {/* ─── Metric Cards ────────────────────────────────────── */}
       <EDocMetrics summary={dashboardData.summary} />
 
-      {/* 2. Charts & Tables Grid */}
-      <div className="grid grid-cols-1 gap-5 xl:grid-cols-12 xl:gap-6">
-        {/* Left Column: Pagu Per Bidang Chart & Monthly Trend */}
-        <div className="space-y-5 xl:col-span-7 xl:space-y-6">
+      {/* ─── Charts & Tables Grid ────────────────────────────── */}
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-12">
+        {/* Left: Charts */}
+        <div className="space-y-6 xl:col-span-7">
           <PaguPerBidangChart data={dashboardData.paguPerBidang} />
           <MonthlyTrendChart data={dashboardData.monthlyTrend} />
         </div>
 
-        {/* Right Column: Pagu Per Bidang Table */}
+        {/* Right: Bidang table */}
         <div className="xl:col-span-5">
           <PaguPerBidangTable data={dashboardData.paguPerBidang} />
         </div>
       </div>
 
+      {/* ─── PPTK Table ──────────────────────────────────────── */}
       <PaguPerPptkTable data={dashboardData.paguPerPptk} />
-
-      {/* 3. Recent Master Dokumen Table */}
-      {/* <div className="w-full">
-        <RecentDokumenTable data={dashboardData.recentDokumen} />
-      </div> */}
     </div>
   );
 };
