@@ -124,7 +124,7 @@ export default function UserDropdown() {
             <Image
               width={44}
               height={44}
-              src="/images/user/owner.jpg"
+              src="/images/user/images.png"
               alt="User"
             />
           </span>
@@ -134,9 +134,8 @@ export default function UserDropdown() {
           </span>
 
           <svg
-            className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${
-              isOpen ? "rotate-180" : ""
-            }`}
+            className={`stroke-gray-500 dark:stroke-gray-400 transition-transform duration-200 ${isOpen ? "rotate-180" : ""
+              }`}
             width="18"
             height="20"
             viewBox="0 0 18 20"
@@ -242,11 +241,10 @@ export default function UserDropdown() {
         {/* Feedback */}
         {feedback && (
           <div
-            className={`mb-4 flex items-start gap-2 rounded-lg px-3.5 py-3 text-sm font-medium ${
-              feedback.type === 'success'
+            className={`mb-4 flex items-start gap-2 rounded-lg px-3.5 py-3 text-sm font-medium ${feedback.type === 'success'
                 ? 'bg-green-50 text-green-700 dark:bg-green-900/30 dark:text-green-400'
                 : 'bg-red-50 text-red-600 dark:bg-red-900/30 dark:text-red-400'
-            }`}
+              }`}
           >
             {feedback.type === 'success' ? (
               <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -338,11 +336,10 @@ export default function UserDropdown() {
                 required
                 autoComplete="new-password"
                 placeholder="Ulangi password baru"
-                className={`w-full px-3 py-2.5 pr-10 rounded-lg border bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:ring-2 outline-none transition-all ${
-                  confirmPassword && confirmPassword !== newPassword
+                className={`w-full px-3 py-2.5 pr-10 rounded-lg border bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white focus:ring-2 outline-none transition-all ${confirmPassword && confirmPassword !== newPassword
                     ? 'border-red-400 focus:ring-red-500/20 focus:border-red-500'
                     : 'border-gray-300 dark:border-gray-700 focus:ring-blue-500/20 focus:border-blue-500'
-                }`}
+                  }`}
               />
               <button
                 type="button"

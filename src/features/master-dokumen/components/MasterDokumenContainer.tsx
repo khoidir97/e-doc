@@ -8,6 +8,7 @@ import {
   updateMasterDokumenAction,
   deleteMasterDokumenAction,
   copyMasterDokumenAction,
+  toggleLockMasterDokumenAction,
 } from '../actions';
 import { MasterDokumenHeader } from './MasterDokumenHeader';
 import { MasterDokumenTable } from './MasterDokumenTable';
@@ -35,6 +36,24 @@ export const MasterDokumenContainer: React.FC = () => {
   const [selectedDocType, setSelectedDocType] = useState<DocumentType>('rab');
   const [selectedMasterDokumen, setSelectedMasterDokumen] = useState<MasterDokumen | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
+  const [userRole, setUserRole] = useState<number | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch('/api/auth/me')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (!isMounted || !data) return;
+        if (data.success && data.user) {
+          setUserRole(data.user.pgw_role);
+        }
+      })
+      .catch((err) => console.error('Failed to load user info:', err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Toast / Alert notification state
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -147,6 +166,20 @@ export const MasterDokumenContainer: React.FC = () => {
     }
   };
 
+  const handleToggleLock = async (masterDokumen: MasterDokumen) => {
+    const newLockStatus = masterDokumen.mdk_is_lock === 1 ? 0 : 1;
+    setActionLoading(true);
+    const res = await toggleLockMasterDokumenAction(masterDokumen.mdk_id, newLockStatus);
+    setActionLoading(false);
+
+    if (res.success) {
+      showToast('success', res.message);
+      loadData();
+    } else {
+      showToast('error', res.message);
+    }
+  };
+
   return (
     <div className="p-1 sm:p-1 w-full space-y-6">
       {/* Toast Notification Banner */}
@@ -172,6 +205,8 @@ export const MasterDokumenContainer: React.FC = () => {
         onCopy={handleOpenCopyModal}
         onDelete={handleOpenDeleteModal}
         onPrint={handleOpenPrintModal}
+        onToggleLock={handleToggleLock}
+        userRole={userRole}
         page={page}
         totalPages={totalPages}
         total={total}

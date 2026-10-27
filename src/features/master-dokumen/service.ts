@@ -36,6 +36,9 @@ export class MasterDokumenService {
     if (!existing) {
       throw new Error('Data Master Dokumen tidak ditemukan.');
     }
+    if (existing.mdk_is_lock === 1) {
+      throw new Error('Master Dokumen telah dikunci (Locked) dan tidak dapat diedit.');
+    }
 
     return await MasterDokumenRepository.update(input);
   }
@@ -45,6 +48,17 @@ export class MasterDokumenService {
     if (!existing) {
       throw new Error('Data Master Dokumen tidak ditemukan.');
     }
+    if (existing.mdk_is_lock === 1) {
+      throw new Error('Master Dokumen telah dikunci (Locked) dan tidak dapat dihapus.');
+    }
     return await MasterDokumenRepository.softDelete(mdk_id, deletedBy);
+  }
+
+  static async setLockStatus(mdk_id: number, isLock: number, updatedBy?: number | null): Promise<boolean> {
+    const existing = await MasterDokumenRepository.findById(mdk_id);
+    if (!existing) {
+      throw new Error('Data Master Dokumen tidak ditemukan.');
+    }
+    return await MasterDokumenRepository.updateLockStatus(mdk_id, isLock, updatedBy);
   }
 }

@@ -62,6 +62,7 @@ export const KwitansiContainer: React.FC<KwitansiContainerProps> = ({
   const [loadingData, setLoadingData] = useState<boolean>(false);
   const [saving, setSaving] = useState<boolean>(false);
   const [saveMessage, setSaveMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const isLocked = selectedMasterDokumen?.mdk_is_lock === 1;
 
   const formatDateStr = (val: string | Date | null | undefined): string => {
     if (!val) return todayYmd;
@@ -488,7 +489,7 @@ export const KwitansiContainer: React.FC<KwitansiContainerProps> = ({
                 <div className="flex flex-wrap items-center gap-2 print:hidden">
                   <button
                     onClick={handleSave}
-                    disabled={saving || isExceedingPagu}
+                    disabled={saving || isExceedingPagu || isLocked}
                     className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs shadow-sm transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-700"
                     title={isExceedingPagu ? 'Total nominal kwitansi melebihi Pagu Anggaran' : 'Simpan Seluruh Kwitansi'}
                   >

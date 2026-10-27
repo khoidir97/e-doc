@@ -7,16 +7,21 @@ import { MasterDokumenService } from './service';
 import { createMasterDokumenSchema, updateMasterDokumenSchema } from './schema';
 import { ActionResponse, CreateMasterDokumenInput, UpdateMasterDokumenInput, MasterDokumenListResult } from './types';
 
-async function getActiveUserId(): Promise<number | null> {
+async function getActiveUser(): Promise<{ pgw_id: number; pgw_role: number } | null> {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
     if (!token) return null;
     const user = await verifyToken(token);
-    return user ? user.pgw_id : null;
+    return user ? { pgw_id: user.pgw_id, pgw_role: user.pgw_role } : null;
   } catch {
     return null;
   }
+}
+
+async function getActiveUserId(): Promise<number | null> {
+  const user = await getActiveUser();
+  return user ? user.pgw_id : null;
 }
 
 export async function getMasterDokumenByIdAction(
@@ -222,6 +227,39 @@ export async function copyMasterDokumenAction(mdk_id: number): Promise<ActionRes
     return {
       success: false,
       message: error.message || 'Gagal menduplikat data Master Dokumen',
+    };
+  }
+}
+
+export async function toggleLockMasterDokumenAction(mdk_id: number, isLock: number): Promise<ActionResponse> {
+  try {
+    if (!mdk_id || mdk_id <= 0) {
+      return {
+        success: false,
+        message: 'ID Dokumen tidak valid.',
+      };
+    }
+
+    const activeUser = await getActiveUser();
+    if (!activeUser || activeUser.pgw_role !== 0) {
+      return {
+        success: false,
+        message: 'Akses ditolak. Hanya Administrator (pgw_role = 0) yang dapat mengunci atau membuka kunci dokumen.',
+      };
+    }
+
+    await MasterDokumenService.setLockStatus(mdk_id, isLock, activeUser.pgw_id);
+    revalidatePath('/master-dokumen');
+    revalidatePath(`/master-dokumen/${mdk_id}`);
+
+    return {
+      success: true,
+      message: isLock === 1 ? 'Master Dokumen berhasil dikunci.' : 'Kunci Master Dokumen berhasil dibuka.',
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || 'Gagal mengubah status kunci dokumen.',
     };
   }
 }

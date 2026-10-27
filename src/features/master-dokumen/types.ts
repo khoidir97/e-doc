@@ -46,6 +46,7 @@ export interface MasterDokumen {
   mdk_no_dpa: string;
   mdk_volume: string;
   mdk_satuan: string;
+  mdk_is_lock?: number;
   mdk_created_at: string | Date;
   mdk_created_by: number | null;
   mdk_updated_at: string | Date | null;

@@ -263,6 +263,7 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
     0
   );
   const paguNominal = Number(selectedMasterDokumen?.mdk_pagu_anggaran) || 0;
+  const isLocked = selectedMasterDokumen?.mdk_is_lock === 1;
   const selisihNominal = paguNominal - totalHargaFaktur;
   const countPPN = totalHargaFaktur * (11 / 100);
 
@@ -537,7 +538,7 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
 
                   <button
                     type="submit"
-                    disabled={saving}
+                    disabled={saving || isLocked}
                     className="flex-1 sm:flex-none px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                   >
                     {saving ? (

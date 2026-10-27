@@ -16,7 +16,7 @@ interface DashboardContainerProps {
 export const DashboardContainer: React.FC<DashboardContainerProps> = ({ initialData }) => {
   const [dashboardData, setDashboardData] = useState<DashboardData>(initialData);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   const fetchLatestData = useCallback(async (silent = true) => {
     if (!silent) setIsRefreshing(true);
@@ -34,6 +34,8 @@ export const DashboardContainer: React.FC<DashboardContainerProps> = ({ initialD
   }, []);
 
   useEffect(() => {
+    setLastUpdated(new Date());
+
     const interval = setInterval(() => {
       fetchLatestData(true);
     }, 10000);
@@ -45,11 +47,13 @@ export const DashboardContainer: React.FC<DashboardContainerProps> = ({ initialD
     fetchLatestData(false);
   };
 
-  const formattedTime = lastUpdated.toLocaleTimeString("id-ID", {
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
-  });
+  const formattedTime = lastUpdated
+    ? lastUpdated.toLocaleTimeString("id-ID", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      })
+    : "--:--:--";
 
   return (
     <div className="space-y-6">

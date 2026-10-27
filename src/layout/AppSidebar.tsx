@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSidebar } from "../context/SidebarContext";
+import { AuthUser } from "@/types/auth";
 import {
   BoxCubeIcon,
   CalenderIcon,
@@ -24,6 +25,7 @@ type NavItem = {
   icon: React.ReactNode;
   path?: string;
   subItems?: { name: string; path: string; pro?: boolean; new?: boolean }[];
+  roles?: number[];
 };
 
 const navItems: NavItem[] = [
@@ -109,6 +111,7 @@ const navItems: NavItem[] = [
   {
     name: "Master",
     icon: <ListIcon />,
+    roles: [0],
     subItems: [
       {
         name: "Perusahaan",
@@ -168,6 +171,37 @@ const navItems: NavItem[] = [
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const pathname = usePathname();
+  const [user, setUser] = useState<AuthUser | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch("/api/auth/me")
+      .then((res) => {
+        if (!res.ok) return null;
+        return res.json();
+      })
+      .then((data) => {
+        if (!isMounted || !data) return;
+        if (data.success && data.user) {
+          setUser(data.user);
+        }
+      })
+      .catch((err) => console.error("Failed to load user in sidebar:", err));
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const filteredNavItems = React.useMemo(() => {
+    return navItems.filter((item) => {
+      if (item.roles && item.roles.length > 0) {
+        if (!user) return false;
+        return item.roles.includes(user.pgw_role);
+      }
+      return true;
+    });
+  }, [user]);
 
   const renderMenuItems = (
     navItems: NavItem[],
@@ -302,7 +336,7 @@ const AppSidebar: React.FC = () => {
     // Check if the current path matches any submenu item
     let submenuMatched = false;
     ["main", "others"].forEach((menuType) => {
-      const items = menuType === "main" ? navItems : [];
+      const items = menuType === "main" ? filteredNavItems : [];
       items.forEach((nav, index) => {
         if (nav.subItems) {
           nav.subItems.forEach((subItem) => {
@@ -322,7 +356,7 @@ const AppSidebar: React.FC = () => {
     if (!submenuMatched) {
       setOpenSubmenu(null);
     }
-  }, [pathname, isActive]);
+  }, [pathname, isActive, filteredNavItems]);
 
   useEffect(() => {
     // Set the height of the submenu items when the submenu is opened
@@ -401,7 +435,7 @@ const AppSidebar: React.FC = () => {
                   <HorizontaLDots />
                 )}
               </h2>
-              {renderMenuItems(navItems, "main")}
+              {renderMenuItems(filteredNavItems, "main")}
             </div>
 
           </div>

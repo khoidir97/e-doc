@@ -251,6 +251,7 @@ export async function initDatabase(): Promise<void> {
       await addMasterDokumenColumnIfNotExists('mdk_nama_level4', "VARCHAR(255) NOT NULL DEFAULT ''");
       await addMasterDokumenColumnIfNotExists('mdk_kode_level5', "VARCHAR(100) NOT NULL DEFAULT ''");
       await addMasterDokumenColumnIfNotExists('mdk_nama_level5', "VARCHAR(255) NOT NULL DEFAULT ''");
+      await addMasterDokumenColumnIfNotExists('mdk_is_lock', 'TINYINT NOT NULL DEFAULT 0');
 
       // Migration check: Ensure missing columns exist in existing survey table
       const addSurveyColumnIfNotExists = async (columnName: string, columnDef: string) => {

@@ -83,7 +83,7 @@ export const PegawaiTable: React.FC<PegawaiTableProps> = ({
                         : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
                         }`}
                     >
-                      {item.pgw_role === 1 ? 'Administrator' : 'Pegawai Staff'}
+                      {item.pgw_role === 0 ? 'Administrator' : 'Pegawai Staff'}
                     </span>
                   </td>
 

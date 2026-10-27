@@ -11,6 +11,8 @@ interface MasterDokumenTableProps {
   onDelete: (masterDokumen: MasterDokumen) => void;
   onCopy?: (masterDokumen: MasterDokumen) => void;
   onPrint?: (masterDokumen: MasterDokumen) => void;
+  onToggleLock?: (masterDokumen: MasterDokumen) => void;
+  userRole?: number | null;
   page: number;
   totalPages: number;
   total: number;
@@ -24,6 +26,8 @@ export const MasterDokumenTable: React.FC<MasterDokumenTableProps> = ({
   onDelete,
   onCopy,
   onPrint,
+  onToggleLock,
+  userRole,
   page,
   totalPages,
   total,
@@ -124,8 +128,16 @@ export const MasterDokumenTable: React.FC<MasterDokumenTableProps> = ({
 
                       {/* Bagian & Pagu */}
                       <td className="px-5 py-3.5">
-                        <div className="font-bold text-gray-900 dark:text-white" title={item.mdk_bagian}>
-                          {item.mdk_bagian || '-'}
+                        <div className="flex items-center gap-1.5 font-bold text-gray-900 dark:text-white" title={item.mdk_bagian}>
+                          {item.mdk_is_lock === 1 && (
+                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-300/60" title="Dokumen Dikunci">
+                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                              </svg>
+                              Locked
+                            </span>
+                          )}
+                          <span>{item.mdk_bagian || '-'}</span>
                         </div>
                         <div className="mt-1 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40">
                           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -200,6 +212,29 @@ export const MasterDokumenTable: React.FC<MasterDokumenTableProps> = ({
                       {/* Action Buttons */}
                       <td className="px-5 py-3.5 text-right pr-6 sticky right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xs shadow-xs">
                         <div className="flex items-center justify-end gap-1.5">
+                          {/* Lock / Unlock Toggle Button (Only accessible for userRole === 0) */}
+                          {userRole === 0 && onToggleLock && (
+                            <button
+                              onClick={() => onToggleLock(item)}
+                              className={`p-1.5 rounded-lg transition-colors cursor-pointer ${
+                                item.mdk_is_lock === 1
+                                  ? 'text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-400'
+                                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
+                              }`}
+                              title={item.mdk_is_lock === 1 ? 'Dokumen Terkunci (Klik untuk Buka Kunci)' : 'Dokumen Terbuka (Klik untuk Kunci)'}
+                            >
+                              {item.mdk_is_lock === 1 ? (
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                              ) : (
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" />
+                                </svg>
+                              )}
+                            </button>
+                          )}
+
                           <Link
                             href={`/master-dokumen/${item.mdk_id}`}
                             className="p-1.5 rounded-lg text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950/30 transition-colors cursor-pointer"
@@ -210,26 +245,30 @@ export const MasterDokumenTable: React.FC<MasterDokumenTableProps> = ({
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
                           </Link>
-                          {/* {onPrint && (
+
+                          {/* Edit button: disabled if locked */}
+                          {item.mdk_is_lock === 1 ? (
                             <button
-                              onClick={() => onPrint(item)}
-                              className="p-1.5 rounded-lg text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:text-emerald-400 dark:hover:bg-emerald-950/30 transition-colors cursor-pointer"
-                              title="Cetak Dokumen (RAB, HPS, Nego, dll)"
+                              disabled
+                              className="p-1.5 rounded-lg text-gray-300 dark:text-gray-600 cursor-not-allowed opacity-50"
+                              title="Dokumen Terkunci - Tidak dapat diedit"
                             >
                               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                               </svg>
                             </button>
-                          )} */}
-                          <button
-                            onClick={() => onEdit(item)}
-                            className="p-1.5 rounded-lg text-gray-500 hover:text-brand-600 hover:bg-brand-50 dark:text-gray-400 dark:hover:text-brand-400 dark:hover:bg-brand-900/20 transition-colors cursor-pointer"
-                            title="Edit Master Dokumen"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                            </svg>
-                          </button>
+                          ) : (
+                            <button
+                              onClick={() => onEdit(item)}
+                              className="p-1.5 rounded-lg text-gray-500 hover:text-brand-600 hover:bg-brand-50 dark:text-gray-400 dark:hover:text-brand-400 dark:hover:bg-brand-900/20 transition-colors cursor-pointer"
+                              title="Edit Master Dokumen"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                              </svg>
+                            </button>
+                          )}
+
                           {onCopy && (
                             <button
                               onClick={() => onCopy(item)}
@@ -241,15 +280,28 @@ export const MasterDokumenTable: React.FC<MasterDokumenTableProps> = ({
                               </svg>
                             </button>
                           )}
-                          <button
-                            onClick={() => onDelete(item)}
-                            className="p-1.5 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 dark:text-gray-400 dark:hover:text-red-400 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
-                            title="Hapus Master Dokumen"
-                          >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
+
+                          {item.mdk_is_lock === 1 ? (
+                            <button
+                              disabled
+                              className="p-1.5 rounded-lg text-gray-300 dark:text-gray-600 cursor-not-allowed opacity-50"
+                              title="Dokumen Terkunci - Tidak dapat dihapus"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          ) : (
+                            <button
+                              onClick={() => onDelete(item)}
+                              className="p-1.5 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 dark:text-gray-400 dark:hover:text-red-400 dark:hover:bg-red-900/20 transition-colors cursor-pointer"
+                              title="Hapus Master Dokumen"
+                            >
+                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -301,7 +353,7 @@ export const MasterDokumenTable: React.FC<MasterDokumenTableProps> = ({
                                   </span>
                                 </div>
                                 <div>
-                                  <span className="text-gray-500 dark:text-gray-400 block text-[10px]">Bendahara:</span>
+                                  <span className="text-gray-500 dark:text-gray-400 block text-[10px]">Bendahara/Pembantu Bendahara:</span>
                                   <span className="font-medium text-gray-800 dark:text-gray-200">
                                     {item.mdk_nama_bendahara || (item.mdk_nama_bendahara_id > 0 ? `ID: ${item.mdk_nama_bendahara_id}` : '-')}
                                   </span>

@@ -325,6 +325,7 @@ export const NegoContainer: React.FC<NegoContainerProps> = ({
   const ppnNego = Math.round(totalHargaNego * 0.11);
   const totalKeseluruhanNego = totalHargaNego + ppnNego;
   const paguNominal = Number(selectedMasterDokumen?.mdk_pagu_anggaran) || 0;
+  const isLocked = selectedMasterDokumen?.mdk_is_lock === 1;
   const selisihNominal = paguNominal - totalKeseluruhanNego;
   const terbilangStr = terbilang(totalKeseluruhanNego);
 
@@ -638,7 +639,7 @@ export const NegoContainer: React.FC<NegoContainerProps> = ({
 
                     <button
                       type="submit"
-                      disabled={saving}
+                      disabled={saving || isLocked}
                       className="flex-1 sm:flex-initial px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                     >
                       {saving ? (

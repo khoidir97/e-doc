@@ -661,8 +661,8 @@ export const MasterDokumenPrintPreview: React.FC<MasterDokumenPrintPreviewProps>
               key={opt.id}
               onClick={() => setActiveTab(opt.id)}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${activeTab === opt.id
-                  ? 'bg-brand-600 text-white shadow-sm'
-                  : 'bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
+                ? 'bg-brand-600 text-white shadow-sm'
+                : 'bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300'
                 }`}
             >
               {opt.icon} {opt.label}

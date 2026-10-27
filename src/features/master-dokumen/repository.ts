@@ -225,4 +225,15 @@ export class MasterDokumenRepository {
     );
     return result.affectedRows > 0;
   }
+
+  static async updateLockStatus(mdk_id: number, isLock: number, updatedBy?: number | null): Promise<boolean> {
+    await initDatabase();
+    const [result]: any = await pool.query(
+      `UPDATE master_dokumen 
+       SET mdk_is_lock = ?, mdk_updated_by = ?, mdk_updated_at = NOW()
+       WHERE mdk_id = ? AND mdk_deleted_at IS NULL`,
+      [isLock ? 1 : 0, updatedBy ?? null, mdk_id]
+    );
+    return result.affectedRows > 0;
+  }
 }

@@ -328,6 +328,7 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
   const totalPph23 = PerhitunganPaketRows.reduce((a, c) => a + (Number(c.pak_pph23) || 0), 0);
   const totalDibayar = PerhitunganPaketRows.reduce((a, c) => a + (Number(c.pak_dibayar) || 0), 0);
   const paguNominal = Number(selectedMasterDokumen?.mdk_pagu_anggaran) || 0;
+  const isLocked = selectedMasterDokumen?.mdk_is_lock === 1;
   const selisihNominal = paguNominal - totalNilaiInvoice;
 
   const inputCls = "w-full px-3 py-2 text-xs rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition-all";
@@ -399,7 +400,7 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
                   <button
                     type="button"
                     onClick={handleSavePaket}
-                    disabled={savingPaket}
+                    disabled={savingPaket || isLocked}
                     className="px-3.5 py-2 rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-400 font-semibold text-xs hover:bg-brand-100 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                   >
                     {savingPaket ? 'Menyimpan...' : 'Simpan Info'}
@@ -563,7 +564,7 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
                       </button>
                       <button
                         type="submit"
-                        disabled={saving}
+                        disabled={saving || isLocked}
                         className="flex-1 sm:flex-initial px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                       >
                         {saving ? (

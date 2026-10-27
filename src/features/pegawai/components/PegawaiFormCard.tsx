@@ -243,8 +243,8 @@ export const PegawaiFormCard: React.FC<PegawaiFormCardProps> = ({
             onChange={(e) => setPgwRole(Number(e.target.value))}
             className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none transition-all"
           >
-            <option value={0}>Pegawai Staff</option>
-            <option value={1}>Administrator</option>
+            <option value={0}>Administrator</option>
+            <option value={1}>Pegawai Staff</option>
           </select>
         </div>
 
