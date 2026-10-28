@@ -60,6 +60,7 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
   const [loadingOptions, setLoadingOptions] = useState(true);
   const [loadingBeritaAcara, setLoadingBeritaAcara] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [hasSavedData, setHasSavedData] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const showToast = (type: 'success' | 'error', message: string) => {
@@ -115,6 +116,8 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
 
     if (res.success && res.data) {
       const { header, items } = res.data;
+      const isSaved = Boolean(header?.bac_id || (items && items.length > 0));
+      setHasSavedData(isSaved);
 
       if (header) {
         setBacNomorSurat(header.bac_nomor_surat || '');
@@ -170,6 +173,9 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
           setBeritaAcaraRows([createEmptyRow()]);
         }
       }
+    } else {
+      setHasSavedData(false);
+      setBeritaAcaraRows([createEmptyRow()]);
     }
     setLoadingBeritaAcara(false);
   }, [selectedMasterDokumen]);
@@ -196,6 +202,7 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
       showToast('error', 'Tidak ada data Rencana Anggaran Biaya (RAB) untuk Master Dokumen ini.');
     }
     setLoadingBeritaAcara(false);
+
   };
 
   useEffect(() => {
@@ -205,6 +212,7 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
       loadBeritaAcaraForMdk(selectedMdkId, found);
     } else {
       setSelectedMasterDokumen(null);
+      setHasSavedData(false);
       setBacNomorSurat('');
       setBacParagrafPertama('');
       setBacParagrafKedua('');
@@ -278,6 +286,7 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
 
     if (success) {
       showToast('success', 'Berhasil menyimpan data Berita Acara!');
+      setHasSavedData(true);
       loadBeritaAcaraForMdk(selectedMdkId, selectedMasterDokumen);
     } else {
       showToast('error', 'Gagal menyimpan data Berita Acara.');
@@ -290,6 +299,7 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
     const validRows = BeritaAcaraRows.filter((r) => r.dba_uraian.trim() !== '');
     if (validRows.length > 0) {
       await saveBatch();
+      setHasSavedData(true);
     }
     window.open(`/berita-acara/print/${selectedMdkId}`, '_blank');
   }, [selectedMdkId, BeritaAcaraRows, bacNomorSurat, bacParagrafPertama, bacParagrafKedua, bacHasilPemeriksaan]);
@@ -298,6 +308,7 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
   const paguNominal = Number(selectedMasterDokumen?.mdk_pagu_anggaran) || 0;
   const isLocked = selectedMasterDokumen?.mdk_is_lock === 1;
   const terbilangStr = terbilang(paguNominal);
+  const isSaved = hasSavedData || BeritaAcaraRows.some((r) => Boolean(r.dba_id));
 
   return (
     <div className="p-1 sm:p-1 w-full space-y-6 overflow-hidden">
@@ -619,14 +630,14 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                           </svg>
-                          Menyimpan...
+                          {isSaved ? 'Mengupdate...' : 'Menyimpan...'}
                         </>
                       ) : (
                         <>
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                           </svg>
-                          Simpan Data Berita Acara
+                          {isSaved ? 'Update Data' : 'Simpan Data'}
                         </>
                       )}
                     </button>
