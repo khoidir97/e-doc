@@ -107,6 +107,7 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
   const [PerhitunganPaketRows, setPerhitunganPaketRows] = useState<PerhitunganPaketItemRow[]>([createEmptyRow()]);
   const [loadingPerhitunganPaket, setLoadingPerhitunganPaket] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [hasSavedData, setHasSavedData] = useState(false);
 
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
@@ -151,7 +152,10 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
       }
     }
 
-    if (res.success && res.data && res.data.length > 0) {
+    const isSaved = Boolean(res.success && res.data && res.data.length > 0);
+    setHasSavedData(isSaved);
+
+    if (isSaved && res.data) {
       setPerhitunganPaketRows(res.data.map((item, idx) => {
         const base = {
           pak_id: item.pak_id,
@@ -211,6 +215,7 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
       loadPaketForMdk(selectedMdkId);
     } else {
       setSelectedMasterDokumen(null);
+      setHasSavedData(false);
       setPerhitunganPaketRows([createEmptyRow()]);
       setPaketData(null);
     }
@@ -330,6 +335,7 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
   const paguNominal = Number(selectedMasterDokumen?.mdk_pagu_anggaran) || 0;
   const isLocked = selectedMasterDokumen?.mdk_is_lock === 1;
   const selisihNominal = paguNominal - totalNilaiInvoice;
+  const isSaved = hasSavedData || PerhitunganPaketRows.some((r) => Boolean(r.pak_id));
 
   const inputCls = "w-full px-3 py-2 text-xs rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition-all";
   const labelCls = "block text-[11px] font-semibold text-gray-500 dark:text-gray-400 mb-1";
@@ -573,14 +579,14 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
                               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                             </svg>
-                            Menyimpan...
+                            {isSaved ? 'Mengupdate...' : 'Menyimpan...'}
                           </>
                         ) : (
                           <>
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                             </svg>
-                            Simpan Data
+                            {isSaved ? 'Update Data' : 'Simpan Data'}
                           </>
                         )}
                       </button>

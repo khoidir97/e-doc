@@ -13,6 +13,7 @@ import { MasterDokumenSelectorCard } from '@/features/master-dokumen/components/
 import { RupiahInput } from '@/components/form/RupiahInput';
 import { Toast } from '@/components/ui/Toast';
 import { getNegoByMasterDokumenAction } from '@/features/nego/actions';
+import { formatDateYYYYMMDD } from '@/lib/date';
 
 // Ambil angka pertama dari string (mendukung "2.00", "1.000", "1.000,5")
 const parseNumber = (value: unknown): number => {
@@ -64,7 +65,7 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
 
   // Header state (tabel faktur)
   const [nomorFaktur, setNomorFaktur] = useState<string>('');
-  const [tanggalFaktur, setTanggalFaktur] = useState<string>('');
+  const [tanggalFaktur, setTanggalFaktur] = useState<string>(() => formatDateYYYYMMDD(new Date()));
 
   // Dynamic Faktur Form Items (tabel detail_faktur)
   const [FakturRows, setFakturRows] = useState<FakturItemRow[]>([
@@ -75,6 +76,7 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
   const [loadingOptions, setLoadingOptions] = useState(true);
   const [loadingFaktur, setLoadingFaktur] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [hasSavedData, setHasSavedData] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const showToast = (type: 'success' | 'error', message: string) => {
@@ -149,19 +151,68 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
     setLoadingFaktur(false);
   }, []);
 
+  const loadFakturForMdk = useCallback(
+    async (mdkId: number, mdkFallback?: MasterDokumen | null) => {
+      setLoadingFaktur(true);
+      const todayYmd = formatDateYYYYMMDD(new Date());
+      const res = await getFakturWithDetailsAction(mdkId);
+
+      if (res.success && res.data) {
+        const { header, details } = res.data;
+        const isSaved = Boolean(header?.fak_id || (details && details.length > 0));
+        setHasSavedData(isSaved);
+        if (header) {
+          setNomorFaktur(header.fak_nomor_faktur || '');
+          setTanggalFaktur(formatDateYYYYMMDD(header.fak_tanggal_faktur) || todayYmd);
+        } else {
+          setNomorFaktur('');
+          setTanggalFaktur(todayYmd);
+        }
+
+        if (details && details.length > 0) {
+          setFakturRows(
+            details.map((item) => ({
+              fkt_id: item.fkt_id,
+              fkt_master_dokumen_id: item.fkt_master_dokumen_id,
+              fkt_jenis_spesifikasi: item.fkt_jenis_spesifikasi || '',
+              fkt_unit: Number(item.fkt_unit) || 0,
+              fkt_hari: String(item.fkt_hari || ''),
+              fkt_harga_satuan: Number(item.fkt_harga_satuan) || 0,
+              fkt_total: Number(item.fkt_total) || 0,
+            }))
+          );
+        } else if (mdkFallback) {
+          await prefillFromMasterAndNego(mdkFallback);
+        } else {
+          setFakturRows([createEmptyRow()]);
+        }
+      } else {
+        if (mdkFallback) {
+          await prefillFromMasterAndNego(mdkFallback);
+        } else {
+          setFakturRows([createEmptyRow()]);
+        }
+        setTanggalFaktur(todayYmd);
+        setHasSavedData(false)
+      }
+      setLoadingFaktur(false);
+    },
+    [prefillFromMasterAndNego]
+  );
+
   useEffect(() => {
     if (selectedMdkId && typeof selectedMdkId === 'number') {
       const found = masterDokumenList.find((m) => m.mdk_id === selectedMdkId) || null;
       setSelectedMasterDokumen(found);
-      // loadFakturForMdk(selectedMdkId);
-      if (found) prefillFromMasterAndNego(found);
+      loadFakturForMdk(selectedMdkId, found);
     } else {
       setSelectedMasterDokumen(null);
       setNomorFaktur('');
-      setTanggalFaktur('');
+      setHasSavedData(false)
+      setTanggalFaktur(formatDateYYYYMMDD(new Date()));
       setFakturRows([createEmptyRow()]);
     }
-  }, [selectedMdkId, masterDokumenList, prefillFromMasterAndNego]);
+  }, [selectedMdkId, masterDokumenList, loadFakturForMdk]);
 
   // Handle Dynamic Rows
   const handleAddRow = () => {
@@ -208,11 +259,13 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
     }
 
     setSaving(true);
+    const todayYmd = formatDateYYYYMMDD(new Date());
     const res = await saveFakturBatchAction({
       fkt_master_dokumen_id: selectedMdkId,
       fak_nomor_faktur: nomorFaktur,
-      fak_tanggal_faktur: tanggalFaktur,
+      fak_tanggal_faktur: tanggalFaktur || todayYmd,
       items: validRows.map((r) => ({
+        fkt_id: r.fkt_id,
         fkt_jenis_spesifikasi: r.fkt_jenis_spesifikasi,
         fkt_unit: Number(r.fkt_unit) || 0,
         fkt_hari: String(r.fkt_hari || ''),
@@ -224,7 +277,7 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
 
     if (res.success) {
       showToast('success', res.message);
-      // loadFakturForMdk(selectedMdkId);
+      loadFakturForMdk(selectedMdkId, selectedMasterDokumen);
     } else {
       showToast('error', res.message);
     }
@@ -239,11 +292,13 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
     const validRows = FakturRows.filter((r) => r.fkt_jenis_spesifikasi.trim() !== '');
     if (validRows.length > 0) {
       setSaving(true);
+      const todayYmd = formatDateYYYYMMDD(new Date());
       await saveFakturBatchAction({
         fkt_master_dokumen_id: selectedMdkId,
         fak_nomor_faktur: nomorFaktur,
-        fak_tanggal_faktur: tanggalFaktur,
+        fak_tanggal_faktur: tanggalFaktur || todayYmd,
         items: validRows.map((r) => ({
+          fkt_id: r.fkt_id,
           fkt_jenis_spesifikasi: r.fkt_jenis_spesifikasi,
           fkt_unit: Number(r.fkt_unit) || 0,
           fkt_hari: String(r.fkt_hari || ''),
@@ -266,6 +321,7 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
   const isLocked = selectedMasterDokumen?.mdk_is_lock === 1;
   const selisihNominal = paguNominal - totalHargaFaktur;
   const countPPN = totalHargaFaktur * (11 / 100);
+  const isSaved = hasSavedData || FakturRows.some((r) => Boolean(r.fkt_id));
 
   return (
     <div className="p-1 sm:p-1 w-full space-y-6 overflow-hidden">
@@ -340,7 +396,7 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
                     </label>
                     <input
                       type="date"
-                      value={tanggalFaktur}
+                      value={tanggalFaktur || formatDateYYYYMMDD(new Date())}
                       onChange={(e) => setTanggalFaktur(e.target.value)}
                       onClick={(e) => e.currentTarget.showPicker && e.currentTarget.showPicker()}
                       className="w-full px-3 py-2 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none transition-all"
@@ -547,14 +603,14 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>
-                        Menyimpan...
+                        {isSaved ? 'Mengupdate...' : 'Menyimpan...'}
                       </>
                     ) : (
                       <>
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                         </svg>
-                        Simpan Data
+                        {isSaved ? 'Update Data' : 'Simpan Data'}
                       </>
                     )}
                   </button>

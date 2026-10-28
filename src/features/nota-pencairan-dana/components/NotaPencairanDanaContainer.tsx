@@ -76,6 +76,7 @@ export const NotaPencairanDanaContainer: React.FC<NotaPencairanDanaContainerProp
   const [loadingOptions, setLoadingOptions] = useState(true);
   const [loadingNotaPencairanDana, setLoadingNotaPencairanDana] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [hasSavedData, setHasSavedData] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const showToast = (type: 'success' | 'error', message: string) => {
@@ -102,90 +103,98 @@ export const NotaPencairanDanaContainer: React.FC<NotaPencairanDanaContainerProp
     initOptions();
   }, [initialMasterDokumenId]);
 
-  const loadNotaPencairanDanaForMdk = useCallback(async (mdkId: number, defaultUraianText = '', defaultDpaVolume = '', defaultDpaSatuan = '', defaultSaatiniVolume = '', defaultSebelumnyaVolume = '', currentMaster?: MasterDokumen | null) => {
-    setLoadingNotaPencairanDana(true);
-    const [res, kwtRes] = await Promise.all([
-      getNotaPencairanDanaByMasterDokumenAction(mdkId),
-      getKwitansiByMasterDokumenIdAction(mdkId),
-    ]);
+  const loadNotaPencairanDanaForMdk = useCallback(
+    async (mdkId: number, targetMaster?: MasterDokumen | null) => {
+      setLoadingNotaPencairanDana(true);
+      const [res, kwtRes] = await Promise.all([
+        getNotaPencairanDanaByMasterDokumenAction(mdkId),
+        getKwitansiByMasterDokumenIdAction(mdkId),
+      ]);
 
-    const paguNilai = currentMaster?.mdk_pagu_anggaran ? Math.round(Number(currentMaster.mdk_pagu_anggaran)) : 0;
+      const effectiveMaster = targetMaster ?? selectedMasterDokumen;
+      const defaultUraianText = effectiveMaster?.mdk_pekerjaan || effectiveMaster?.mdk_uraian_belanja || '';
+      const defaultDpaVolume = effectiveMaster?.mdk_volume || '';
+      const defaultDpaSatuan = effectiveMaster?.mdk_satuan || '';
+      const defaultSaatiniVolume = effectiveMaster?.mdk_volume || '';
+      const defaultSebelumnyaVolume = effectiveMaster?.mdk_volume || '';
+      const paguNilai = effectiveMaster?.mdk_pagu_anggaran ? Math.round(Number(effectiveMaster.mdk_pagu_anggaran)) : 0;
 
-    let calcBelumNilai = 0;
-    let calcSaatIniNilai = 0;
+      let calcBelumNilai = 0;
+      let calcSaatIniNilai = 0;
 
-    if (kwtRes.success && kwtRes.data?.kwitansiList) {
-      const kwtList = kwtRes.data.kwitansiList;
-      const lunasKwitansi = kwtList.filter((k) => Number(k.kwt_status_lunas) === 1);
+      if (kwtRes.success && kwtRes.data?.kwitansiList) {
+        const kwtList = kwtRes.data.kwitansiList;
+        const lunasKwitansi = kwtList.filter((k) => Number(k.kwt_status_lunas) === 1);
 
-      if (lunasKwitansi.length > 0) {
-        // Kwitansi lunas terakhir -> dpd_saatini_nilai
-        const lastLunas = lunasKwitansi[lunasKwitansi.length - 1];
-        calcSaatIniNilai = Math.round(Number(lastLunas.kwt_uang_sejumlah) || 0);
+        if (lunasKwitansi.length > 0) {
+          // Kwitansi lunas terakhir -> dpd_saatini_nilai
+          const lastLunas = lunasKwitansi[lunasKwitansi.length - 1];
+          calcSaatIniNilai = Math.round(Number(lastLunas.kwt_uang_sejumlah) || 0);
 
-        // Kwitansi lunas sebelum kwitansi terakhir -> dpd_belum_nilai
-        const previousLunas = lunasKwitansi.slice(0, lunasKwitansi.length - 1);
-        calcBelumNilai = previousLunas.reduce(
-          (sum, k) => sum + Math.round(Number(k.kwt_uang_sejumlah) || 0),
-          0
-        );
-      } else if (kwtList.length > 0) {
-        const lastKwt = kwtList[kwtList.length - 1];
-        calcSaatIniNilai = Math.round(Number(lastKwt.kwt_uang_sejumlah) || 0);
+          // Kwitansi lunas sebelum kwitansi terakhir -> dpd_belum_nilai
+          const previousLunas = lunasKwitansi.slice(0, lunasKwitansi.length - 1);
+          calcBelumNilai = previousLunas.reduce(
+            (sum, k) => sum + Math.round(Number(k.kwt_uang_sejumlah) || 0),
+            0
+          );
+        } else if (kwtList.length > 0) {
+          const lastKwt = kwtList[kwtList.length - 1];
+          calcSaatIniNilai = Math.round(Number(lastKwt.kwt_uang_sejumlah) || 0);
+        }
       }
-    }
 
-    if (res.success && res.data && res.data.length > 0) {
-      setNotaPencairanDanaRows(
-        res.data.map((item) => {
-          const dpaNilai = (item.dpd_dpa_nilai && Number(item.dpd_dpa_nilai) > 0) ? Number(item.dpd_dpa_nilai) : paguNilai;
-          const belumNilai = (item.dpd_belum_nilai && Number(item.dpd_belum_nilai) > 0) ? Number(item.dpd_belum_nilai) : calcBelumNilai;
-          const saatIniNilai = (item.dpd_saatini_nilai && Number(item.dpd_saatini_nilai) > 0) ? Number(item.dpd_saatini_nilai) : calcSaatIniNilai;
+      const isSaved = Boolean(res.success && res.data && res.data.length > 0);
+      setHasSavedData(isSaved);
+      if (isSaved && res.data) {
+        setNotaPencairanDanaRows(
+          res.data.map((item) => {
+            const dpaNilai = (item.dpd_dpa_nilai && Number(item.dpd_dpa_nilai) > 0) ? Number(item.dpd_dpa_nilai) : paguNilai;
+            const belumNilai = (item.dpd_belum_nilai && Number(item.dpd_belum_nilai) > 0) ? Number(item.dpd_belum_nilai) : calcBelumNilai;
+            const saatIniNilai = (item.dpd_saatini_nilai && Number(item.dpd_saatini_nilai) > 0) ? Number(item.dpd_saatini_nilai) : calcSaatIniNilai;
 
-          const ppn = Math.round((Number(item.dpd_saatini_ppn) * 0.0990990990990991) || 0);
-          const pph23 = Math.round((item.dpd_saatini_nilai - ppn) * (1.5 / 100));
-          const totalPajak = ppn + pph23;
-          const pembayaran = saatIniNilai - totalPajak;
-          const sisaNilai = dpaNilai - belumNilai - saatIniNilai;
+            const ppn = Math.round((Number(item.dpd_saatini_ppn) * 0.0990990990990991) || 0);
+            const pph23 = Math.round((item.dpd_saatini_nilai - ppn) * (1.5 / 100));
+            const totalPajak = ppn + pph23;
+            const pembayaran = saatIniNilai - totalPajak;
+            const sisaNilai = dpaNilai - belumNilai - saatIniNilai;
 
-          return {
-            dpd_id: item.dpd_id,
-            dpd_master_dokumen_id: item.dpd_master_dokumen_id,
-            dpd_uraian: (item.dpd_uraian && item.dpd_uraian.trim() !== '') ? item.dpd_uraian : defaultUraianText,
-            dpd_dpa_volume: (item.dpd_dpa_volume && item.dpd_dpa_volume.trim() !== '') ? item.dpd_dpa_volume : defaultDpaVolume,
-            dpd_dpa_satuan: (item.dpd_dpa_satuan && item.dpd_dpa_satuan.trim() !== '') ? item.dpd_dpa_satuan : defaultDpaSatuan,
-            dpd_dpa_nilai: dpaNilai,
-            dpd_belum_volume: item.dpd_belum_volume || defaultSebelumnyaVolume,
-            dpd_belum_nilai: belumNilai,
-            dpd_saatini_volume: item.dpd_saatini_volume || defaultSaatiniVolume,
-            dpd_saatini_nilai: saatIniNilai,
-            dpd_saatini_ppn: ppn,
-            dpd_saatini_pph23: pph23,
-            dpd_saatini_total_pajak: totalPajak,
-            dpd_saatini_pembayaran: pembayaran,
-            dpd_sisa_volume: item.dpd_sisa_volume || '',
-            dpd_sisa_nilai: sisaNilai,
-          };
-        })
-      );
-    } else {
-      setNotaPencairanDanaRows([createEmptyRow(defaultUraianText, paguNilai, calcBelumNilai, calcSaatIniNilai, defaultDpaVolume, defaultDpaSatuan, defaultSaatiniVolume, defaultSebelumnyaVolume)]);
-    }
-    setLoadingNotaPencairanDana(false);
-  }, []);
+            return {
+              dpd_id: item.dpd_id,
+              dpd_master_dokumen_id: item.dpd_master_dokumen_id,
+              dpd_uraian: (item.dpd_uraian && item.dpd_uraian.trim() !== '') ? item.dpd_uraian : defaultUraianText,
+              dpd_dpa_volume: (item.dpd_dpa_volume && item.dpd_dpa_volume.trim() !== '') ? item.dpd_dpa_volume : defaultDpaVolume,
+              dpd_dpa_satuan: (item.dpd_dpa_satuan && item.dpd_dpa_satuan.trim() !== '') ? item.dpd_dpa_satuan : defaultDpaSatuan,
+              dpd_dpa_nilai: dpaNilai,
+              dpd_belum_volume: item.dpd_belum_volume || defaultSebelumnyaVolume,
+              dpd_belum_nilai: belumNilai,
+              dpd_saatini_volume: item.dpd_saatini_volume || defaultSaatiniVolume,
+              dpd_saatini_nilai: saatIniNilai,
+              dpd_saatini_ppn: ppn,
+              dpd_saatini_pph23: pph23,
+              dpd_saatini_total_pajak: totalPajak,
+              dpd_saatini_pembayaran: pembayaran,
+              dpd_sisa_volume: item.dpd_sisa_volume || '',
+              dpd_sisa_nilai: sisaNilai,
+            };
+          })
+        );
+      } else {
+        setHasSavedData(false);
+        setNotaPencairanDanaRows([createEmptyRow(defaultUraianText, paguNilai, calcBelumNilai, calcSaatIniNilai, defaultDpaVolume, defaultDpaSatuan, defaultSaatiniVolume, defaultSebelumnyaVolume)]);
+      }
+      setLoadingNotaPencairanDana(false);
+    },
+    [selectedMasterDokumen]
+  );
 
   useEffect(() => {
     if (selectedMdkId && typeof selectedMdkId === 'number') {
       const found = masterDokumenList.find((m) => m.mdk_id === selectedMdkId) || null;
       setSelectedMasterDokumen(found);
-      const defaultUraianText = found?.mdk_pekerjaan || found?.mdk_uraian_belanja || '';
-      const defaultDpaVolume = found?.mdk_volume || '';
-      const defaultDpaSatuan = found?.mdk_satuan || '';
-      const defaultSaatiniVolume = found?.mdk_volume || '';
-      const defaultSebelumnyaVolume = found?.mdk_volume || '';
-      loadNotaPencairanDanaForMdk(selectedMdkId, defaultUraianText, defaultDpaVolume, defaultDpaSatuan, defaultSaatiniVolume, defaultSebelumnyaVolume, found);
+      loadNotaPencairanDanaForMdk(selectedMdkId, found);
     } else {
       setSelectedMasterDokumen(null);
+      setHasSavedData(false);
       setNotaPencairanDanaRows([createEmptyRow()]);
     }
   }, [selectedMdkId, masterDokumenList, loadNotaPencairanDanaForMdk]);
@@ -278,7 +287,8 @@ export const NotaPencairanDanaContainer: React.FC<NotaPencairanDanaContainerProp
     setSaving(false);
     if (res.success) {
       showToast('success', res.message);
-      loadNotaPencairanDanaForMdk(selectedMdkId);
+      setHasSavedData(true);
+      loadNotaPencairanDanaForMdk(selectedMdkId, selectedMasterDokumen);
     } else {
       showToast('error', res.message);
     }
@@ -308,6 +318,7 @@ export const NotaPencairanDanaContainer: React.FC<NotaPencairanDanaContainerProp
           dpd_sisa_nilai: Number(r.dpd_sisa_nilai) || 0,
         })),
       });
+      setHasSavedData(true);
     }
     window.open(`/nota-pencairan-dana/print/${selectedMdkId}`, '_blank');
   }, [selectedMdkId, NotaPencairanDanaRows]);
@@ -322,6 +333,7 @@ export const NotaPencairanDanaContainer: React.FC<NotaPencairanDanaContainerProp
   const isLocked = selectedMasterDokumen?.mdk_is_lock === 1;
   const selisihNominal = paguNominal - totalKeseluruhanNotaPencairanDana;
   const terbilangStr = terbilang(totalKeseluruhanNotaPencairanDana);
+  const isSaved = hasSavedData || NotaPencairanDanaRows.some((r) => Boolean(r.dpd_id));
 
   return (
     <div className="p-1 sm:p-1 w-full space-y-6 overflow-hidden">
@@ -643,14 +655,14 @@ export const NotaPencairanDanaContainer: React.FC<NotaPencairanDanaContainerProp
                             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                           </svg>
-                          Menyimpan...
+                          {isSaved ? 'Mengupdate...' : 'Menyimpan...'}
                         </>
                       ) : (
                         <>
                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                           </svg>
-                          Simpan Data
+                          {isSaved ? 'Update Data' : 'Simpan Data'}
                         </>
                       )}
                     </button>

@@ -67,6 +67,7 @@ export const SurveyContainer: React.FC<SurveyContainerProps> = ({
 
   // Full Survey Data & Print Modal
   const [surveyData, setSurveyData] = useState<SurveyWithDetails | null>(null);
+  const [hasSavedData, setHasSavedData] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
 
   // Loading & Action states
@@ -107,6 +108,8 @@ export const SurveyContainer: React.FC<SurveyContainerProps> = ({
     if (res.success && res.data) {
       setSurveyData(res.data);
       const { header, details, masterDokumen } = res.data;
+      const isSaved = Boolean(header?.srv_id || (details && details.length > 0));
+      setHasSavedData(isSaved);
 
       const effectiveMdk = masterDokumen || targetMdk || selectedMasterDokumen;
 
@@ -161,6 +164,8 @@ export const SurveyContainer: React.FC<SurveyContainerProps> = ({
         }]);
       }
     } else {
+      setSurveyData(null);
+      setHasSavedData(false);
       setSurveyRows([{
         dsrv_jenis_spesifikasi: targetMdk?.mdk_pekerjaan?.trim() || '',
         dsrv_harga_survey: 0,
@@ -194,6 +199,8 @@ export const SurveyContainer: React.FC<SurveyContainerProps> = ({
       loadSurveyForMdk(selectedMdkId, found);
     } else {
       setSelectedMasterDokumen(null);
+      setSurveyData(null);
+      setHasSavedData(false);
       setSurveyRows([{ dsrv_jenis_spesifikasi: '', dsrv_harga_survey: 0 }]);
       setHeaderState({
         srv_nomor: '',
@@ -258,6 +265,7 @@ export const SurveyContainer: React.FC<SurveyContainerProps> = ({
 
     if (res.success) {
       showToast('success', res.message);
+      setHasSavedData(true);
       loadSurveyForMdk(selectedMdkId);
     } else {
       showToast('error', res.message);
@@ -268,6 +276,7 @@ export const SurveyContainer: React.FC<SurveyContainerProps> = ({
   const totalHargaSurvey = surveyRows.reduce((acc, curr) => acc + (Number(curr.dsrv_harga_survey) || 0), 0);
   const paguNominal = Number(selectedMasterDokumen?.mdk_pagu_anggaran) || 0;
   const isLocked = selectedMasterDokumen?.mdk_is_lock === 1;
+  const isSaved = hasSavedData || Boolean(surveyData?.header?.srv_id) || surveyRows.some((r) => Boolean(r.dsrv_id));
   const selisihNominal = paguNominal - totalHargaSurvey;
 
   const currentHeaderForPrint: SurveyHeader = {
@@ -297,6 +306,7 @@ export const SurveyContainer: React.FC<SurveyContainerProps> = ({
         srv_alamat_perusahaan: headerState.srv_alamat_perusahaan,
         items: validRows,
       });
+      setHasSavedData(true);
     }
     window.open(`/survey/print/${selectedMdkId}`, '_blank');
   }, [selectedMdkId, headerState, surveyRows]);
@@ -620,14 +630,14 @@ export const SurveyContainer: React.FC<SurveyContainerProps> = ({
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                         </svg>
-                        Menyimpan...
+                        {isSaved ? 'Mengupdate...' : 'Menyimpan...'}
                       </>
                     ) : (
                       <>
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                         </svg>
-                        Simpan Data Survey
+                        {isSaved ? 'Update Data Survey' : 'Simpan Data Survey'}
                       </>
                     )}
                   </button>
