@@ -137,7 +137,7 @@ export const BeritaAcaraPrintSheet: React.FC<BeritaAcaraPrintSheetProps> = ({
               <th className="border border-black px-3 py-2 text-center">Uraian</th>
               <th className="border border-black px-3 py-2 text-center w-20">Volume</th>
               <th className="border border-black px-3 py-2 text-center w-20">Satuan</th>
-              <th className="border border-black px-3 py-2 text-center w-32">Status Pemeriksaan</th>
+              <th className="border border-black px-3 py-2 text-center w-32">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -168,9 +168,10 @@ export const BeritaAcaraPrintSheet: React.FC<BeritaAcaraPrintSheetProps> = ({
       <p className="indent-8 text-justify leading-relaxed">
         Demikian Berita Acara ini dibuat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.
       </p>
+      <p className="text-end">Pekanbaru, {bacTanggalFormatted}</p>
 
       {/* Tanda Tangan */}
-      <div className="pt-6 grid grid-cols-2 text-center gap-8 text-xs sm:text-sm">
+      <div className="pt-3 grid grid-cols-2 text-center gap-4 text-xs sm:text-sm">
         {/* Pihak Kedua */}
         <div className="space-y-1">
           <p className="font-semibold">Pihak Kedua</p>
@@ -183,7 +184,7 @@ export const BeritaAcaraPrintSheet: React.FC<BeritaAcaraPrintSheetProps> = ({
 
         {/* Pihak Pertama */}
         <div className="space-y-1">
-          <p>Pekanbaru, {bacTanggalFormatted}</p>
+
           <p className="font-semibold">Pihak Pertama</p>
           <p>Yang Menerima,</p>
           <p className="font-semibold">{masterDokumen.mdk_jabatan_pejabat?.trim().toUpperCase()} selaku PPK</p>

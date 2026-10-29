@@ -951,7 +951,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                     </label>
                     <SearchableSelect
                       options={pegawaiList
-                        .filter((pgw) => pgw.pgw_status_pegawai === 0)
+                        .filter((pgw) => pgw.pgw_jabatan == 'PPTK')
                         .map((pgw) => ({
                           value: pgw.pgw_id,
                           label: pgw.pgw_nama + ` (${pgw.pgw_nip})`,
@@ -971,7 +971,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                     </label>
                     <SearchableSelect
                       options={pegawaiList
-                        .filter((pgw) => pgw.pgw_status_pegawai === 0)
+                        .filter((pgw) => pgw.pgw_jabatan && pgw.pgw_jabatan.toLowerCase().includes('bendahara'))
                         .map((pgw) => ({
                           value: pgw.pgw_id,
                           label: pgw.pgw_nama + ` (${pgw.pgw_nip})`,

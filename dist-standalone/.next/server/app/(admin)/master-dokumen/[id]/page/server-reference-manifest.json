@@ -420,6 +420,21 @@
       "exportedName": "deleteKwitansiAction",
       "filename": "src/features/kwitansi/actions.ts"
     },
+    "400a3927d19fbb63a84ec40aeaa55a6402ce2dc325": {
+      "workers": {
+        "app/(admin)/master-dokumen/[id]/page": {
+          "moduleId": 43726,
+          "async": false,
+          "exportedName": "getFakturWithDetailsAction",
+          "filename": "src/features/faktur/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/master-dokumen/[id]/page": "action-browser"
+      },
+      "exportedName": "getFakturWithDetailsAction",
+      "filename": "src/features/faktur/actions.ts"
+    },
     "4083c6fe4e3d53c2a9c59c930c07a9d00aab512ea2": {
       "workers": {
         "app/(admin)/master-dokumen/[id]/page": {

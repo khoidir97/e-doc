@@ -75,6 +75,21 @@
       "exportedName": "copyMasterDokumenAction",
       "filename": "src/features/master-dokumen/actions.ts"
     },
+    "6068eaad516311906ff5e45fac0bfae2a4bfafa398": {
+      "workers": {
+        "app/(admin)/master-dokumen/page": {
+          "moduleId": 22117,
+          "async": false,
+          "exportedName": "toggleLockMasterDokumenAction",
+          "filename": "src/features/master-dokumen/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/master-dokumen/page": "action-browser"
+      },
+      "exportedName": "toggleLockMasterDokumenAction",
+      "filename": "src/features/master-dokumen/actions.ts"
+    },
     "70970ca61659dfad9e52e46a6fa3bc061388bdf54b": {
       "workers": {
         "app/(admin)/master-dokumen/page": {

@@ -34,7 +34,7 @@ interface NotaPencairanDanaItemRow {
   dpd_sisa_nilai: number;
 }
 
-const createEmptyRow = (defaultUraian = '', dpaNilai = 0, belumNilai = 0, saatIniNilai = 0, defaultDpaVolume = '', defaultDpaSatuan = '', defaultSaatiniVolume = '', defaultSebelumnyaVolume = ''): NotaPencairanDanaItemRow => {
+const createEmptyRow = (defaultUraian = '', dpaNilai = 0, belumNilai = 0, saatIniNilai = 0, defaultDpaVolume = '', defaultDpaSatuan = '', defaultSaatiniVolume = '', defaultSebelumnyaVolume = '', defaultSisaVolume = ''): NotaPencairanDanaItemRow => {
   const ppn = Math.round((Number(saatIniNilai) * 0.0990990990990991) || 0);
   const pph23 = Math.round((Number(saatIniNilai) - ppn) * (1.5 / 100));
 
@@ -55,7 +55,7 @@ const createEmptyRow = (defaultUraian = '', dpaNilai = 0, belumNilai = 0, saatIn
     dpd_saatini_pph23: pph23,
     dpd_saatini_total_pajak: totalPajak,
     dpd_saatini_pembayaran: pembayaran,
-    dpd_sisa_volume: '',
+    dpd_sisa_volume: defaultSisaVolume,
     dpd_sisa_nilai: sisaNilai,
   };
 };
@@ -117,6 +117,7 @@ export const NotaPencairanDanaContainer: React.FC<NotaPencairanDanaContainerProp
       const defaultDpaSatuan = effectiveMaster?.mdk_satuan || '';
       const defaultSaatiniVolume = effectiveMaster?.mdk_volume || '';
       const defaultSebelumnyaVolume = effectiveMaster?.mdk_volume || '';
+      const defaultSisaVolume = effectiveMaster?.mdk_volume || '';
       const paguNilai = effectiveMaster?.mdk_pagu_anggaran ? Math.round(Number(effectiveMaster.mdk_pagu_anggaran)) : 0;
 
       let calcBelumNilai = 0;
@@ -173,14 +174,14 @@ export const NotaPencairanDanaContainer: React.FC<NotaPencairanDanaContainerProp
               dpd_saatini_pph23: pph23,
               dpd_saatini_total_pajak: totalPajak,
               dpd_saatini_pembayaran: pembayaran,
-              dpd_sisa_volume: item.dpd_sisa_volume || '',
+              dpd_sisa_volume: item.dpd_sisa_volume || defaultSisaVolume,
               dpd_sisa_nilai: sisaNilai,
             };
           })
         );
       } else {
         setHasSavedData(false);
-        setNotaPencairanDanaRows([createEmptyRow(defaultUraianText, paguNilai, calcBelumNilai, calcSaatIniNilai, defaultDpaVolume, defaultDpaSatuan, defaultSaatiniVolume, defaultSebelumnyaVolume)]);
+        setNotaPencairanDanaRows([createEmptyRow(defaultUraianText, paguNilai, calcBelumNilai, calcSaatIniNilai, defaultDpaVolume, defaultDpaSatuan, defaultSaatiniVolume, defaultSebelumnyaVolume, defaultSisaVolume)]);
       }
       setLoadingNotaPencairanDana(false);
     },
@@ -206,7 +207,8 @@ export const NotaPencairanDanaContainer: React.FC<NotaPencairanDanaContainerProp
     const defaultDpaSatuan = selectedMasterDokumen?.mdk_satuan || '';
     const defaultSaatiniVolume = selectedMasterDokumen?.mdk_volume || '';
     const defaultSebelumnyaVolume = selectedMasterDokumen?.mdk_volume || '';
-    setNotaPencairanDanaRows((prev) => [...prev, createEmptyRow(defaultUraianText, paguNilai, 0, 0, defaultDpaVolume, defaultDpaSatuan, defaultSaatiniVolume, defaultSebelumnyaVolume)]);
+    const defaultSisaVolume = selectedMasterDokumen?.mdk_volume || '';
+    setNotaPencairanDanaRows((prev) => [...prev, createEmptyRow(defaultUraianText, paguNilai, 0, 0, defaultDpaVolume, defaultDpaSatuan, defaultSaatiniVolume, defaultSebelumnyaVolume, defaultSisaVolume)]);
   };
 
   const handleRemoveRow = (index: number) => {
@@ -216,8 +218,9 @@ export const NotaPencairanDanaContainer: React.FC<NotaPencairanDanaContainerProp
     const defaultDpaSatuan = selectedMasterDokumen?.mdk_satuan || '';
     const defaultSaatiniVolume = selectedMasterDokumen?.mdk_volume || '';
     const defaultSebelumnyaVolume = selectedMasterDokumen?.mdk_volume || '';
+    const defaultSisaVolume = selectedMasterDokumen?.mdk_volume || '';
     if (NotaPencairanDanaRows.length === 1) {
-      setNotaPencairanDanaRows([createEmptyRow(defaultUraianText, paguNilai, 0, 0, defaultDpaVolume, defaultDpaSatuan, defaultSaatiniVolume, defaultSebelumnyaVolume)]);
+      setNotaPencairanDanaRows([createEmptyRow(defaultUraianText, paguNilai, 0, 0, defaultDpaVolume, defaultDpaSatuan, defaultSaatiniVolume, defaultSebelumnyaVolume, defaultSisaVolume)]);
       return;
     }
     setNotaPencairanDanaRows((prev) => prev.filter((_, idx) => idx !== index));

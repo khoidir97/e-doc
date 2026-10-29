@@ -221,6 +221,42 @@
       "filename": "src/features/faktur/actions.ts",
       "exportedName": "getMasterDokumenOptionsAction"
     },
+    "400a3927d19fbb63a84ec40aeaa55a6402ce2dc325": {
+      "workers": {
+        "app/(admin)/faktur/page": {
+          "moduleId": 95740,
+          "async": false,
+          "exportedName": "getFakturWithDetailsAction",
+          "filename": "src/features/faktur/actions.ts"
+        },
+        "app/(admin)/master-dokumen/[id]/page": {
+          "moduleId": 43726,
+          "async": false,
+          "exportedName": "getFakturWithDetailsAction",
+          "filename": "src/features/faktur/actions.ts"
+        },
+        "app/(admin)/master-dokumen/page": {
+          "moduleId": 22117,
+          "async": false,
+          "exportedName": "getFakturWithDetailsAction",
+          "filename": "src/features/faktur/actions.ts"
+        },
+        "app/faktur/print/[id]/page": {
+          "moduleId": 57404,
+          "async": false,
+          "exportedName": "getFakturWithDetailsAction",
+          "filename": "src/features/faktur/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/faktur/page": "action-browser",
+        "app/(admin)/master-dokumen/[id]/page": "action-browser",
+        "app/(admin)/master-dokumen/page": "action-browser",
+        "app/faktur/print/[id]/page": "action-browser"
+      },
+      "filename": "src/features/faktur/actions.ts",
+      "exportedName": "getFakturWithDetailsAction"
+    },
     "4083c6fe4e3d53c2a9c59c930c07a9d00aab512ea2": {
       "workers": {
         "app/(admin)/faktur/page": {
@@ -580,6 +616,21 @@
       "filename": "src/features/master-dokumen/actions.ts",
       "exportedName": "copyMasterDokumenAction"
     },
+    "6068eaad516311906ff5e45fac0bfae2a4bfafa398": {
+      "workers": {
+        "app/(admin)/master-dokumen/page": {
+          "moduleId": 22117,
+          "async": false,
+          "exportedName": "toggleLockMasterDokumenAction",
+          "filename": "src/features/master-dokumen/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/master-dokumen/page": "action-browser"
+      },
+      "filename": "src/features/master-dokumen/actions.ts",
+      "exportedName": "toggleLockMasterDokumenAction"
+    },
     "70970ca61659dfad9e52e46a6fa3bc061388bdf54b": {
       "workers": {
         "app/(admin)/master-dokumen/page": {
@@ -623,28 +674,6 @@
       },
       "filename": "src/features/perusahaan/actions.ts",
       "exportedName": "getPerusahaanListAction"
-    },
-    "400a3927d19fbb63a84ec40aeaa55a6402ce2dc325": {
-      "workers": {
-        "app/(admin)/master-dokumen/page": {
-          "moduleId": 22117,
-          "async": false,
-          "exportedName": "getFakturWithDetailsAction",
-          "filename": "src/features/faktur/actions.ts"
-        },
-        "app/faktur/print/[id]/page": {
-          "moduleId": 57404,
-          "async": false,
-          "exportedName": "getFakturWithDetailsAction",
-          "filename": "src/features/faktur/actions.ts"
-        }
-      },
-      "layer": {
-        "app/(admin)/master-dokumen/page": "action-browser",
-        "app/faktur/print/[id]/page": "action-browser"
-      },
-      "filename": "src/features/faktur/actions.ts",
-      "exportedName": "getFakturWithDetailsAction"
     },
     "40acff3aca516d8405e8e66167ac76f420484c00fa": {
       "workers": {
