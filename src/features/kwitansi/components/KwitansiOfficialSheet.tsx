@@ -64,37 +64,39 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
           {/* ROW 1: A + B (left)  |  Header, Title, Main Fields (right) */}
           <tr>
             {/* LEFT COLUMN TOP (A, B) - Width 32% */}
-            <td className="w-[32%] border-r-2 border-black align-top p-0">
-              {/* A. PEMBAYARAN TAHUN DINAS */}
-              <div className="border-b-2 border-black p-3">
-                <div className="font-bold text-[11px]">A. PEMBAYARAN TAHUN DINAS</div>
-                <div className="text-center mt-2 space-y-1">
-                  <div className="font-bold text-xs">{tahunAnggaran}</div>
-                  <div className="font-bold text-[11px] mt-2">KODE REKENING</div>
-                  <div className="font-sans text-[11px] font-normal break-all">
-                    {masterDokumen.mdk_rekening_belanja || '-'}
+            <td className="w-[33%] border-r-2 border-black align-top p-0">
+              <div className="h-full flex flex-col justify-between">
+                {/* A. PEMBAYARAN TAHUN DINAS */}
+                <div className="border-b-2 border-black p-3 shrink-0">
+                  <div className="font-bold text-[11px]">A. PEMBAYARAN TAHUN DINAS</div>
+                  <div className="text-center mt-2 space-y-1">
+                    <div className="font-bold text-xs">{tahunAnggaran}</div>
+                    <div className="font-bold text-[11px] mt-2">KODE REKENING</div>
+                    <div className="font-sans text-[11px] font-normal break-all">
+                      {masterDokumen.mdk_kode_sub_kegiatan} {masterDokumen.mdk_rekening_belanja || '-'}
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* B. SETUJU DIBAYAR */}
-              <div className="p-2 sm:p-3 flex flex-col justify-between min-h-[160px] print:min-h-[140px]">
-                <div>
-                  <div className="font-bold text-[11px]">B. SETUJU DIBAYAR</div>
-                  <div className="text-center mt-2 leading-snug">
-                    <div>{labelPejabat}</div>
-                    <div>Selaku</div>
-                    <div>Pejabat Pembuat Komitmen</div>
+                {/* B. SETUJU DIBAYAR */}
+                <div className="p-2 sm:p-3 flex flex-col justify-between flex-1 min-h-[160px] print:min-h-[140px]">
+                  <div>
+                    <div className="font-bold text-[11px]">B. SETUJU DIBAYAR</div>
+                    <div className="text-center mt-2 leading-snug">
+                      <div>{labelPejabat}</div>
+                      <div>Selaku</div>
+                      <div>Pejabat Pembuat Komitmen</div>
+                    </div>
                   </div>
-                </div>
-                <div className="text-center mt-auto pt-6 space-y-0.5">
-                  <div className="font-bold underline uppercase text-[11px]">
-                    {masterDokumen.mdk_nama_pejabat || '...........................................'}
-                  </div>
-                  <div className="text-[10px]">
-                    {masterDokumen.mdk_nip_pejabat || masterDokumen.mdk_nip_pejabat_pengadaan
-                      ? `NIP. ${masterDokumen.mdk_nip_pejabat || masterDokumen.mdk_nip_pejabat_pengadaan}`
-                      : '...........................................'}
+                  <div className="text-center mt-auto pt-6 space-y-0.5">
+                    <div className="font-bold underline uppercase text-[11px]">
+                      {masterDokumen.mdk_nama_pejabat || '...........................................'}
+                    </div>
+                    <div className="text-[10px]">
+                      {masterDokumen.mdk_nip_pejabat || masterDokumen.mdk_nip_pejabat_pengadaan
+                        ? `NIP. ${masterDokumen.mdk_nip_pejabat || masterDokumen.mdk_nip_pejabat_pengadaan}`
+                        : '...........................................'}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -232,17 +234,17 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
 
           {/* ROW 2: C. LUNAS DIBAYAR (left) | Mengetahui PPTK | Yang Terima Uang */}
           <tr>
-            <td colSpan={2} className="border-t-2 border-black p-0">
+            <td colSpan={2} className="p-0">
               <table className="w-full border-collapse text-xs">
                 <colgroup>
-                  <col className="w-[32%]" />
-                  <col className="w-[34%]" />
+                  <col className="w-[33%]" />
+                  <col className="w-[33%]" />
                   <col className="w-[34%]" />
                 </colgroup>
                 <tbody>
                   {/* Row 2a: title + date, only present in the left column. */}
                   <tr>
-                    <td className="border-r-2 border-black align-top px-3 pt-3">
+                    <td className="border-r-2 border-t-2 border-black align-top px-3 pt-3">
                       <div className="font-bold text-[11px]">C. LUNAS DIBAYAR</div>
                       <div className="mt-1 font-normal text-[11px] flex items-center gap-1">
                         <span className="shrink-0">Pada Tanggal :</span>

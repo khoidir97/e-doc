@@ -19,7 +19,7 @@ export const PaguPerBidangChart: React.FC<PaguPerBidangChartProps> = ({ data }) 
   const seriesData = data.map((item) => item.total_pagu);
 
   const options: ApexOptions = {
-    colors: ["#465fff", "#0ba5ec", "#12b76a", "#f79009", "#ee46bc", "#7a5af8"],
+    colors: ["#6366f1", "#0ea5e9", "#10b981", "#f59e0b", "#ec4899", "#8b5cf6"],
     chart: {
       fontFamily: "Outfit, sans-serif",
       type: "bar",
@@ -35,9 +35,9 @@ export const PaguPerBidangChart: React.FC<PaguPerBidangChartProps> = ({ data }) 
     plotOptions: {
       bar: {
         horizontal: true,
-        borderRadius: 7,
+        borderRadius: 6,
         borderRadiusApplication: "end",
-        barHeight: "52%",
+        barHeight: "56%",
         distributed: true,
       },
     },
@@ -52,7 +52,7 @@ export const PaguPerBidangChart: React.FC<PaguPerBidangChartProps> = ({ data }) 
           if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(0)} Jt`;
           return `Rp ${num.toLocaleString("id-ID")}`;
         },
-        style: { colors: "#667085", fontSize: "11px", fontFamily: "Outfit, sans-serif" },
+        style: { colors: "#94a3b8", fontSize: "11px", fontFamily: "Outfit, sans-serif" },
       },
       axisBorder: { show: false },
       axisTicks: { show: false },
@@ -60,7 +60,7 @@ export const PaguPerBidangChart: React.FC<PaguPerBidangChartProps> = ({ data }) 
     yaxis: {
       labels: {
         style: {
-          colors: "#344054",
+          colors: "#475569",
           fontSize: "12px",
           fontWeight: 500,
           fontFamily: "Outfit, sans-serif",
@@ -68,7 +68,7 @@ export const PaguPerBidangChart: React.FC<PaguPerBidangChartProps> = ({ data }) 
       },
     },
     grid: {
-      borderColor: "#f2f4f7",
+      borderColor: "#f1f5f9",
       strokeDashArray: 4,
       xaxis: { lines: { show: true } },
       yaxis: { lines: { show: false } },
@@ -88,24 +88,24 @@ export const PaguPerBidangChart: React.FC<PaguPerBidangChartProps> = ({ data }) 
   const series = [{ name: "Pagu Anggaran", data: seriesData }];
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
+    <section className="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
       {/* Header */}
-      <div className="flex items-start justify-between border-b border-gray-100 px-5 py-4 dark:border-gray-800 md:px-6">
+      <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 dark:border-gray-800">
         <div>
-          <h2 className="text-base font-semibold tracking-tight text-gray-800 dark:text-white">
-            Pagu Anggaran Per Bidang
+          <h2 className="text-base font-semibold tracking-tight text-gray-900 dark:text-white">
+            Grafik Pagu Per Bidang
           </h2>
           <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
-            Perbandingan alokasi pagu di setiap bidang / bagian
+            Perbandingan alokasi pagu di setiap bidang
           </p>
         </div>
-        <span className="flex h-7 items-center rounded-lg bg-brand-50 px-2.5 text-xs font-semibold text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">
+        <span className="inline-flex items-center rounded-lg bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-700 border border-indigo-100 dark:border-indigo-900/50 dark:bg-indigo-950/50 dark:text-indigo-400">
           {data.length} Bidang
         </span>
       </div>
 
       {/* Chart body */}
-      <div className="px-2 pb-2 pt-3">
+      <div className="flex-1 px-3 py-3">
         {data.length === 0 ? (
           <div className="flex h-64 flex-col items-center justify-center gap-2 text-sm text-gray-400 dark:text-gray-500">
             <svg className="h-10 w-10 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">

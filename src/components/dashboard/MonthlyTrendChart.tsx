@@ -19,18 +19,21 @@ export const MonthlyTrendChart: React.FC<MonthlyTrendChartProps> = ({ data }) =>
   const paguSeries = data.map((d) => d.total_pagu);
   const dokumenSeries = data.map((d) => d.total_dokumen);
 
+  const totalPaguYear = data.reduce((acc, curr) => acc + (curr.total_pagu || 0), 0);
+  const totalDokumenYear = data.reduce((acc, curr) => acc + (curr.total_dokumen || 0), 0);
+
   const options: ApexOptions = {
-    colors: ["#465fff", "#12b76a"],
+    colors: ["#6366f1", "#10b981"],
     chart: {
       fontFamily: "Outfit, sans-serif",
       type: "area",
-      height: 300,
+      height: 290,
       toolbar: { show: false },
       background: "transparent",
       animations: {
         enabled: true,
         speed: 600,
-        animateGradually: { enabled: true, delay: 80 },
+        animateGradually: { enabled: true, delay: 60 },
       },
     },
     stroke: {
@@ -41,7 +44,7 @@ export const MonthlyTrendChart: React.FC<MonthlyTrendChartProps> = ({ data }) =>
       type: "gradient",
       gradient: {
         shadeIntensity: 1,
-        opacityFrom: 0.25,
+        opacityFrom: 0.22,
         opacityTo: 0.02,
         stops: [0, 85, 100],
       },
@@ -52,7 +55,7 @@ export const MonthlyTrendChart: React.FC<MonthlyTrendChartProps> = ({ data }) =>
       axisTicks: { show: false },
       labels: {
         style: {
-          colors: "#667085",
+          colors: "#94a3b8",
           fontSize: "11px",
           fontFamily: "Outfit, sans-serif",
         },
@@ -62,7 +65,7 @@ export const MonthlyTrendChart: React.FC<MonthlyTrendChartProps> = ({ data }) =>
       {
         title: {
           text: "Pagu (Rp)",
-          style: { color: "#667085", fontSize: "11px", fontFamily: "Outfit, sans-serif" },
+          style: { color: "#64748b", fontSize: "11px", fontFamily: "Outfit, sans-serif" },
         },
         labels: {
           formatter: (val: number) => {
@@ -70,29 +73,30 @@ export const MonthlyTrendChart: React.FC<MonthlyTrendChartProps> = ({ data }) =>
             if (val >= 1_000_000) return `${(val / 1_000_000).toFixed(0)} Jt`;
             return `${val}`;
           },
-          style: { colors: "#667085", fontSize: "11px", fontFamily: "Outfit, sans-serif" },
+          style: { colors: "#94a3b8", fontSize: "11px", fontFamily: "Outfit, sans-serif" },
         },
       },
       {
         opposite: true,
         title: {
           text: "Dokumen",
-          style: { color: "#667085", fontSize: "11px", fontFamily: "Outfit, sans-serif" },
+          style: { color: "#64748b", fontSize: "11px", fontFamily: "Outfit, sans-serif" },
         },
         labels: {
           formatter: (val: number) => `${Math.round(val)}`,
-          style: { colors: "#667085", fontSize: "11px", fontFamily: "Outfit, sans-serif" },
+          style: { colors: "#94a3b8", fontSize: "11px", fontFamily: "Outfit, sans-serif" },
         },
       },
     ],
     grid: {
-      borderColor: "#f2f4f7",
+      borderColor: "#f1f5f9",
       strokeDashArray: 4,
-      padding: { left: 0, right: 0 },
+      padding: { left: 10, right: 10 },
     },
     tooltip: {
       shared: true,
       intersect: false,
+      theme: "light",
       style: { fontFamily: "Outfit, sans-serif" },
       y: [
         { formatter: (val: number) => formatRupiah(val) },
@@ -100,12 +104,7 @@ export const MonthlyTrendChart: React.FC<MonthlyTrendChartProps> = ({ data }) =>
       ],
     },
     legend: {
-      position: "top",
-      horizontalAlign: "right",
-      fontSize: "12px",
-      fontFamily: "Outfit, sans-serif",
-      fontWeight: 500,
-      markers: { size: 6 },
+      show: false,
     },
   };
 
@@ -115,32 +114,34 @@ export const MonthlyTrendChart: React.FC<MonthlyTrendChartProps> = ({ data }) =>
   ];
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
+    <section className="overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
       {/* Header */}
-      <div className="flex items-start justify-between border-b border-gray-100 px-5 py-4 dark:border-gray-800 md:px-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-100 px-5 py-4 dark:border-gray-800">
         <div>
-          <h2 className="text-base font-semibold tracking-tight text-gray-800 dark:text-white">
+          <h2 className="text-base font-semibold tracking-tight text-gray-900 dark:text-white">
             Tren Pagu &amp; Dokumen Bulanan
           </h2>
           <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
-            Statistik akumulasi pagu dan pembuatan dokumen per bulan
+            Statistik pergerakan pagu anggaran dan penerbitan dokumen per bulan
           </p>
         </div>
-        {/* Legend chips */}
-        <div className="flex shrink-0 items-center gap-2">
-          <span className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400">
-            <span className="inline-block h-2 w-2 rounded-full bg-brand-500" />
-            Pagu
-          </span>
-          <span className="flex items-center gap-1 text-xs font-medium text-gray-500 dark:text-gray-400">
-            <span className="inline-block h-2 w-2 rounded-full bg-success-500" />
-            Dokumen
-          </span>
+
+        {/* Legend Chips & Stats */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-1.5 rounded-lg bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300 border border-gray-150 dark:border-gray-700">
+            <span className="inline-block h-2 w-2 rounded-full bg-indigo-500" />
+            <span>Pagu: <strong>{formatRupiah(totalPaguYear)}</strong></span>
+          </div>
+
+          <div className="flex items-center gap-1.5 rounded-lg bg-gray-50 px-2.5 py-1 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-300 border border-gray-150 dark:border-gray-700">
+            <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+            <span>Dokumen: <strong>{totalDokumenYear}</strong></span>
+          </div>
         </div>
       </div>
 
       {/* Chart body */}
-      <div className="px-2 pb-2 pt-3">
+      <div className="px-3 pb-3 pt-4">
         {data.length === 0 ? (
           <div className="flex h-64 flex-col items-center justify-center gap-2 text-sm text-gray-400 dark:text-gray-500">
             <svg className="h-10 w-10 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -149,7 +150,7 @@ export const MonthlyTrendChart: React.FC<MonthlyTrendChartProps> = ({ data }) =>
             <span>Belum ada data tren bulanan</span>
           </div>
         ) : (
-          <ReactApexChart options={options} series={series} type="area" height={300} />
+          <ReactApexChart options={options} series={series} type="area" height={290} />
         )}
       </div>
     </section>

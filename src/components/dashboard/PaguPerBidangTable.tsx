@@ -9,14 +9,14 @@ interface PaguPerBidangTableProps {
   data: PaguPerBidang[];
 }
 
-// Warna dot per index (rotating)
+// Warna dot per index (selaras dengan grafik PaguPerBidangChart)
 const DOT_COLORS = [
-  "bg-brand-500",
+  "bg-indigo-500",
   "bg-sky-500",
   "bg-emerald-500",
   "bg-amber-500",
   "bg-pink-500",
-  "bg-violet-500",
+  "bg-purple-500",
 ];
 
 export const PaguPerBidangTable: React.FC<PaguPerBidangTableProps> = ({ data }) => {
@@ -28,51 +28,59 @@ export const PaguPerBidangTable: React.FC<PaguPerBidangTableProps> = ({ data }) 
     setIsModalOpen(true);
   };
 
+  const totalPaguAll = data.reduce((acc, curr) => acc + (curr.total_pagu || 0), 0);
+  const totalDokumenAll = data.reduce((acc, curr) => acc + (curr.total_dokumen || 0), 0);
+
   return (
-    <section className="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-theme-xs dark:border-gray-800 dark:bg-gray-900">
+    <section className="flex h-full flex-col overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
       {/* Header */}
-      <div className="border-b border-gray-100 px-5 py-4 dark:border-gray-800 md:px-6">
-        <h2 className="text-base font-semibold tracking-tight text-gray-800 dark:text-white">
-          Rincian Pagu Per Bidang
-        </h2>
-        <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
-          Klik nama bidang atau jumlah dokumen untuk melihat rincian
-        </p>
+      <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4 dark:border-gray-800">
+        <div>
+          <h2 className="text-base font-semibold tracking-tight text-gray-900 dark:text-white">
+            Rincian Pagu Per Bidang
+          </h2>
+          <p className="mt-0.5 text-xs text-gray-400 dark:text-gray-500">
+            Klik nama bidang untuk melihat daftar dokumen aktif
+          </p>
+        </div>
+        <span className="inline-flex items-center rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-semibold text-emerald-700 border border-emerald-100 dark:border-emerald-900/50 dark:bg-emerald-950/50 dark:text-emerald-400">
+          {totalDokumenAll} Dokumen
+        </span>
       </div>
 
-      {/* Table */}
+      {/* Table Content */}
       <div className="flex-1 overflow-x-auto">
-        <table className="w-full min-w-[440px] text-left text-sm">
+        <table className="w-full min-w-[420px] text-left text-sm">
           <thead>
-            <tr className="border-b border-gray-100 dark:border-gray-800">
+            <tr className="border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/30">
               <th
                 scope="col"
-                className="px-5 py-3 text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 md:px-6"
+                className="px-5 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500"
               >
                 Bidang
               </th>
               <th
                 scope="col"
-                className="px-3 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500"
+                className="px-3 py-2.5 text-center text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500"
               >
-                Dok.
+                Dokumen
               </th>
               <th
                 scope="col"
-                className="px-3 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500"
+                className="px-3 py-2.5 text-right text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500"
               >
                 Total Pagu
               </th>
               <th
                 scope="col"
-                className="px-5 py-3 text-right text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500 md:px-6"
+                className="px-5 py-2.5 text-right text-[11px] font-semibold uppercase tracking-wider text-gray-400 dark:text-gray-500"
               >
                 Porsi
               </th>
             </tr>
           </thead>
 
-          <tbody className="divide-y divide-gray-50 dark:divide-gray-800/60">
+          <tbody className="divide-y divide-gray-100 dark:divide-gray-800/60">
             {data.length === 0 ? (
               <tr>
                 <td
@@ -99,32 +107,34 @@ export const PaguPerBidangTable: React.FC<PaguPerBidangTableProps> = ({ data }) 
               data.map((item, idx) => (
                 <tr
                   key={item.bdg_id || idx}
-                  className="group transition-colors hover:bg-gray-50/80 dark:hover:bg-white/[0.02]"
+                  className="group transition-colors hover:bg-gray-50/70 dark:hover:bg-white/[0.02]"
                 >
                   {/* Nama Bidang */}
-                  <td className="px-5 py-3 md:px-6">
+                  <td className="px-5 py-2.5">
                     <button
+                      type="button"
                       onClick={() => handleOpenModal(item)}
-                      className="flex items-center gap-2.5 text-left text-sm font-medium text-gray-700 transition-colors hover:text-brand-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:text-gray-200 dark:hover:text-brand-400"
+                      className="flex items-center gap-2.5 text-left text-xs font-medium text-gray-800 transition-colors hover:text-indigo-600 focus-visible:outline-none dark:text-gray-200 dark:hover:text-indigo-400 cursor-pointer"
                       title={`Lihat rincian dokumen ${item.bdg_nama}`}
                     >
                       <span
                         aria-hidden="true"
                         className={`inline-block h-2 w-2 shrink-0 rounded-full ${DOT_COLORS[idx % DOT_COLORS.length]}`}
                       />
-                      <span className="truncate">{item.bdg_nama}</span>
+                      <span className="truncate max-w-[160px] sm:max-w-[200px]">{item.bdg_nama}</span>
                     </button>
                   </td>
 
-                  {/* Jumlah Dokumen */}
-                  <td className="px-3 py-3 text-center">
+                  {/* Jumlah Dokumen Button */}
+                  <td className="px-3 py-2.5 text-center">
                     <button
+                      type="button"
                       onClick={() => handleOpenModal(item)}
-                      className="inline-flex items-center gap-1 rounded-lg border border-brand-100 bg-brand-50 px-2.5 py-1 text-xs font-semibold text-brand-700 transition-colors hover:bg-brand-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 dark:border-brand-800/60 dark:bg-brand-950/40 dark:text-brand-300 dark:hover:bg-brand-900/60"
-                      title={`Lihat ${item.total_dokumen} dokumen ${item.bdg_nama}`}
+                      className="inline-flex items-center gap-1 rounded-md border border-gray-200/80 bg-gray-50 px-2 py-0.5 text-xs font-semibold text-gray-700 transition-all hover:bg-indigo-50 hover:border-indigo-200 hover:text-indigo-600 focus-visible:outline-none dark:border-gray-800 dark:bg-gray-800/60 dark:text-gray-300 dark:hover:bg-indigo-950/60 dark:hover:text-indigo-400 cursor-pointer"
+                      title={`Buka rincian ${item.total_dokumen} dokumen`}
                     >
                       <svg
-                        className="h-3 w-3"
+                        className="h-3 w-3 text-gray-400 group-hover:text-indigo-500"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -147,19 +157,19 @@ export const PaguPerBidangTable: React.FC<PaguPerBidangTableProps> = ({ data }) 
                   </td>
 
                   {/* Total Pagu */}
-                  <td className="px-3 py-3 text-right text-sm font-semibold tabular-nums text-gray-700 dark:text-gray-200">
+                  <td className="px-3 py-2.5 text-right text-xs font-semibold tabular-nums text-gray-700 dark:text-gray-200">
                     {formatRupiah(item.total_pagu)}
                   </td>
 
                   {/* Porsi % + mini bar */}
-                  <td className="px-5 py-3 md:px-6">
+                  <td className="px-5 py-2.5 text-right">
                     <div className="flex flex-col items-end gap-1">
-                      <span className="text-xs font-semibold tabular-nums text-gray-500 dark:text-gray-400">
+                      <span className="text-[11px] font-semibold tabular-nums text-gray-500 dark:text-gray-400">
                         {item.persentase}%
                       </span>
-                      <div className="h-1.5 w-20 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
+                      <div className="h-1.5 w-16 overflow-hidden rounded-full bg-gray-100 dark:bg-gray-800">
                         <div
-                          className={`h-full rounded-full ${DOT_COLORS[idx % DOT_COLORS.length]}`}
+                          className={`h-full rounded-full transition-all duration-500 ${DOT_COLORS[idx % DOT_COLORS.length]}`}
                           style={{ width: `${Math.min(item.persentase, 100)}%` }}
                         />
                       </div>
@@ -169,6 +179,28 @@ export const PaguPerBidangTable: React.FC<PaguPerBidangTableProps> = ({ data }) 
               ))
             )}
           </tbody>
+
+          {/* Footer Total Row */}
+          {data.length > 0 && (
+            <tfoot>
+              <tr className="border-t border-gray-200/80 bg-gray-50/70 font-semibold text-xs text-gray-800 dark:border-gray-800 dark:bg-gray-800/40 dark:text-gray-200">
+                <th scope="row" className="px-5 py-3">
+                  Total
+                </th>
+                <td className="px-3 py-3 text-center">
+                  <span className="inline-flex items-center rounded-md bg-gray-200/70 dark:bg-gray-700 px-2 py-0.5 text-xs font-bold text-gray-700 dark:text-gray-200">
+                    {totalDokumenAll}
+                  </span>
+                </td>
+                <td className="px-3 py-3 text-right tabular-nums font-bold text-gray-900 dark:text-white">
+                  {formatRupiah(totalPaguAll)}
+                </td>
+                <td className="px-5 py-3 text-right tabular-nums text-gray-600 dark:text-gray-400">
+                  100%
+                </td>
+              </tr>
+            </tfoot>
+          )}
         </table>
       </div>
 

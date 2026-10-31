@@ -120,7 +120,7 @@ export default function SignInForm() {
                     NIP Pegawai <span className="text-error-500">*</span>
                   </Label>
                   <Input
-                    placeholder="Masukkan NIP Pegawai (contoh: 123456)"
+                    placeholder="Masukkan NIP (contoh: 199806042010041001)"
                     type="text"
                     value={pgwNip}
                     onChange={(e) => setPgwNip(e.target.value)}
@@ -175,7 +175,7 @@ export default function SignInForm() {
                       <input
                         type="number"
                         inputMode="numeric"
-                        placeholder="Jawaban"
+                        placeholder={`Jawaban ${captcha.a + captcha.b}`}
                         value={captchaInput}
                         onChange={(e) => { setCaptchaInput(e.target.value); setCaptchaError(false); }}
                         className={`w-full px-4 py-2.5 text-sm rounded-xl border transition-all focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:bg-gray-800 dark:text-white ${captchaError
