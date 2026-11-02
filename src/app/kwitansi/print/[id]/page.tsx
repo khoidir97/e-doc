@@ -71,6 +71,7 @@ export default function KwitansiPrintPage({
           noBukuKas: '',
           uangSejumlah: uangSejumlahRaw ? Number(uangSejumlahRaw) : undefined,
           sudahTerimaDari: '',
+          yaituKet: '',
           tanggalLunasDibayar: todayYmd,
           tanggalTerimaUang: todayYmd,
         },
@@ -104,6 +105,7 @@ export default function KwitansiPrintPage({
         noBukuKas: kwt.kwt_buku_kas_umum_no || '',
         uangSejumlah: uangSejumlahRaw ? Number(uangSejumlahRaw) : undefined,
         sudahTerimaDari: kwt.kwt_sudah_terima_dari || '',
+        yaituKet: kwt.kwt_yaitu || '',
         tanggalLunasDibayar: d1 && !isNaN(d1.getTime()) ? d1.toISOString().split('T')[0] : todayYmd,
         tanggalTerimaUang: d2 && !isNaN(d2.getTime()) ? d2.toISOString().split('T')[0] : todayYmd,
       };
@@ -199,6 +201,7 @@ export default function KwitansiPrintPage({
               noBukuKas={sheet.noBukuKas}
               uangSejumlah={sheet.uangSejumlah}
               sudahTerimaDari={sheet.sudahTerimaDari}
+              yaituKet={sheet.yaituKet}
               tanggalLunasDibayar={sheet.tanggalLunasDibayar}
               tanggalTerimaUang={sheet.tanggalTerimaUang}
               isEditable={false}

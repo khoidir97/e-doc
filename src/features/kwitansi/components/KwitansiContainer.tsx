@@ -27,6 +27,7 @@ export interface LocalKwitansiItem {
   kwt_buku_kas_umum_no: string;
   kwt_uang_sejumlah: number | string;
   kwt_sudah_terima_dari: string;
+  kwt_yaitu: string;
   kwt_tanggal_lunas_dibayar: string;
   kwt_tanggal_terima_uang: string;
   kwt_no_sp2d: string;
@@ -105,6 +106,7 @@ export const KwitansiContainer: React.FC<KwitansiContainerProps> = ({
           kwt_buku_kas_umum_no: item.kwt_buku_kas_umum_no || '',
           kwt_uang_sejumlah: item.kwt_uang_sejumlah !== null ? Number(item.kwt_uang_sejumlah) : '',
           kwt_sudah_terima_dari: item.kwt_sudah_terima_dari || '',
+          kwt_yaitu: item.kwt_yaitu || '',
           kwt_tanggal_lunas_dibayar: formatDateStr(item.kwt_tanggal_lunas_dibayar),
           kwt_tanggal_terima_uang: formatDateStr(item.kwt_tanggal_terima_uang),
           kwt_no_sp2d: item.kwt_no_sp2d || '',
@@ -127,6 +129,7 @@ export const KwitansiContainer: React.FC<KwitansiContainerProps> = ({
             kwt_buku_kas_umum_no: '',
             kwt_uang_sejumlah: defaultNominal,
             kwt_sudah_terima_dari: '',
+            kwt_yaitu: '',
             kwt_tanggal_lunas_dibayar: todayYmd,
             kwt_tanggal_terima_uang: todayYmd,
             kwt_no_sp2d: '',
@@ -177,6 +180,7 @@ export const KwitansiContainer: React.FC<KwitansiContainerProps> = ({
       kwt_buku_kas_umum_no: '',
       kwt_uang_sejumlah: sisa > 0 ? sisa : '',
       kwt_sudah_terima_dari: '',
+      kwt_yaitu: '',
       kwt_tanggal_lunas_dibayar: todayYmd,
       kwt_tanggal_terima_uang: todayYmd,
       kwt_no_sp2d: '',
@@ -200,6 +204,7 @@ export const KwitansiContainer: React.FC<KwitansiContainerProps> = ({
         kwt_buku_kas_umum_no: '',
         kwt_uang_sejumlah: '',
         kwt_sudah_terima_dari: '',
+        kwt_yaitu: '',
         kwt_tanggal_lunas_dibayar: todayYmd,
         kwt_tanggal_terima_uang: todayYmd,
         kwt_no_sp2d: '',
@@ -295,6 +300,8 @@ export const KwitansiContainer: React.FC<KwitansiContainerProps> = ({
   const activeItem = kwitansiList[activeTab] || {
     kwt_buku_kas_umum_no: '',
     kwt_uang_sejumlah: '',
+    kwt_sudah_terima_dari: '',
+    kwt_yaitu: '',
     kwt_tanggal_lunas_dibayar: todayYmd,
     kwt_tanggal_terima_uang: todayYmd,
     kwt_no_sp2d: '',
@@ -318,6 +325,7 @@ export const KwitansiContainer: React.FC<KwitansiContainerProps> = ({
           activeItem.kwt_buku_kas_umum_no || '',
           activeItem.kwt_uang_sejumlah || 0,
           activeItem.kwt_sudah_terima_dari || '',
+          activeItem.kwt_yaitu || '',
           activeItem.kwt_tanggal_lunas_dibayar,
           activeItem.kwt_tanggal_terima_uang,
           activeItem.kwt_no_sp2d || '',
@@ -899,6 +907,8 @@ export const KwitansiContainer: React.FC<KwitansiContainerProps> = ({
                       maxUangSejumlah={maxAllowedForActive}
                       sudahTerimaDari={activeItem.kwt_sudah_terima_dari}
                       onSudahTerimaDariChange={(val) => updateActiveKwitansi('kwt_sudah_terima_dari', val)}
+                      yaituKet={activeItem.kwt_yaitu}
+                      onYaituKetChange={(val) => updateActiveKwitansi('kwt_yaitu', val)}
                       tanggalLunasDibayar={activeItem.kwt_tanggal_lunas_dibayar}
                       onTanggalLunasDibayarChange={(val) => updateActiveKwitansi('kwt_tanggal_lunas_dibayar', val)}
                       tanggalTerimaUang={activeItem.kwt_tanggal_terima_uang}

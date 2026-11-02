@@ -13,6 +13,8 @@ interface KwitansiOfficialSheetProps {
   maxUangSejumlah?: number;
   sudahTerimaDari?: string;
   onSudahTerimaDariChange?: (val: string) => void;
+  yaituKet?: string;
+  onYaituKetChange?: (val: string) => void;
   tanggalLunasDibayar?: string;
   onTanggalLunasDibayarChange?: (val: string) => void;
   tanggalTerimaUang?: string;
@@ -29,6 +31,8 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
   maxUangSejumlah,
   sudahTerimaDari = '',
   onSudahTerimaDariChange,
+  yaituKet = '',
+  onYaituKetChange,
   tanggalLunasDibayar = '',
   onTanggalLunasDibayarChange,
   tanggalTerimaUang = '',
@@ -45,7 +49,10 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
   const defaultSudahTerima = masterDokumen.mdk_jabatan_pejabat === 'PA'
     ? `PENGGUNA ANGGARAN/PEJABAT PEMBUAT KOMITMEN\n${(masterDokumen.mdk_bagian || 'BADAN PENGELOLA KEUANGAN DAN ASET DAERAH KOTA PEKANBARU').toUpperCase()}`
     : `KUASA PENGGUNA ANGGARAN/PEJABAT PEMBUAT KOMITMEN\n${(masterDokumen.mdk_bagian || 'BADAN PENGELOLA KEUANGAN DAN ASET DAERAH KOTA PEKANBARU').toUpperCase()}`;
+  const defaultYaitu = `Pembayaran ${masterDokumen.mdk_uraian_belanja || '-'}${masterDokumen.mdk_sub_kegiatan ? ` Pada Sub Kegiatan ${masterDokumen.mdk_sub_kegiatan}` : ''
+    }`;
   const currentSudahTerima = sudahTerimaDari && sudahTerimaDari.trim() !== '' ? sudahTerimaDari : defaultSudahTerima;
+  const currentYaituKet = yaituKet && yaituKet.trim() !== '' ? yaituKet : defaultYaitu;
   const labelPejabat = masterDokumen.mdk_jabatan_pejabat?.trim().toUpperCase() === 'PA'
     ? 'Pengguna Anggaran'
     : 'Kuasa Pengguna Anggaran';
@@ -220,9 +227,15 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
                       <td className="w-32 align-top font-normal py-1">Y a i t u</td>
                       <td className="w-4 align-top py-1 font-bold text-center">:</td>
                       <td className="align-top py-1 leading-relaxed text-[11px]">
-                        Pembayaran {masterDokumen.mdk_uraian_belanja || '-'}
-                        {masterDokumen.mdk_sub_kegiatan && (
-                          <span> Pada Sub Kegiatan {masterDokumen.mdk_sub_kegiatan}</span>
+                        {isEditable ? (
+                          <textarea
+                            rows={4}
+                            value={currentYaituKet}
+                            onChange={(e) => onYaituKetChange?.(e.target.value)}
+                            className="w-full text-xs text-black bg-transparent dark:text-black border-b border-dashed border-gray-400 focus:border-black outline-none resize-none px-1 leading-relaxed print:border-none print:resize-none"
+                          />
+                        ) : (
+                          <span className="whitespace-pre-line">{currentYaituKet}</span>
                         )}
                       </td>
                     </tr>

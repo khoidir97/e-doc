@@ -4,6 +4,7 @@ export interface Kwitansi {
     kwt_buku_kas_umum_no: string
     kwt_uang_sejumlah: number;
     kwt_sudah_terima_dari: string;
+    kwt_yaitu: string;
     kwt_tanggal_lunas_dibayar: string | Date | null
     kwt_tanggal_terima_uang: string | Date | null
     kwt_no_sp2d: string;
@@ -22,6 +23,7 @@ export interface CreateKwitansiInput {
     kwt_buku_kas_umum_no: string;
     kwt_uang_sejumlah: number;
     kwt_sudah_terima_dari: string;
+    kwt_yaitu: string;
     kwt_tanggal_lunas_dibayar: string | Date;
     kwt_tanggal_terima_uang: string | Date;
     kwt_no_sp2d: string;
@@ -40,6 +42,7 @@ export interface UpdateKwitansiInput {
     kwt_buku_kas_umum_no: string;
     kwt_uang_sejumlah: number;
     kwt_sudah_terima_dari: string;
+    kwt_yaitu: string;
     kwt_tanggal_lunas_dibayar: string | Date | null;
     kwt_tanggal_terima_uang: string | Date | null;
     kwt_no_sp2d: string;

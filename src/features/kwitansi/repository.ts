@@ -101,6 +101,7 @@ export class KwitansiRepository {
     bukuKasNo: string,
     uangSejumlah: number | string,
     sudahTerimaDari: string,
+    yaituKet: string,
     tanggalLunasDibayar?: string | Date | null,
     tanggalTerimaUang?: string | Date | null,
     noSp2d?: string | null,
@@ -116,9 +117,9 @@ export class KwitansiRepository {
     const cleanStatusLunas = Number(statusLunas) === 1 ? 1 : 0;
 
     const [result]: any = await pool.query(
-      `INSERT INTO kwitansi (kwt_master_dokumen_id, kwt_buku_kas_umum_no, kwt_sudah_terima_dari, kwt_uang_sejumlah, kwt_tanggal_lunas_dibayar, kwt_tanggal_terima_uang, kwt_no_sp2d, kwt_status_lunas, kwt_created_at, kwt_created_by) 
+      `INSERT INTO kwitansi (kwt_master_dokumen_id, kwt_buku_kas_umum_no, kwt_sudah_terima_dari, kwt_yaitu, kwt_uang_sejumlah, kwt_tanggal_lunas_dibayar, kwt_tanggal_terima_uang, kwt_no_sp2d, kwt_status_lunas, kwt_created_at, kwt_created_by) 
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)`,
-      [mdk_id, cleanBukuKasNo, sudahTerimaDari, nominalInt, tglLunas, tglTerima, cleanNoSp2d, cleanStatusLunas, userId ?? null]
+      [mdk_id, cleanBukuKasNo, sudahTerimaDari, yaituKet, nominalInt, tglLunas, tglTerima, cleanNoSp2d, cleanStatusLunas, userId ?? null]
     );
 
     if (result.insertId > 0) {
@@ -132,6 +133,7 @@ export class KwitansiRepository {
     bukuKasNo: string,
     uangSejumlah: number | string,
     sudahTerimaDari: string,
+    yaituKet: string,
     tanggalLunasDibayar?: string | Date | null,
     tanggalTerimaUang?: string | Date | null,
     noSp2d?: string | null,
@@ -148,9 +150,9 @@ export class KwitansiRepository {
 
     const [result]: any = await pool.query(
       `UPDATE kwitansi 
-       SET kwt_buku_kas_umum_no = ?, kwt_uang_sejumlah = ?, kwt_sudah_terima_dari = ?, kwt_tanggal_lunas_dibayar = ?, kwt_tanggal_terima_uang = ?, kwt_no_sp2d = ?, kwt_status_lunas = ?, kwt_updated_by = ?, kwt_updated_at = NOW() 
+       SET kwt_buku_kas_umum_no = ?, kwt_uang_sejumlah = ?, kwt_sudah_terima_dari = ?, kwt_yaitu = ?, kwt_tanggal_lunas_dibayar = ?, kwt_tanggal_terima_uang = ?, kwt_no_sp2d = ?, kwt_status_lunas = ?, kwt_updated_by = ?, kwt_updated_at = NOW() 
        WHERE kwt_id = ? AND kwt_deleted_at IS NULL`,
-      [cleanBukuKasNo, nominalInt, sudahTerimaDari, tglLunas, tglTerima, cleanNoSp2d, cleanStatusLunas, userId ?? null, kwt_id]
+      [cleanBukuKasNo, nominalInt, sudahTerimaDari, yaituKet, tglLunas, tglTerima, cleanNoSp2d, cleanStatusLunas, userId ?? null, kwt_id]
     );
     return result.affectedRows > 0;
   }
@@ -171,6 +173,7 @@ export class KwitansiRepository {
     bukuKasNo: string,
     uangSejumlah: number | string,
     sudahTerimaDari: string,
+    yaituKet: string,
     tanggalLunasDibayar?: string | Date | null,
     tanggalTerimaUang?: string | Date | null,
     noSp2d?: string | null,
@@ -180,9 +183,9 @@ export class KwitansiRepository {
     await initDatabase();
     const existing = await this.findByMasterDokumenId(mdk_id);
     if (existing) {
-      return await this.update(existing.kwt_id, bukuKasNo, uangSejumlah, sudahTerimaDari, tanggalLunasDibayar, tanggalTerimaUang, noSp2d, statusLunas, userId);
+      return await this.update(existing.kwt_id, bukuKasNo, uangSejumlah, sudahTerimaDari, yaituKet, tanggalLunasDibayar, tanggalTerimaUang, noSp2d, statusLunas, userId);
     } else {
-      const created = await this.create(mdk_id, bukuKasNo, uangSejumlah, sudahTerimaDari, tanggalLunasDibayar, tanggalTerimaUang, noSp2d, statusLunas, userId);
+      const created = await this.create(mdk_id, bukuKasNo, uangSejumlah, sudahTerimaDari, yaituKet, tanggalLunasDibayar, tanggalTerimaUang, noSp2d, statusLunas, userId);
       return created !== null;
     }
   }

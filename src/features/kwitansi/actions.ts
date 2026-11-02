@@ -54,6 +54,7 @@ export async function saveKwitansiAction(
   bukuKasNo: string,
   uangSejumlah: number | string,
   sudahTerimaDari: string,
+  yaituKet: string,
   tanggalLunasDibayar?: string | null,
   tanggalTerimaUang?: string | null,
   noSp2d?: string | null,
@@ -70,6 +71,7 @@ export async function saveKwitansiAction(
       bukuKasNo,
       uangSejumlah,
       sudahTerimaDari,
+      yaituKet,
       tanggalLunasDibayar,
       tanggalTerimaUang,
       noSp2d,
@@ -97,6 +99,7 @@ export async function saveKwitansiItemAction(
   bukuKasNo: string,
   uangSejumlah: number | string,
   sudahTerimaDari: string,
+  yaituKet: string,
   tanggalLunasDibayar?: string | null,
   tanggalTerimaUang?: string | null,
   noSp2d?: string | null,
@@ -115,6 +118,7 @@ export async function saveKwitansiItemAction(
         bukuKasNo,
         uangSejumlah,
         sudahTerimaDari,
+        yaituKet,
         tanggalLunasDibayar,
         tanggalTerimaUang,
         noSp2d,
@@ -131,6 +135,7 @@ export async function saveKwitansiItemAction(
         bukuKasNo,
         uangSejumlah,
         sudahTerimaDari,
+        yaituKet,
         tanggalLunasDibayar,
         tanggalTerimaUang,
         noSp2d,
@@ -159,6 +164,7 @@ export async function saveAllKwitansiAction(
     kwt_buku_kas_umum_no: string;
     kwt_uang_sejumlah: number | string;
     kwt_sudah_terima_dari: string;
+    kwt_yaitu: string;
     kwt_tanggal_lunas_dibayar?: string | null;
     kwt_tanggal_terima_uang?: string | null;
     kwt_no_sp2d?: string | null;
@@ -179,6 +185,7 @@ export async function saveAllKwitansiAction(
           item.kwt_buku_kas_umum_no,
           item.kwt_uang_sejumlah,
           item.kwt_sudah_terima_dari,
+          item.kwt_yaitu,
           item.kwt_tanggal_lunas_dibayar,
           item.kwt_tanggal_terima_uang,
           item.kwt_no_sp2d,
@@ -191,6 +198,7 @@ export async function saveAllKwitansiAction(
           item.kwt_buku_kas_umum_no,
           item.kwt_uang_sejumlah,
           item.kwt_sudah_terima_dari,
+          item.kwt_yaitu,
           item.kwt_tanggal_lunas_dibayar,
           item.kwt_tanggal_terima_uang,
           item.kwt_no_sp2d,
