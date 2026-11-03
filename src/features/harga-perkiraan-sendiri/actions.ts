@@ -46,7 +46,15 @@ export async function getHargaPerkiraanSendiriWithDetailsAction(mdkId: number): 
 
 export async function getMasterDokumenOptionsAction(): Promise<ActionResponse<any[]>> {
   try {
-    const result = await MasterDokumenService.getList('', 1, 100);
+    const cookieStore = await cookies();
+    const token = cookieStore.get('token')?.value;
+    const user = token ? await verifyToken(token) : null;
+    let filterBdgId: number | null | undefined = undefined;
+    if (user && user.pgw_role !== 0) {
+      filterBdgId = user.pgw_bdg_id ? Number(user.pgw_bdg_id) : 0;
+    }
+
+    const result = await MasterDokumenService.getList('', 1, 100, filterBdgId);
     return {
       success: true,
       message: 'Berhasil mengambil opsi Master Dokumen',

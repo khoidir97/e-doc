@@ -449,6 +449,7 @@ export async function initDatabase(): Promise<void> {
       await addColumnIfNotExists('pgw_updated_by', 'INT NULL');
       await addColumnIfNotExists('pgw_deleted_at', 'TIMESTAMP NULL');
       await addColumnIfNotExists('pgw_deleted_by', 'INT NULL');
+      await addColumnIfNotExists('pgw_bdg_id', 'INT NULL');
 
       // Migration check: Ensure performance composite indexes exist
       const addIndexIfNotExists = async (tableName: string, indexName: string, columnsDef: string) => {

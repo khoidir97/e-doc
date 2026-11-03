@@ -1,5 +1,6 @@
 export interface User {
   pgw_id: number;
+  pgw_bdg_id?: number | null;
   pgw_nip: string;
   pgw_nama: string;
   pgw_jabatan: string;
@@ -15,6 +16,7 @@ export interface User {
 
 export interface AuthUser {
   pgw_id: number;
+  pgw_bdg_id?: number | null;
   pgw_nip: string;
   pgw_nama: string;
   pgw_jabatan: string;

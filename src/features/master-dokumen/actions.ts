@@ -7,13 +7,13 @@ import { MasterDokumenService } from './service';
 import { createMasterDokumenSchema, updateMasterDokumenSchema } from './schema';
 import { ActionResponse, CreateMasterDokumenInput, UpdateMasterDokumenInput, MasterDokumenListResult } from './types';
 
-async function getActiveUser(): Promise<{ pgw_id: number; pgw_role: number } | null> {
+async function getActiveUser(): Promise<{ pgw_id: number; pgw_role: number; pgw_bdg_id?: number | null } | null> {
   try {
     const cookieStore = await cookies();
     const token = cookieStore.get('token')?.value;
     if (!token) return null;
     const user = await verifyToken(token);
-    return user ? { pgw_id: user.pgw_id, pgw_role: user.pgw_role } : null;
+    return user ? { pgw_id: user.pgw_id, pgw_role: user.pgw_role, pgw_bdg_id: user.pgw_bdg_id } : null;
   } catch {
     return null;
   }
@@ -35,6 +35,16 @@ export async function getMasterDokumenByIdAction(
       };
     }
     const result = await MasterDokumenService.getById(mdk_id);
+    const activeUser = await getActiveUser();
+    if (activeUser && activeUser.pgw_role !== 0) {
+      const userBdgId = activeUser.pgw_bdg_id ? Number(activeUser.pgw_bdg_id) : null;
+      if (userBdgId !== null && Number(result.mdk_bidang_id) !== userBdgId) {
+        return {
+          success: false,
+          message: 'Anda tidak memiliki hak akses untuk melihat dokumen dari bidang lain.',
+        };
+      }
+    }
     return {
       success: true,
       message: 'Berhasil mengambil data master dokumen',
@@ -54,7 +64,13 @@ export async function getMasterDokumenListAction(
   limit = 10
 ): Promise<ActionResponse<MasterDokumenListResult>> {
   try {
-    const result = await MasterDokumenService.getList(search, page, limit);
+    const activeUser = await getActiveUser();
+    let filterBdgId: number | null | undefined = undefined;
+    if (activeUser && activeUser.pgw_role !== 0) {
+      filterBdgId = activeUser.pgw_bdg_id ? Number(activeUser.pgw_bdg_id) : 0;
+    }
+
+    const result = await MasterDokumenService.getList(search, page, limit, filterBdgId);
     return {
       success: true,
       message: 'Berhasil mengambil data master dokumen',

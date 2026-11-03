@@ -5,18 +5,21 @@ export class PegawaiRepository {
   static async findMany(search = '', limit = 10, offset = 0): Promise<{ data: Pegawai[]; total: number }> {
     await initDatabase();
 
-    let whereClause = 'WHERE pgw_deleted_at IS NULL';
+    let whereClause = 'WHERE p.pgw_deleted_at IS NULL';
     const params: any[] = [];
 
     if (search.trim()) {
-      whereClause += ' AND (pgw_nip LIKE ? OR pgw_nama LIKE ?)';
+      whereClause += ' AND (p.pgw_nip LIKE ? OR p.pgw_nama LIKE ? OR b.bdg_nama LIKE ?)';
       const term = `%${search.trim()}%`;
-      params.push(term, term);
+      params.push(term, term, term);
     }
 
     // Count query
     const [countRows] = await pool.query<any[]>(
-      `SELECT COUNT(*) as total FROM pegawai ${whereClause}`,
+      `SELECT COUNT(*) as total 
+       FROM pegawai p 
+       LEFT JOIN bidang b ON p.pgw_bdg_id = b.bdg_id 
+       ${whereClause}`,
       params
     );
     const total = countRows[0]?.total || 0;
@@ -24,10 +27,12 @@ export class PegawaiRepository {
     // Data query
     const dataParams = [...params, Number(limit), Number(offset)];
     const [rows] = await pool.query<any[]>(
-      `SELECT pgw_id, pgw_nip, pgw_nama, pgw_jabatan, pgw_role, pgw_status_pegawai, pgw_created_at, pgw_updated_at 
-       FROM pegawai 
+      `SELECT p.pgw_id, p.pgw_bdg_id, p.pgw_nip, p.pgw_nama, p.pgw_jabatan, p.pgw_role, p.pgw_status_pegawai, p.pgw_created_at, p.pgw_updated_at,
+              b.bdg_nama
+       FROM pegawai p
+       LEFT JOIN bidang b ON p.pgw_bdg_id = b.bdg_id
        ${whereClause} 
-       ORDER BY pgw_id DESC 
+       ORDER BY p.pgw_id DESC 
        LIMIT ? OFFSET ?`,
       dataParams
     );
@@ -41,9 +46,11 @@ export class PegawaiRepository {
   static async findById(pgw_id: number): Promise<Pegawai | null> {
     await initDatabase();
     const [rows] = await pool.query<any[]>(
-      `SELECT pgw_id, pgw_nip, pgw_nama, pgw_jabatan, pgw_role, pgw_status_pegawai, pgw_created_at, pgw_updated_at 
-       FROM pegawai 
-       WHERE pgw_id = ? AND pgw_deleted_at IS NULL 
+      `SELECT p.pgw_id, p.pgw_bdg_id, p.pgw_nip, p.pgw_nama, p.pgw_jabatan, p.pgw_role, p.pgw_status_pegawai, p.pgw_created_at, p.pgw_updated_at,
+              b.bdg_nama
+       FROM pegawai p
+       LEFT JOIN bidang b ON p.pgw_bdg_id = b.bdg_id
+       WHERE p.pgw_id = ? AND p.pgw_deleted_at IS NULL 
        LIMIT 1`,
       [pgw_id]
     );
@@ -54,9 +61,11 @@ export class PegawaiRepository {
   static async findByNip(pgw_nip: string): Promise<Pegawai | null> {
     await initDatabase();
     const [rows] = await pool.query<any[]>(
-      `SELECT pgw_id, pgw_nip, pgw_nama, pgw_jabatan, pgw_role, pgw_status_pegawai 
-       FROM pegawai 
-       WHERE pgw_nip = ? and pgw_deleted_at is null
+      `SELECT p.pgw_id, p.pgw_bdg_id, p.pgw_nip, p.pgw_nama, p.pgw_jabatan, p.pgw_role, p.pgw_status_pegawai,
+              b.bdg_nama
+       FROM pegawai p
+       LEFT JOIN bidang b ON p.pgw_bdg_id = b.bdg_id
+       WHERE p.pgw_nip = ? AND p.pgw_deleted_at IS NULL
        LIMIT 1`,
       [pgw_nip]
     );
@@ -67,9 +76,9 @@ export class PegawaiRepository {
   static async insert(input: CreatePegawaiInput): Promise<number> {
     await initDatabase();
     const [result]: any = await pool.query(
-      `INSERT INTO pegawai (pgw_nip, pgw_nama, pgw_jabatan, pgw_password, pgw_role, pgw_status_pegawai, pgw_created_by) 
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
-      [input.pgw_nip, input.pgw_nama, input.pgw_jabatan, input.pgw_password, input.pgw_role || 0, input.pgw_status_pegawai || 0, input.pgw_created_by ?? null]
+      `INSERT INTO pegawai (pgw_nip, pgw_bdg_id, pgw_nama, pgw_jabatan, pgw_password, pgw_role, pgw_status_pegawai, pgw_created_by) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [input.pgw_nip, input.pgw_bdg_id ?? null, input.pgw_nama, input.pgw_jabatan, input.pgw_password, input.pgw_role || 0, input.pgw_status_pegawai || 0, input.pgw_created_by ?? null]
     );
     return result.insertId;
   }
@@ -80,17 +89,17 @@ export class PegawaiRepository {
     if (input.pgw_password) {
       const [result]: any = await pool.query(
         `UPDATE pegawai 
-         SET pgw_nip = ?, pgw_nama = ?, pgw_jabatan = ?, pgw_password = ?, pgw_role = ?, pgw_status_pegawai = ?, pgw_updated_by = ?, pgw_updated_at = NOW() 
+         SET pgw_nip = ?, pgw_bdg_id = ?, pgw_nama = ?, pgw_jabatan = ?, pgw_password = ?, pgw_role = ?, pgw_status_pegawai = ?, pgw_updated_by = ?, pgw_updated_at = NOW() 
          WHERE pgw_id = ? AND pgw_deleted_at IS NULL`,
-        [input.pgw_nip, input.pgw_nama, input.pgw_jabatan, input.pgw_password, input.pgw_role, input.pgw_status_pegawai, input.pgw_updated_by ?? null, input.pgw_id]
+        [input.pgw_nip, input.pgw_bdg_id ?? null, input.pgw_nama, input.pgw_jabatan, input.pgw_password, input.pgw_role, input.pgw_status_pegawai, input.pgw_updated_by ?? null, input.pgw_id]
       );
       return result.affectedRows > 0;
     } else {
       const [result]: any = await pool.query(
         `UPDATE pegawai 
-         SET pgw_nip = ?, pgw_nama = ?, pgw_jabatan = ?, pgw_role = ?, pgw_status_pegawai = ?, pgw_updated_by = ?, pgw_updated_at = NOW() 
+         SET pgw_nip = ?, pgw_bdg_id = ?, pgw_nama = ?, pgw_jabatan = ?, pgw_role = ?, pgw_status_pegawai = ?, pgw_updated_by = ?, pgw_updated_at = NOW() 
          WHERE pgw_id = ? AND pgw_deleted_at IS NULL`,
-        [input.pgw_nip, input.pgw_nama, input.pgw_jabatan, input.pgw_role, input.pgw_status_pegawai, input.pgw_updated_by ?? null, input.pgw_id]
+        [input.pgw_nip, input.pgw_bdg_id ?? null, input.pgw_nama, input.pgw_jabatan, input.pgw_role, input.pgw_status_pegawai, input.pgw_updated_by ?? null, input.pgw_id]
       );
       return result.affectedRows > 0;
     }

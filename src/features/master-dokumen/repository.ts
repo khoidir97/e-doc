@@ -2,11 +2,16 @@ import pool, { initDatabase } from '@/lib/db';
 import { MasterDokumen, CreateMasterDokumenInput, UpdateMasterDokumenInput } from './types';
 
 export class MasterDokumenRepository {
-  static async findMany(search = '', limit = 10, offset = 0): Promise<{ data: MasterDokumen[]; total: number }> {
+  static async findMany(search = '', limit = 10, offset = 0, filterBdgId?: number | null): Promise<{ data: MasterDokumen[]; total: number }> {
     await initDatabase();
 
     let whereClause = 'WHERE md.mdk_deleted_at IS NULL';
     const params: any[] = [];
+
+    if (filterBdgId !== undefined && filterBdgId !== null) {
+      whereClause += ' AND md.mdk_bidang_id = ?';
+      params.push(filterBdgId);
+    }
 
     if (search.trim()) {
       whereClause += ' AND (md.mdk_bidang_id LIKE ? OR md.mdk_program LIKE ? OR md.mdk_kegiatan LIKE ? OR md.mdk_no_dpa LIKE ? OR p_pejabat.pgw_nama LIKE ? OR p_sh.psh_nama LIKE ?)';

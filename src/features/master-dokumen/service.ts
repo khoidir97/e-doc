@@ -2,12 +2,12 @@ import { MasterDokumenRepository } from './repository';
 import { MasterDokumen, CreateMasterDokumenInput, UpdateMasterDokumenInput, MasterDokumenListResult } from './types';
 
 export class MasterDokumenService {
-  static async getList(search = '', page = 1, limit = 10): Promise<MasterDokumenListResult> {
+  static async getList(search = '', page = 1, limit = 10, filterBdgId?: number | null): Promise<MasterDokumenListResult> {
     const validPage = Math.max(1, page);
     const validLimit = Math.max(1, Math.min(100, limit));
     const offset = (validPage - 1) * validLimit;
 
-    const { data, total } = await MasterDokumenRepository.findMany(search, validLimit, offset);
+    const { data, total } = await MasterDokumenRepository.findMany(search, validLimit, offset, filterBdgId);
     const totalPages = Math.ceil(total / validLimit) || 1;
 
     return {

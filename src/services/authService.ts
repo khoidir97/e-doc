@@ -12,6 +12,7 @@ export async function signToken(user: AuthUser, rememberMe = true): Promise<stri
   const expirationTime = rememberMe ? '7d' : '1d';
   return new SignJWT({
     pgw_id: user.pgw_id,
+    pgw_bdg_id: user.pgw_bdg_id,
     pgw_nip: user.pgw_nip,
     pgw_nama: user.pgw_nama,
     pgw_jabatan: user.pgw_jabatan,
@@ -28,6 +29,7 @@ export async function verifyToken(token: string): Promise<AuthUser | null> {
     const { payload } = await jwtVerify(token, JWT_SECRET);
     return {
       pgw_id: payload.pgw_id as number,
+      pgw_bdg_id: payload.pgw_bdg_id as number | undefined | null,
       pgw_nip: payload.pgw_nip as string,
       pgw_nama: payload.pgw_nama as string,
       pgw_jabatan: payload.pgw_jabatan as string,

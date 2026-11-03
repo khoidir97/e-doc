@@ -1,5 +1,7 @@
 export interface Pegawai {
   pgw_id: number;
+  pgw_bdg_id?: number | null;
+  bdg_nama?: string;
   pgw_nip: string;
   pgw_nama: string;
   pgw_jabatan: string;
@@ -15,6 +17,7 @@ export interface Pegawai {
 
 export interface CreatePegawaiInput {
   pgw_nip: string;
+  pgw_bdg_id?: number | null;
   pgw_nama: string;
   pgw_jabatan: string;
   pgw_password: string;
@@ -26,6 +29,7 @@ export interface CreatePegawaiInput {
 export interface UpdatePegawaiInput {
   pgw_id: number;
   pgw_nip: string;
+  pgw_bdg_id?: number | null;
   pgw_nama: string;
   pgw_jabatan: string;
   pgw_password?: string;

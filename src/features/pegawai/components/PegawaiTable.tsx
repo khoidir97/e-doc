@@ -33,6 +33,7 @@ export const PegawaiTable: React.FC<PegawaiTableProps> = ({
               <th className="px-4 py-3.5">No</th>
               <th className="px-4 py-3.5">NIP</th>
               <th className="px-4 py-3.5">Nama Pegawai</th>
+              <th className="px-4 py-3.5">Bidang</th>
               <th className="px-4 py-3.5">Jabatan</th>
               <th className="px-4 py-3.5">Role</th>
               <th className="px-4 py-3.5">Pejabat Luar</th>
@@ -42,7 +43,7 @@ export const PegawaiTable: React.FC<PegawaiTableProps> = ({
           <tbody className="divide-y divide-gray-100 dark:divide-gray-800 text-xs sm:text-sm">
             {loading ? (
               <tr>
-                <td colSpan={7} className="px-4 py-12 text-center text-gray-400">
+                <td colSpan={8} className="px-4 py-12 text-center text-gray-400">
                   <div className="flex items-center justify-center gap-2">
                     <svg className="animate-spin h-5 w-5 text-brand-500" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
@@ -54,7 +55,7 @@ export const PegawaiTable: React.FC<PegawaiTableProps> = ({
               </tr>
             ) : data.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-12 text-center text-gray-400">
+                <td colSpan={8} className="px-4 py-12 text-center text-gray-400">
                   Belum ada data pegawai.
                 </td>
               </tr>
@@ -72,6 +73,15 @@ export const PegawaiTable: React.FC<PegawaiTableProps> = ({
                   </td>
                   <td className="px-4 py-3.5 font-medium text-gray-900 dark:text-white">
                     {item.pgw_nama}
+                  </td>
+                  <td className="px-4 py-3.5">
+                    {item.bdg_nama ? (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/60">
+                        {item.bdg_nama}
+                      </span>
+                    ) : (
+                      <span className="text-gray-400 italic text-xs">-</span>
+                    )}
                   </td>
                   <td className="px-4 py-3.5 font-medium text-gray-900 dark:text-white">
                     {item.pgw_jabatan}

@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
 
     const authUser = {
       pgw_id: user.pgw_id,
+      pgw_bdg_id: user.pgw_bdg_id,
       pgw_nip: user.pgw_nip,
       pgw_nama: user.pgw_nama,
       pgw_jabatan: user.pgw_jabatan,

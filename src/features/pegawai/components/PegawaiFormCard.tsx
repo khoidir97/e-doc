@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { Pegawai, CreatePegawaiInput, UpdatePegawaiInput } from '../types';
+import { Bidang } from '@/features/bidang/types';
+import { getBidangListAction } from '@/features/bidang/actions';
 
 interface PegawaiFormCardProps {
   onSubmit: (data: CreatePegawaiInput | UpdatePegawaiInput) => Promise<any>;
@@ -17,16 +19,37 @@ export const PegawaiFormCard: React.FC<PegawaiFormCardProps> = ({
   loading,
 }) => {
   const [pgwNip, setPgwNip] = useState('');
+  const [pgwBdgId, setPgwBdgId] = useState<number | ''>('');
   const [pgwNama, setPgwNama] = useState('');
   const [pgwJabatan, setPgwJabatan] = useState('');
   const [pgwPassword, setPgwPassword] = useState('');
   const [pgwRole, setPgwRole] = useState(1);
   const [pgwStatusPegawai, setPgwStatusPegawai] = useState(0);
+  const [bidangList, setBidangList] = useState<Bidang[]>([]);
+  const [loadingBidang, setLoadingBidang] = useState(false);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchBidang = async () => {
+      setLoadingBidang(true);
+      try {
+        const res = await getBidangListAction('', 1, 100);
+        if (res.success && res.data) {
+          setBidangList(res.data.data);
+        }
+      } catch (err) {
+        console.error('Failed to load bidang list:', err);
+      } finally {
+        setLoadingBidang(false);
+      }
+    };
+    fetchBidang();
+  }, []);
 
   useEffect(() => {
     if (initialData) {
       setPgwNip(initialData.pgw_nip || '');
+      setPgwBdgId(initialData.pgw_bdg_id ? Number(initialData.pgw_bdg_id) : '');
       setPgwNama(initialData.pgw_nama || '');
       setPgwJabatan(initialData.pgw_jabatan || '');
       setPgwRole(initialData.pgw_role ?? 1);
@@ -34,6 +57,7 @@ export const PegawaiFormCard: React.FC<PegawaiFormCardProps> = ({
       setPgwPassword('');
     } else {
       setPgwNip('');
+      setPgwBdgId('');
       setPgwNama('');
       setPgwJabatan('');
       setPgwPassword('');
@@ -45,6 +69,7 @@ export const PegawaiFormCard: React.FC<PegawaiFormCardProps> = ({
 
   const handleReset = () => {
     setPgwNip('');
+    setPgwBdgId('');
     setPgwNama('');
     setPgwJabatan('');
     setPgwPassword('');
@@ -73,6 +98,7 @@ export const PegawaiFormCard: React.FC<PegawaiFormCardProps> = ({
         res = await onSubmit({
           pgw_id: initialData.pgw_id,
           pgw_nip: pgwNip.trim(),
+          pgw_bdg_id: pgwBdgId ? Number(pgwBdgId) : null,
           pgw_nama: pgwNama.trim(),
           pgw_jabatan: pgwJabatan.trim(),
           pgw_password: pgwPassword.trim() ? pgwPassword.trim() : undefined,
@@ -82,6 +108,7 @@ export const PegawaiFormCard: React.FC<PegawaiFormCardProps> = ({
       } else {
         res = await onSubmit({
           pgw_nip: pgwNip.trim(),
+          pgw_bdg_id: pgwBdgId ? Number(pgwBdgId) : null,
           pgw_nama: pgwNama.trim(),
           pgw_jabatan: pgwJabatan.trim(),
           pgw_password: pgwPassword.trim(),
@@ -95,6 +122,7 @@ export const PegawaiFormCard: React.FC<PegawaiFormCardProps> = ({
       } else if (!initialData) {
         // Reset on successful creation
         setPgwNip('');
+        setPgwBdgId('');
         setPgwNama('');
         setPgwJabatan('');
         setPgwPassword('');
@@ -184,6 +212,28 @@ export const PegawaiFormCard: React.FC<PegawaiFormCardProps> = ({
             onChange={(e) => setPgwJabatan(e.target.value)}
             className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none transition-all"
           />
+        </div>
+
+        {/* Bidang */}
+        <div>
+          <label className="block text-xs font-semibold uppercase tracking-wider text-gray-700 dark:text-gray-300 mb-1.5">
+            Bidang
+          </label>
+          <select
+            value={pgwBdgId}
+            onChange={(e) => setPgwBdgId(e.target.value === '' ? '' : Number(e.target.value))}
+            className="w-full px-4 py-2.5 text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none transition-all"
+          >
+            <option value="">-- Pilih Bidang (Opsional) --</option>
+            {bidangList.map((b) => (
+              <option key={b.bdg_id} value={b.bdg_id}>
+                {b.bdg_nama}
+              </option>
+            ))}
+          </select>
+          {loadingBidang && (
+            <p className="text-[11px] text-gray-400 mt-1">Memuat daftar bidang...</p>
+          )}
         </div>
 
         <div>

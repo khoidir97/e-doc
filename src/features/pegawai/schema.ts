@@ -5,6 +5,11 @@ export const createPegawaiSchema = z.object({
     .string()
     .min(1, { message: 'NIP wajib diisi' })
     .max(50, { message: 'NIP maksimal 50 karakter' }),
+  pgw_bdg_id: z
+    .coerce
+    .number()
+    .nullable()
+    .optional(),
   pgw_nama: z
     .string()
     .min(1, { message: 'Nama Pegawai wajib diisi' })
@@ -32,6 +37,11 @@ export const updatePegawaiSchema = z.object({
     .string()
     .min(1, { message: 'NIP wajib diisi' })
     .max(50, { message: 'NIP maksimal 50 karakter' }),
+  pgw_bdg_id: z
+    .coerce
+    .number()
+    .nullable()
+    .optional(),
   pgw_nama: z
     .string()
     .min(1, { message: 'Nama Pegawai wajib diisi' })
