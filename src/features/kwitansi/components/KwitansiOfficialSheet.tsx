@@ -95,7 +95,7 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
                       <div>Pejabat Pembuat Komitmen</div>
                     </div>
                   </div>
-                  <div className="text-center mt-auto pt-6 space-y-0.5">
+                  <div className="text-center mt-auto pt-15 space-y-0.5">
                     <div className="font-bold underline uppercase text-[11px]">
                       {masterDokumen.mdk_nama_pejabat || '...........................................'}
                     </div>

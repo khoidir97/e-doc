@@ -84,47 +84,65 @@ export default function BeritaAcaraPrintPage({ params }: { params: Promise<{ id:
                 </button>
             </div>
 
-            {/* A4 Print Container */}
-            <div
-                className="mx-auto bg-white text-black shadow-xl print:shadow-none print:m-0"
-                style={{ maxWidth: '210mm', padding: '8mm 15mm 15mm 15mm' }}
-            >
-                <style jsx global>{`
-          @media print {
-            html, body {
-              background: white !important;
-              color: black !important;
-              margin: 0 !important;
-              padding: 0 !important;
-              font-family: 'Times New Roman', Times, serif;
-            }
-            .print\\:hidden { display: none !important; }
-            @page {
-              size: A4 portrait;
-              margin: 0;
-            }
-          }
-        `}</style>
+            <style jsx global>{`
+              @media print {
+                html, body {
+                  background: white !important;
+                  color: black !important;
+                  margin: 0 !important;
+                  padding: 0 !important;
+                  font-family: 'Times New Roman', Times, serif;
+                }
+                .print-hidden { display: none !important; }
+                @page {
+                  size: A4 portrait;
+                  margin: 0;
+                }
+              }
+            `}</style>
 
             {/* Lembar 1 – Berita Acara Pemeriksaan Hasil Pekerjaan */}
-                <div style={{ pageBreakAfter: 'always' }}>
-                    <BeritaAcaraPrintSheet
-                        masterDokumen={masterDokumen}
-                        header={header}
-                        items={items}
-                        judul="BERITA ACARA PEMERIKSAAN HASIL PEKERJAAN"
-                    />
-                </div>
+            <div
+                className="mx-auto bg-white text-black shadow-xl print:shadow-none print:m-0"
+                style={{
+                    width: '210mm',
+                    minHeight: '297mm',
+                    boxSizing: 'border-box',
+                    pageBreakAfter: 'always',
+                    breakAfter: 'page',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    paddingTop: '10mm',
+                    paddingBottom: '8mm',
+                }}
+            >
+                <BeritaAcaraPrintSheet
+                    masterDokumen={masterDokumen}
+                    header={header}
+                    items={items}
+                    judul="BERITA ACARA PEMERIKSAAN HASIL PEKERJAAN"
+                />
+            </div>
 
-                {/* Lembar 2 – Berita Acara Serah Terima Hasil Pekerjaan */}
-                <div>
-                    <BeritaAcaraPrintSheet
-                        masterDokumen={masterDokumen}
-                        header={header}
-                        items={items}
-                        judul="BERITA ACARA SERAH TERIMA HASIL PEKERJAAN"
-                    />
-                </div>
+            {/* Lembar 2 – Berita Acara Serah Terima Hasil Pekerjaan */}
+            <div
+                className="mx-auto bg-white text-black shadow-xl print:shadow-none print:m-0 mt-6 print:mt-0"
+                style={{
+                    width: '210mm',
+                    minHeight: '297mm',
+                    boxSizing: 'border-box',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    paddingTop: '10mm',
+                    paddingBottom: '8mm',
+                }}
+            >
+                <BeritaAcaraPrintSheet
+                    masterDokumen={masterDokumen}
+                    header={header}
+                    items={items}
+                    judul="BERITA ACARA SERAH TERIMA HASIL PEKERJAAN"
+                />
             </div>
         </div>
     );

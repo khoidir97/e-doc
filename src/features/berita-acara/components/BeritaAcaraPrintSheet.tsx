@@ -47,12 +47,16 @@ export const BeritaAcaraPrintSheet: React.FC<BeritaAcaraPrintSheetProps> = ({
     masterDokumen?.mdk_alamat ||
     'Jl. Tembusu Blok C. 25 No. 24, Perum Pandau Permai, Kel. Pandau Jaya, Kec. Siak Hulu, Kab Kampar';
 
+  const isPemeriksaan = judul.toUpperCase().includes('PEMERIKSAAN');
+
   return (
-    <div className="font-serif text-black leading-normal text-xs sm:text-sm space-y-4 max-w-[210mm] mx-auto px-4 pb-4 pt-0 sm:px-8 sm:pb-8 sm:pt-0 bg-white">
-      {/* Title */}
-      <KopSuratBpkad />
-      <div className="text-center space-y-1">
-        <h1 className="text-base font-bold underline tracking-wide uppercase">
+    <div className="font-serif text-black leading-snug text-[11px] sm:text-xs space-y-2 max-w-[210mm] mx-auto px-6 py-0 bg-white">
+      {/* Kop Surat */}
+      <KopSuratBpkad className="!mb-2" />
+
+      {/* Judul & Nomor */}
+      <div className="text-center space-y-0.5">
+        <h1 className="text-sm sm:text-[13.5px] font-bold underline tracking-wide uppercase">
           {judul}
         </h1>
         <p className="text-xs font-semibold">
@@ -61,20 +65,19 @@ export const BeritaAcaraPrintSheet: React.FC<BeritaAcaraPrintSheetProps> = ({
       </div>
 
       {/* Paragraf Pertama */}
-      <p className="text-justify indent-8 leading-relaxed">
+      <p className="text-justify indent-8 leading-snug">
         {paragrafPertama}
       </p>
 
       {/* Identitas Pihak Pertama & Kedua */}
-      <div className="pl-6 space-y-3">
+      <div className="pl-6 space-y-2">
         {/* Pihak Pertama */}
-
-        <table>
-          <tbody >
+        <table className="leading-tight">
+          <tbody>
             <tr>
-              <td>Nama</td>
-              <td>:</td>
-              <td>{kpaNama}</td>
+              <td className="w-24">Nama</td>
+              <td className="w-3">:</td>
+              <td className="font-semibold">{kpaNama}</td>
             </tr>
             <tr>
               <td>NIP</td>
@@ -88,16 +91,15 @@ export const BeritaAcaraPrintSheet: React.FC<BeritaAcaraPrintSheetProps> = ({
             </tr>
           </tbody>
         </table>
-        <p className="font-semibold">Selanjutnya disebut <span className="font-bold">PIHAK PERTAMA</span>.</p>
+        <p className="font-semibold text-[11px]">Selanjutnya disebut <span className="font-bold">PIHAK PERTAMA</span>,</p>
 
         {/* Pihak Kedua */}
-
-        <table>
+        <table className="leading-tight">
           <tbody>
             <tr>
-              <td>Nama</td>
-              <td>:</td>
-              <td>{penyediaNamaPimpinan}</td>
+              <td className="w-24">Nama</td>
+              <td className="w-3">:</td>
+              <td className="font-semibold">{penyediaNamaPimpinan}</td>
             </tr>
             <tr>
               <td>Jabatan</td>
@@ -116,83 +118,105 @@ export const BeritaAcaraPrintSheet: React.FC<BeritaAcaraPrintSheetProps> = ({
             </tr>
           </tbody>
         </table>
-        <p className="font-semibold">Selanjutnya disebut <span className="font-bold">PIHAK KEDUA</span>.</p>
+        <p className="font-semibold text-[11px]">Selanjutnya disebut <span className="font-bold">PIHAK KEDUA</span>.</p>
       </div>
 
       {/* Paragraf Kedua */}
-      <p className="text-justify indent-8 leading-relaxed">
+      <p className="text-justify indent-8 leading-snug">
         {paragrafKedua}
       </p>
 
-      {/* Poin 1: Hasil Pekerjaan Table */}
+      {/* Poin-poin Pemeriksaan / Tabel */}
       <div className="space-y-2">
-        <p className="font-semibold">
-          1. <span className="underline">Hasil pekerjaan yang diperiksa oleh <span className="font-bold">PIHAK PERTAMA</span> dan <span className="font-bold">PIHAK KEDUA</span>, adalah berupa :</span>
-        </p>
+        {isPemeriksaan ? (
+          <div>
+            <p className="font-semibold">
+              1. Hasil pekerjaan yang diperiksa oleh <span className="font-bold">PIHAK PERTAMA</span> dan <span className="font-bold">PIHAK KEDUA</span>, adalah berupa :
+            </p>
+          </div>
+        ) : null}
 
-        <table className="w-full border-collapse border border-black text-center text-xs">
+        <table className="w-full border-collapse border border-black text-center text-[10.5px]">
           <thead>
-            <tr className="border-b border-black bg-gray-50">
-              <th className="border border-black px-3 py-2 text-center w-12">No</th>
-              <th className="border border-black px-3 py-2 text-center">Uraian</th>
-              <th className="border border-black px-3 py-2 text-center w-20">Volume</th>
-              <th className="border border-black px-3 py-2 text-center w-20">Satuan</th>
-              <th className="border border-black px-3 py-2 text-center w-32">Status</th>
+            <tr className="border-b border-black bg-gray-50 font-bold">
+              <th className="border border-black px-2 py-1 text-center w-10">No</th>
+              <th className="border border-black px-2 py-1 text-center">Uraian</th>
+              <th className="border border-black px-2 py-1 text-center w-16">Volume</th>
+              <th className="border border-black px-2 py-1 text-center w-16">Satuan</th>
+              <th className="border border-black px-2 py-1 text-center w-28">Status Pemeriksaan</th>
             </tr>
           </thead>
           <tbody>
             {items && items.length > 0 ? (
               items.map((item, idx) => (
                 <tr key={idx} className="border-b border-black">
-                  <td className="border border-black px-2 py-2 text-center">{idx + 1}</td>
-                  <td className="border border-black px-3 py-2 text-left">{item.dba_uraian}</td>
-                  <td className="border border-black px-2 py-2 text-center">{item.dba_volume}</td>
-                  <td className="border border-black px-2 py-2 text-center">{item.dba_satuan}</td>
-                  <td className="border border-black px-2 py-2 text-center font-semibold">{item.dba_status_pemeriksaan}</td>
+                  <td className="border border-black px-2 py-1 text-center">{idx + 1}</td>
+                  <td className="border border-black px-2 py-1 text-left">{item.dba_uraian}</td>
+                  <td className="border border-black px-2 py-1 text-center">{item.dba_volume}</td>
+                  <td className="border border-black px-2 py-1 text-center">{item.dba_satuan}</td>
+                  <td className="border border-black px-2 py-1 text-center font-medium">{item.dba_status_pemeriksaan}</td>
                 </tr>
               ))
             ) : (
               <tr>
-                <td colSpan={5} className="border border-black px-3 py-4 text-center text-gray-500 italic">
+                <td colSpan={5} className="border border-black px-3 py-2 text-center text-gray-500 italic">
                   Belum ada item rincian pekerjaan.
                 </td>
               </tr>
             )}
           </tbody>
         </table>
+
+        {/* Poin 2 & Poin 3 khusus Berita Acara Pemeriksaan Hasil Pekerjaan */}
+        {isPemeriksaan && (
+          <div className="space-y-1.5 pt-0.5">
+            <div>
+              <p className="font-semibold">2. Hasil pemeriksaan adalah sebagai berikut :</p>
+              <p className="pl-5 text-justify italic">
+                {hasilPemeriksaan.startsWith('"') ? hasilPemeriksaan : `"${hasilPemeriksaan}"`}.
+              </p>
+            </div>
+            <div className="flex items-start gap-1">
+              <span className="font-semibold">3.</span>
+              <p className="text-justify leading-snug">
+                Selanjutnya dilanjutkan ke proses serah terima barang atas pekerjaan tersebut, sama dengan pada saat dilakukan pemeriksaan ini serta sesuai dengan ketentuan dan peraturan yang berlaku.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
 
-
-
       {/* Penutup */}
-      <p className="indent-8 text-justify leading-relaxed">
+      <p className="indent-8 text-justify leading-snug">
         Demikian Berita Acara ini dibuat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.
       </p>
-      <p className="text-end">Pekanbaru, {bacTanggalFormatted}</p>
+
+      {!isPemeriksaan && (
+        <p className="text-end text-xs">Pekanbaru, {bacTanggalFormatted}</p>
+      )}
 
       {/* Tanda Tangan */}
-      <div className="pt-3 grid grid-cols-2 text-center gap-4 text-xs sm:text-sm">
+      <div className={`grid grid-cols-2 text-center gap-4 text-xs ${isPemeriksaan ? 'pt-2' : 'pt-1'}`}>
         {/* Pihak Kedua */}
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           <p className="font-semibold">Pihak Kedua</p>
           <p>Yang Menyerahkan,</p>
           <p className="font-bold uppercase">{penyediaPerusahaan}</p>
-          <div className="h-20"></div>
+          <div className="h-14"></div>
           <p className="font-bold underline uppercase">{penyediaNamaPimpinan}</p>
           <p>{jabatanPimpinanPerusahaan}</p>
         </div>
 
         {/* Pihak Pertama */}
-        <div className="space-y-1">
-
+        <div className="space-y-0.5">
           <p className="font-semibold">Pihak Pertama</p>
           <p>Yang Menerima,</p>
           <p className="font-semibold">{masterDokumen.mdk_jabatan_pejabat?.trim().toUpperCase()} selaku PPK</p>
-          <div className="h-20"></div>
+          <div className="h-14"></div>
           <p className="font-bold underline uppercase">{kpaNama}</p>
           <p>NIP. {kpaNip}</p>
         </div>
       </div>
-    </div >
+    </div>
   );
 };
