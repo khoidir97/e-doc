@@ -284,7 +284,7 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
 
                   {/* Row 2b: the three signature labels */}
                   <tr>
-                    <td className="border-r-2 border-black align-top px-3 pt-3 text-center leading-snug">
+                    <td className="border-r-2 border-black align-top px-3 pt-3 text-center leading-snug vertical-align-bottom">
                       Bendahara Pengeluaran Pembantu
                     </td>
                     <td className="align-top px-3 pt-3 text-center leading-snug">
@@ -319,7 +319,7 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
 
                   {/* Row 2c: signature name / NIP / jabatan */}
                   <tr>
-                    <td className="border-r-2 border-black align-bottom px-2 pt-15 pb-2 print:pt-4 print:pb-1.5 text-center vertical-align-bottom">
+                    <td className="border-r-2 border-black align-bottom px-2 pt-15 pb-2 print:pt-4 print:pb-1.5 text-center">
                       <div className="font-bold underline uppercase text-[11px]">
                         {masterDokumen.mdk_nama_bendahara || '...........................................'}
                       </div>
