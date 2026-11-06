@@ -108,6 +108,11 @@ export default function PerhitunganPaketPrintPage({ params }: { params: Promise<
   const tdColon = "text-center py-0.5 pr-2 align-top w-3";
   const tdValue = "text-[9px] py-0.5 align-top leading-snug";
 
+  // Tentukan label PPh (PPh 22, PPh 23, atau PPh)
+  const jenisPphHeader = items.some((i) => i.pak_jenis_pph === '22') || paket?.pkt_jenis_pph === '22'
+    ? (items.some((i) => i.pak_jenis_pph === '23') ? 'PPh' : 'PPh 22')
+    : 'PPh 23';
+
   return (
     <div className="min-h-screen bg-gray-100 py-6 print:py-0 print:bg-white">
       {/* Floating Control Bar */}
@@ -176,7 +181,7 @@ export default function PerhitunganPaketPrintPage({ params }: { params: Promise<
               <th className="border border-black px-2 py-2">NILAI INVOICE</th>
               <th className="border border-black px-2 py-2">DPP</th>
               <th className="border border-black px-2 py-2">PPN</th>
-              <th className="border border-black px-2 py-2">PPh 23</th>
+              <th className="border border-black px-2 py-2">{jenisPphHeader}</th>
               <th className="border border-black px-2 py-2 bg-blue-50">DIBAYAR</th>
             </tr>
           </thead>

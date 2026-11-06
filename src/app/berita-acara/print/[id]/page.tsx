@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, use } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { getBeritaAcaraWithDetailsAction } from '@/features/berita-acara/actions';
 import { BeritaAcaraPrintSheet } from '@/features/berita-acara/components/BeritaAcaraPrintSheet';
 import { MasterDokumen } from '@/features/master-dokumen/types';
@@ -9,18 +10,25 @@ import { BeritaAcara, BeritaAcaraHeader } from '@/features/berita-acara/types';
 export default function BeritaAcaraPrintPage({ params }: { params: Promise<{ id: string }> }) {
     const resolvedParams = use(params);
     const mdkId = Number(resolvedParams.id);
+    const searchParams = useSearchParams();
+    const jenisParam = searchParams.get('jenis') || '001';
 
     const [loading, setLoading] = useState(true);
     const [masterDokumen, setMasterDokumen] = useState<MasterDokumen | null>(null);
     const [header, setHeader] = useState<BeritaAcaraHeader | null>(null);
     const [items, setItems] = useState<BeritaAcara[]>([]);
 
+    const judul =
+        jenisParam === '002'
+            ? 'BERITA ACARA SERAH TERIMA HASIL PEKERJAAN'
+            : 'BERITA ACARA PEMERIKSAAN HASIL PEKERJAAN';
+
     useEffect(() => {
         async function loadData() {
             if (!mdkId) return;
             setLoading(true);
 
-            const res = await getBeritaAcaraWithDetailsAction(mdkId);
+            const res = await getBeritaAcaraWithDetailsAction(mdkId, jenisParam);
 
             if (res.success && res.data) {
                 setMasterDokumen(res.data.masterDokumen);
@@ -31,7 +39,7 @@ export default function BeritaAcaraPrintPage({ params }: { params: Promise<{ id:
             setLoading(false);
         }
         loadData();
-    }, [mdkId]);
+    }, [mdkId, jenisParam]);
 
     useEffect(() => {
         if (!loading && masterDokumen) {
@@ -91,7 +99,7 @@ export default function BeritaAcaraPrintPage({ params }: { params: Promise<{ id:
                   color: black !important;
                   margin: 0 !important;
                   padding: 0 !important;
-                  font-family: 'Times New Roman', Times, serif;
+                  font-family: Arial, Helvetica, sans-serif !important;
                 }
                 .print-hidden { display: none !important; }
                 @page {
@@ -101,15 +109,13 @@ export default function BeritaAcaraPrintPage({ params }: { params: Promise<{ id:
               }
             `}</style>
 
-            {/* Lembar 1 – Berita Acara Pemeriksaan Hasil Pekerjaan */}
+            {/* Berita Acara Sheet */}
             <div
                 className="mx-auto bg-white text-black shadow-xl print:shadow-none print:m-0"
                 style={{
                     width: '210mm',
                     minHeight: '297mm',
                     boxSizing: 'border-box',
-                    pageBreakAfter: 'always',
-                    breakAfter: 'page',
                     display: 'flex',
                     flexDirection: 'column',
                     paddingTop: '10mm',
@@ -120,28 +126,7 @@ export default function BeritaAcaraPrintPage({ params }: { params: Promise<{ id:
                     masterDokumen={masterDokumen}
                     header={header}
                     items={items}
-                    judul="BERITA ACARA PEMERIKSAAN HASIL PEKERJAAN"
-                />
-            </div>
-
-            {/* Lembar 2 – Berita Acara Serah Terima Hasil Pekerjaan */}
-            <div
-                className="mx-auto bg-white text-black shadow-xl print:shadow-none print:m-0 mt-6 print:mt-0"
-                style={{
-                    width: '210mm',
-                    minHeight: '297mm',
-                    boxSizing: 'border-box',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    paddingTop: '10mm',
-                    paddingBottom: '8mm',
-                }}
-            >
-                <BeritaAcaraPrintSheet
-                    masterDokumen={masterDokumen}
-                    header={header}
-                    items={items}
-                    judul="BERITA ACARA SERAH TERIMA HASIL PEKERJAAN"
+                    judul={judul}
                 />
             </div>
         </div>

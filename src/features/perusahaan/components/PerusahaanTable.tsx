@@ -35,6 +35,10 @@ export const PerusahaanTable: React.FC<PerusahaanTableProps> = ({
               <th className="px-6 py-4">Nama Pimpinan</th>
               <th className="px-6 py-4">Jabatan</th>
               <th className="px-6 py-4">Alamat</th>
+              <th className="px-6 py-4">NPWP</th>
+              <th className="px-6 py-4">Nomor Rekening</th>
+              <th className="px-6 py-4">Nama Rekening</th>
+              <th className="px-6 py-4">Nama Bank</th>
               <th className="px-6 py-4 text-right">Aksi</th>
             </tr>
           </thead>
@@ -77,6 +81,18 @@ export const PerusahaanTable: React.FC<PerusahaanTableProps> = ({
                   </td>
                   <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
                     {item.psh_alamat}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                    {item.psh_npwp}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                    {item.psh_nomor_rekening}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                    {item.psh_nama_rekening}
+                  </td>
+                  <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                    {item.psh_nama_bank}
                   </td>
 
 

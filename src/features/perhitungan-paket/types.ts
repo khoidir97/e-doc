@@ -6,6 +6,7 @@ export interface PerhitunganPaket {
   pak_dpp: number;
   pak_ppn: number;
   pak_pph23: number;
+  pak_jenis_pph?: string | null;
   pak_dibayar: number;
   pak_created_at: Date | string | null;
   pak_created_by: number | null;
@@ -30,6 +31,7 @@ export interface Paket {
   pkt_no_rekening: string | null;
   pkt_nama_rekening: string | null;
   pkt_nama_bank: string | null;
+  pkt_jenis_pph?: string | null;
   pkt_created_at: string | Date | null;
   pkt_created_by: number | null;
   pkt_updated_at: string | Date | null;
@@ -51,6 +53,7 @@ export interface UpsertPaketInput {
   pkt_no_rekening?: string | null;
   pkt_nama_rekening?: string | null;
   pkt_nama_bank?: string | null;
+  pkt_jenis_pph?: string | null;
   pkt_created_by?: number | null;
   pkt_updated_by?: number | null;
 }
@@ -63,6 +66,7 @@ export interface CreatePerhitunganPaketInput {
   pak_dpp: number;
   pak_ppn: number;
   pak_pph23: number;
+  pak_jenis_pph?: string | null;
   pak_dibayar: number;
   pak_created_by?: number | null;
 }
@@ -75,6 +79,7 @@ export interface UpdatePerhitunganPaketInput {
   pak_dpp: number;
   pak_ppn: number;
   pak_pph23: number;
+  pak_jenis_pph?: string | null;
   pak_dibayar: number;
   pak_updated_by?: number | null;
 }

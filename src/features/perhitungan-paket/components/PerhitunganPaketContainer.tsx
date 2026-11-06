@@ -13,6 +13,7 @@ import {
 } from '../actions';
 import { getNegoByMasterDokumenAction } from '@/features/nego/actions';
 import { formatRupiah } from '@/lib/terbilang';
+import { formatDateYYYYMMDD } from '@/lib/date';
 import { MasterDokumenSelectorCard } from '@/features/master-dokumen/components/MasterDokumenSelectorCard';
 import { RupiahInput } from '@/components/form/RupiahInput';
 import { Toast } from '@/components/ui/Toast';
@@ -24,28 +25,42 @@ interface PerhitunganPaketItemRow {
   pak_dpp: number;
   pak_ppn: number;
   pak_pph23: number;
+  pak_jenis_pph?: '23' | '22';
   pak_dibayar: number;
 }
 
-const createEmptyRow = (): PerhitunganPaketItemRow => ({
+const createEmptyRow = (defaultJenisPph: '23' | '22' = '23'): PerhitunganPaketItemRow => ({
   pak_nilai_invoice: 0,
   pak_dpp: 0,
   pak_ppn: 0,
   pak_pph23: 0,
+  pak_jenis_pph: defaultJenisPph,
   pak_dibayar: 0,
 });
 
+// Hitung tarif PPh: PPh 23 = 2% (0.02) atau 1.5% (0.015), PPh 22 = 1.5% (0.015)
+// Default rumus: PPh 23 = 2% (Math.round(dpp * 0.02)), PPh 22 = 1.5% (Math.round(dpp * 0.015))
+const getPphRate = (jenisPph: '23' | '22' = '23') => {
+  return jenisPph === '22' ? 0.015 : 0.02;
+};
+
 // Hitung otomatis turunan dari Nilai Invoice (invoice sudah termasuk PPN 11%)
-const calcFromInvoice = (invoice: number, ppnOverride?: number): Omit<PerhitunganPaketItemRow, 'pak_id' | 'pak_master_dokumen_id'> => {
+const calcFromInvoice = (
+  invoice: number,
+  ppnOverride?: number,
+  jenisPph: '23' | '22' = '23'
+): Omit<PerhitunganPaketItemRow, 'pak_id' | 'pak_master_dokumen_id'> => {
   const nilai = Number(invoice) || 0;
   const ppn = ppnOverride !== undefined ? ppnOverride : Math.round((nilai * 11) / 111);
   const dpp = nilai - ppn;
-  const pph = Math.round(dpp * 0.015);
+  const rate = getPphRate(jenisPph);
+  const pph = Math.round(dpp * rate);
   return {
     pak_nilai_invoice: nilai,
     pak_ppn: ppn,
     pak_dpp: dpp,
     pak_pph23: pph,
+    pak_jenis_pph: jenisPph,
     pak_dibayar: dpp - pph,
   };
 };
@@ -88,7 +103,7 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
   const [loadingOptions, setLoadingOptions] = useState(true);
 
   // Paket header state (tabel perhitungan_paket)
-  const todayYmd = new Date().toISOString().split('T')[0];
+  const todayYmd = formatDateYYYYMMDD(new Date());
   const [paketData, setPaketData] = useState<Paket | null>(null);
   const [pktSpkKwitansi, setPktSpkKwitansi] = useState(0);
   const [pktNoSpkKwitansi, setPktNoSpkKwitansi] = useState('');
@@ -101,6 +116,7 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
   const [pktNoRekening, setPktNoRekening] = useState('');
   const [pktNamaRekening, setPktNamaRekening] = useState('');
   const [pktNamaBank, setPktNamaBank] = useState('');
+  const [pktJenisPph, setPktJenisPph] = useState<'23' | '22'>('23');
   const [savingPaket, setSavingPaket] = useState(false);
 
   // Detail rows state (tabel detail_perhitungan_paket)
@@ -157,9 +173,11 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
 
     if (isSaved && res.data) {
       setPerhitunganPaketRows(res.data.map((item, idx) => {
+        const itemJenisPph: '23' | '22' = item.pak_jenis_pph === '22' ? '22' : '23';
         const base = {
           pak_id: item.pak_id,
           pak_master_dokumen_id: item.pak_master_dokumen_id,
+          pak_jenis_pph: itemJenisPph,
         };
         // Jika invoice tersimpan masih kosong, ambil dari Nego (baris pertama)
         if (idx === 0 && !Number(item.pak_nilai_invoice) && negoCalc) {
@@ -175,10 +193,10 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
         };
       }));
     } else {
-      setPerhitunganPaketRows([negoCalc ? { ...negoCalc } : createEmptyRow()]);
+      setPerhitunganPaketRows([negoCalc ? { ...negoCalc } : createEmptyRow(pktJenisPph)]);
     }
     setLoadingPerhitunganPaket(false);
-  }, []);
+  }, [pktJenisPph]);
 
   const loadPaketForMdk = useCallback(async (mdkId: number) => {
     const res = await getPaketByMasterDokumenAction(mdkId);
@@ -188,22 +206,21 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
       setPktSpkKwitansi(p.pkt_spk_kwitansi || 0);
       setPktNoSpkKwitansi(p.pkt_no_spk_kwitansi || '');
       setPktTanggalSpkKwitansi(
-        p.pkt_tanggal_spk_kwitansi
-          ? new Date(p.pkt_tanggal_spk_kwitansi as string).toISOString().split('T')[0]
-          : todayYmd
+        p.pkt_tanggal_spk_kwitansi ? formatDateYYYYMMDD(p.pkt_tanggal_spk_kwitansi) : todayYmd
       );
       setPktBapp(p.pkt_bapp || '');
       setPktBast(p.pkt_bast || '');
       setPktBap(p.pkt_bap || '');
       setPktTanggal(
-        p.pkt_tanggal
-          ? new Date(p.pkt_tanggal as string).toISOString().split('T')[0]
-          : todayYmd
+        p.pkt_tanggal ? formatDateYYYYMMDD(p.pkt_tanggal) : todayYmd
       );
       setPktNpwp(p.pkt_npwp || '');
       setPktNoRekening(p.pkt_no_rekening || '');
       setPktNamaRekening(p.pkt_nama_rekening || '');
       setPktNamaBank(p.pkt_nama_bank || '');
+      if (p.pkt_jenis_pph === '22' || p.pkt_jenis_pph === '23') {
+        setPktJenisPph(p.pkt_jenis_pph);
+      }
     }
   }, []);
 
@@ -221,11 +238,11 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
     }
   }, [selectedMdkId, masterDokumenList, loadPerhitunganPaketForMdk, loadPaketForMdk]);
 
-  const handleAddRow = () => setPerhitunganPaketRows((prev) => [...prev, createEmptyRow()]);
+  const handleAddRow = () => setPerhitunganPaketRows((prev) => [...prev, createEmptyRow(pktJenisPph)]);
 
   const handleRemoveRow = (index: number) => {
     if (PerhitunganPaketRows.length === 1) {
-      setPerhitunganPaketRows([createEmptyRow()]);
+      setPerhitunganPaketRows([createEmptyRow(pktJenisPph)]);
       return;
     }
     setPerhitunganPaketRows((prev) => prev.filter((_, idx) => idx !== index));
@@ -235,18 +252,33 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
     setPerhitunganPaketRows((prev) => {
       const updated = [...prev];
       let row = { ...updated[index], [field]: value };
-      const num = Number(value) || 0;
+      const currentJenisPph = row.pak_jenis_pph || pktJenisPph || '23';
 
-      if (field === 'pak_nilai_invoice') {
+      if (field === 'pak_jenis_pph') {
+        const newJenis = value as '23' | '22';
+        row.pak_jenis_pph = newJenis;
+        if (row.pak_nilai_invoice > 0) {
+          row = { ...row, ...calcFromInvoice(row.pak_nilai_invoice, row.pak_ppn, newJenis) };
+        } else if (row.pak_dpp > 0) {
+          const rate = getPphRate(newJenis);
+          row.pak_pph23 = Math.round(row.pak_dpp * rate);
+          row.pak_dibayar = row.pak_dpp - row.pak_pph23;
+        }
+      } else if (field === 'pak_nilai_invoice') {
         // Invoice berubah -> hitung ulang semua
-        row = { ...row, ...calcFromInvoice(num) };
+        const num = Number(value) || 0;
+        row = { ...row, ...calcFromInvoice(num, undefined, currentJenisPph) };
       } else if (field === 'pak_ppn') {
         // PPN diubah manual -> DPP, PPh, Dibayar menyesuaikan
-        row = { ...row, ...calcFromInvoice(row.pak_nilai_invoice, num) };
+        const num = Number(value) || 0;
+        row = { ...row, ...calcFromInvoice(row.pak_nilai_invoice, num, currentJenisPph) };
       } else if (field === 'pak_dpp') {
-        row.pak_pph23 = Math.round(num * 0.015);
+        const num = Number(value) || 0;
+        const rate = getPphRate(currentJenisPph);
+        row.pak_pph23 = Math.round(num * rate);
         row.pak_dibayar = num - row.pak_pph23;
       } else if (field === 'pak_pph23') {
+        const num = Number(value) || 0;
         row.pak_dibayar = (Number(row.pak_dpp) || 0) - num;
       }
 
@@ -255,19 +287,38 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
     });
   };
 
+  // Ubah jenis PPh untuk semua baris sekaligus
+  const handleBulkJenisPphChange = (newJenis: '23' | '22') => {
+    setPktJenisPph(newJenis);
+    setPerhitunganPaketRows((prev) =>
+      prev.map((r) => {
+        const row = { ...r, pak_jenis_pph: newJenis };
+        if (row.pak_nilai_invoice > 0) {
+          return { ...row, ...calcFromInvoice(row.pak_nilai_invoice, row.pak_ppn, newJenis) };
+        } else if (row.pak_dpp > 0) {
+          const rate = getPphRate(newJenis);
+          const pph = Math.round(row.pak_dpp * rate);
+          return { ...row, pak_pph23: pph, pak_dibayar: row.pak_dpp - pph };
+        }
+        return row;
+      })
+    );
+  };
+
   const getPaketInputPayload = (mdkId: number): UpsertPaketInput => ({
     pkt_master_dokumen_id: mdkId,
     pkt_spk_kwitansi: pktSpkKwitansi ? Number(pktSpkKwitansi) : null,
-    pkt_no_spk_kwitansi: pktNoSpkKwitansi || null,
-    pkt_tanggal_spk_kwitansi: pktTanggalSpkKwitansi || null,
-    pkt_bapp: pktBapp || null,
-    pkt_bast: pktBast || null,
-    pkt_bap: pktBap || null,
-    pkt_tanggal: pktTanggal || null,
-    pkt_npwp: pktNpwp || null,
-    pkt_no_rekening: pktNoRekening || null,
-    pkt_nama_rekening: pktNamaRekening || null,
-    pkt_nama_bank: pktNamaBank || null,
+    pkt_no_spk_kwitansi: pktNoSpkKwitansi ? pktNoSpkKwitansi.trim() : null,
+    pkt_tanggal_spk_kwitansi: pktTanggalSpkKwitansi ? formatDateYYYYMMDD(pktTanggalSpkKwitansi) : null,
+    pkt_bapp: pktBapp ? pktBapp.trim() : null,
+    pkt_bast: pktBast ? pktBast.trim() : null,
+    pkt_bap: pktBap ? pktBap.trim() : null,
+    pkt_tanggal: pktTanggal ? formatDateYYYYMMDD(pktTanggal) : null,
+    pkt_npwp: pktNpwp ? pktNpwp.trim() : null,
+    pkt_no_rekening: pktNoRekening ? pktNoRekening.trim() : null,
+    pkt_nama_rekening: pktNamaRekening ? pktNamaRekening.trim() : null,
+    pkt_nama_bank: pktNamaBank ? pktNamaBank.trim() : null,
+    pkt_jenis_pph: pktJenisPph || '23',
   });
 
   const handleSavePaket = async () => {
@@ -304,6 +355,7 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
           pak_dpp: r.pak_dpp,
           pak_ppn: r.pak_ppn,
           pak_pph23: r.pak_pph23,
+          pak_jenis_pph: r.pak_jenis_pph || pktJenisPph || '23',
           pak_dibayar: r.pak_dibayar,
         })),
       }),
@@ -449,21 +501,48 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
               {/* ── Section 2: Rincian Invoice ── */}
               <form onSubmit={handleSubmitDetail} className="space-y-4">
                 <div className="p-5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm space-y-5">
-                  <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800 gap-3">
                     <div>
                       <h2 className="text-base font-bold text-gray-900 dark:text-white">Rincian Nilai Invoice</h2>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">Isi nilai invoice, DPP, PPN, PPH23, dan dibayar</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Isi nilai invoice, DPP, PPN, PPh 23 / PPh 22, dan jumlah dibayar</p>
                     </div>
-                    <button
-                      type="button"
-                      onClick={handleAddRow}
-                      className="px-3.5 py-2 rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-400 font-semibold text-xs hover:bg-brand-100 transition-colors flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                      </svg>
-                      Tambah Baris
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1.5 bg-gray-100 dark:bg-gray-800 p-1 rounded-xl border border-gray-200 dark:border-gray-700">
+                        <span className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 px-1.5">Pajak PPh:</span>
+                        <button
+                          type="button"
+                          onClick={() => handleBulkJenisPphChange('23')}
+                          className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                            pktJenisPph === '23'
+                              ? 'bg-brand-600 text-white shadow-xs'
+                              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                          }`}
+                        >
+                          PPh 23 (2%)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleBulkJenisPphChange('22')}
+                          className={`px-2.5 py-1 text-xs font-bold rounded-lg transition-all cursor-pointer ${
+                            pktJenisPph === '22'
+                              ? 'bg-brand-600 text-white shadow-xs'
+                              : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                          }`}
+                        >
+                          PPh 22 (1.5%)
+                        </button>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleAddRow}
+                        className="px-3.5 py-2 rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-400 font-semibold text-xs hover:bg-brand-100 transition-colors flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Tambah Baris
+                      </button>
+                    </div>
                   </div>
 
                   {loadingPerhitunganPaket ? (
@@ -475,50 +554,94 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
                         <div className="col-span-1 text-center">No</div>
                         <div className="col-span-2">Nilai Invoice</div>
                         <div className="col-span-2">DPP</div>
-                        <div className="col-span-2">PPN</div>
-                        <div className="col-span-2">PPH 23</div>
+                        <div className="col-span-2">PPN (11%)</div>
+                        <div className="col-span-2">Jenis & Nilai PPh</div>
                         <div className="col-span-2">Dibayar</div>
                         <div className="col-span-1"></div>
                       </div>
 
-                      {PerhitunganPaketRows.map((row, index) => (
-                        <div key={index} className="p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/40">
-                          <div className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center">
-                            <div className="hidden md:flex items-center justify-center col-span-1">
-                              <span className="w-6 h-6 rounded-md bg-gray-200 dark:bg-gray-700 text-xs font-bold text-gray-600 dark:text-gray-300 flex items-center justify-center">{index + 1}</span>
-                            </div>
-                            {[
-                              { label: 'Nilai Invoice', field: 'pak_nilai_invoice' as keyof PerhitunganPaketItemRow },
-                              { label: 'DPP', field: 'pak_dpp' as keyof PerhitunganPaketItemRow },
-                              { label: 'PPN', field: 'pak_ppn' as keyof PerhitunganPaketItemRow },
-                              { label: 'PPH 22', field: 'pak_pph23' as keyof PerhitunganPaketItemRow },
-                              { label: 'Dibayar', field: 'pak_dibayar' as keyof PerhitunganPaketItemRow },
-                            ].map(({ label, field }) => (
-                              <div key={field} className="md:col-span-2">
-                                <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1 md:hidden">{label}</label>
+                      {PerhitunganPaketRows.map((row, index) => {
+                        const rowJenis = row.pak_jenis_pph || pktJenisPph || '23';
+                        return (
+                          <div key={index} className="p-3 rounded-xl border border-gray-200 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/40">
+                            <div className="grid grid-cols-1 md:grid-cols-12 gap-2 items-center">
+                              <div className="hidden md:flex items-center justify-center col-span-1">
+                                <span className="w-6 h-6 rounded-md bg-gray-200 dark:bg-gray-700 text-xs font-bold text-gray-600 dark:text-gray-300 flex items-center justify-center">{index + 1}</span>
+                              </div>
+                              <div className="md:col-span-2">
+                                <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1 md:hidden">Nilai Invoice</label>
                                 <RupiahInput
                                   placeholder="0"
-                                  value={(row[field] as number) || ''}
-                                  onChange={(e) => handleRowChange(index, field, Number(e))}
+                                  value={row.pak_nilai_invoice || ''}
+                                  onChange={(e) => handleRowChange(index, 'pak_nilai_invoice', Number(e))}
                                   className="w-full px-2.5 py-2 text-xs font-mono rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none"
                                 />
                               </div>
-                            ))}
-                            <div className="md:col-span-1 flex justify-end">
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveRow(index)}
-                                className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
-                                title="Hapus Baris"
-                              >
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                              </button>
+                              <div className="md:col-span-2">
+                                <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1 md:hidden">DPP</label>
+                                <RupiahInput
+                                  placeholder="0"
+                                  value={row.pak_dpp || ''}
+                                  onChange={(e) => handleRowChange(index, 'pak_dpp', Number(e))}
+                                  className="w-full px-2.5 py-2 text-xs font-mono rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none"
+                                />
+                              </div>
+                              <div className="md:col-span-2">
+                                <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1 md:hidden">PPN</label>
+                                <RupiahInput
+                                  placeholder="0"
+                                  value={row.pak_ppn || ''}
+                                  onChange={(e) => handleRowChange(index, 'pak_ppn', Number(e))}
+                                  className="w-full px-2.5 py-2 text-xs font-mono rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none"
+                                />
+                              </div>
+                              <div className="md:col-span-2">
+                                <div className="flex items-center justify-between mb-1 md:mb-0.5">
+                                  <label className="text-[11px] font-medium text-gray-500 dark:text-gray-400">
+                                    PPh {rowJenis} ({rowJenis === '22' ? '1.5%' : '2%'})
+                                  </label>
+                                  <select
+                                    value={rowJenis}
+                                    onChange={(e) => handleRowChange(index, 'pak_jenis_pph', e.target.value)}
+                                    className="text-[10px] py-0.5 px-1.5 rounded bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 border-none font-bold cursor-pointer"
+                                    title="Pilih Jenis PPh untuk baris ini"
+                                  >
+                                    <option value="23">PPh 23 (2%)</option>
+                                    <option value="22">PPh 22 (1.5%)</option>
+                                  </select>
+                                </div>
+                                <RupiahInput
+                                  placeholder="0"
+                                  value={row.pak_pph23 || ''}
+                                  onChange={(e) => handleRowChange(index, 'pak_pph23', Number(e))}
+                                  className="w-full px-2.5 py-2 text-xs font-mono rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none"
+                                />
+                              </div>
+                              <div className="md:col-span-2">
+                                <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1 md:hidden">Dibayar</label>
+                                <RupiahInput
+                                  placeholder="0"
+                                  value={row.pak_dibayar || ''}
+                                  onChange={(e) => handleRowChange(index, 'pak_dibayar', Number(e))}
+                                  className="w-full px-2.5 py-2 text-xs font-mono font-bold rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-brand-600 dark:text-brand-400 focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none"
+                                />
+                              </div>
+                              <div className="md:col-span-1 flex justify-end">
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveRow(index)}
+                                  className="p-1.5 rounded-lg text-gray-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors cursor-pointer"
+                                  title="Hapus Baris"
+                                >
+                                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                  </svg>
+                                </button>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -533,7 +656,7 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
                           <th className="px-3 py-2 text-left">Nilai Invoice</th>
                           <th className="px-3 py-2 text-left">DPP</th>
                           <th className="px-3 py-2 text-left">PPN</th>
-                          <th className="px-3 py-2 text-left">PPH 23</th>
+                          <th className="px-3 py-2 text-left">PPh ({pktJenisPph === '22' ? '22' : '23'})</th>
                           <th className="px-3 py-2 text-left font-extrabold text-brand-600 dark:text-brand-400">Dibayar</th>
                         </tr>
                       </thead>

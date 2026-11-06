@@ -24,13 +24,13 @@ async function getActiveUserId(): Promise<number | null> {
   }
 }
 
-export async function getBeritaAcaraWithDetailsAction(mdkId: number): Promise<ActionResponse<{
+export async function getBeritaAcaraWithDetailsAction(mdkId: number, jenis_ba_kode?: string): Promise<ActionResponse<{
   fullData: BeritaAcaraFullData;
   masterDokumen: MasterDokumen | null;
   hpsItems: any[];
 }>> {
   try {
-    const fullData = await BeritaAcaraService.getFullDataByMasterDokumenId(mdkId);
+    const fullData = await BeritaAcaraService.getFullDataByMasterDokumenId(mdkId, jenis_ba_kode);
     const masterDokumen = await MasterDokumenRepository.findById(mdkId);
     let hpsItems: any[] = [];
     try {
@@ -77,9 +77,43 @@ export async function getMasterDokumenOptionsAction(): Promise<ActionResponse<an
   }
 }
 
-export async function getBeritaAcaraByMasterDokumenAction(mdk_id: number): Promise<ActionResponse<BeritaAcaraFullData>> {
+export async function getMasterJenisBeritaAcaraAction(): Promise<ActionResponse<{ mba_id: number; mba_kode: string; mba_nama: string }[]>> {
   try {
-    const fullData = await BeritaAcaraService.getFullDataByMasterDokumenId(mdk_id);
+    const data = await BeritaAcaraService.getMasterJenisBeritaAcara();
+    return {
+      success: true,
+      message: 'Berhasil mengambil Master Jenis Berita Acara',
+      data,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || 'Gagal mengambil Master Jenis Berita Acara',
+      data: [],
+    };
+  }
+}
+
+export async function getMasterBaBuktiPerikatanAction(): Promise<ActionResponse<{ mbk_id: number; mbk_kode: string; mbk_nama: string }[]>> {
+  try {
+    const data = await BeritaAcaraService.getMasterBaBuktiPerikatan();
+    return {
+      success: true,
+      message: 'Berhasil mengambil Master Bukti Perikatan',
+      data,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || 'Gagal mengambil Master Bukti Perikatan',
+      data: [],
+    };
+  }
+}
+
+export async function getBeritaAcaraByMasterDokumenAction(mdk_id: number, jenis_ba_kode?: string): Promise<ActionResponse<BeritaAcaraFullData>> {
+  try {
+    const fullData = await BeritaAcaraService.getFullDataByMasterDokumenId(mdk_id, jenis_ba_kode);
     return {
       success: true,
       message: 'Berhasil mengambil data Berita Acara',
@@ -127,6 +161,11 @@ export async function saveBeritaAcaraBatchAction(input: BatchBeritaAcaraInputTyp
     await BeritaAcaraService.saveBatch(
       validation.data.bac_master_dokumen_id,
       {
+        bac_master_jenis_ba_id: validation.data.bac_master_jenis_ba_id,
+        bac_bukti_perikatan: validation.data.bac_bukti_perikatan,
+        bac_nomor_bukti_perikatan: validation.data.bac_nomor_bukti_perikatan,
+        bac_nomor_surat_pemeriksaan: validation.data.bac_nomor_surat_pemeriksaan,
+        bac_nomor_surat_serah_terima: validation.data.bac_nomor_surat_serah_terima,
         bac_nomor_surat: validation.data.bac_nomor_surat || '',
         bac_paragraf_pertama: validation.data.bac_paragraf_pertama || '',
         bac_paragraf_kedua: validation.data.bac_paragraf_kedua || '',

@@ -47,9 +47,9 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
   const nominalTerbilang = terbilang(currentAmount);
 
   const defaultSudahTerima = masterDokumen.mdk_jabatan_pejabat === 'PA'
-    ? `PENGGUNA ANGGARAN/PEJABAT PEMBUAT KOMITMEN\n${(masterDokumen.mdk_bagian || 'BADAN PENGELOLA KEUANGAN DAN ASET DAERAH KOTA PEKANBARU').toUpperCase()}`
-    : `KUASA PENGGUNA ANGGARAN/PEJABAT PEMBUAT KOMITMEN\n${(masterDokumen.mdk_bagian || 'BADAN PENGELOLA KEUANGAN DAN ASET DAERAH KOTA PEKANBARU').toUpperCase()}`;
-  const defaultYaitu = `Pembayaran ${masterDokumen.mdk_uraian_belanja || '-'}${masterDokumen.mdk_sub_kegiatan ? ` Pada Sub Kegiatan ${masterDokumen.mdk_sub_kegiatan}` : ''
+    ? `PENGGUNA ANGGARAN/PEJABAT PEMBUAT KOMITMEN BADAN PENGELOLA KEUANGAN DAN ASET DAERAH KOTA PEKANBARU`
+    : `KUASA PENGGUNA ANGGARAN/PEJABAT PEMBUAT KOMITMEN BADAN PENGELOLA KEUANGAN DAN ASET DAERAH KOTA PEKANBARU`;
+  const defaultYaitu = `Pembayaran ${masterDokumen.mdk_uraian_belanja || '-'} ${masterDokumen.mdk_pekerjaan || '-'} ${masterDokumen.mdk_volume || '-'} ${masterDokumen.mdk_satuan || '-'}${masterDokumen.mdk_sub_kegiatan ? ` Pada Sub Kegiatan ${masterDokumen.mdk_sub_kegiatan}` : ''
     }`;
   const currentSudahTerima = sudahTerimaDari && sudahTerimaDari.trim() !== '' ? sudahTerimaDari : defaultSudahTerima;
   const currentYaituKet = yaituKet && yaituKet.trim() !== '' ? yaituKet : defaultYaitu;
@@ -262,12 +262,17 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
                       <div className="mt-1 font-normal text-[11px] flex items-center gap-1">
                         <span className="shrink-0">Pada Tanggal :</span>
                         {isEditable ? (
-                          <input
-                            type="date"
-                            value={tanggalLunasDibayar}
-                            onChange={(e) => onTanggalLunasDibayarChange?.(e.target.value)}
-                            className="text-black bg-transparent dark:text-black border-b border-dashed border-gray-400 focus:border-black outline-none px-1 text-xs w-28 print:border-none print:w-auto"
-                          />
+                          <div className="relative inline-flex items-center">
+                            <span className="text-black bg-transparent dark:text-black border-b border-dashed border-gray-400 focus-within:border-black px-1 text-xs min-w-28 print:border-none print:min-w-0 cursor-pointer">
+                              {tanggalLunasDibayar ? formatDateIndonesian(tanggalLunasDibayar) : 'Pilih tanggal...'}
+                            </span>
+                            <input
+                              type="date"
+                              value={tanggalLunasDibayar}
+                              onChange={(e) => onTanggalLunasDibayarChange?.(e.target.value)}
+                              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full print:hidden"
+                            />
+                          </div>
                         ) : (
                           <span>{formatDateIndonesian(tanggalLunasDibayar)}</span>
                         )}
@@ -290,12 +295,17 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
                       <div className="flex items-center justify-center gap-1">
                         <span>Pekanbaru,</span>
                         {isEditable ? (
-                          <input
-                            type="date"
-                            value={tanggalTerimaUang}
-                            onChange={(e) => onTanggalTerimaUangChange?.(e.target.value)}
-                            className="text-black bg-transparent dark:text-black border-b border-dashed border-gray-400 focus:border-black outline-none px-1 text-xs w-28 print:border-none print:w-auto"
-                          />
+                          <div className="relative inline-flex items-center">
+                            <span className="text-black bg-transparent dark:text-black border-b border-dashed border-gray-400 focus-within:border-black px-1 text-xs min-w-28 print:border-none print:min-w-0 cursor-pointer">
+                              {tanggalTerimaUang ? formatDateIndonesian(tanggalTerimaUang) : 'Pilih tanggal...'}
+                            </span>
+                            <input
+                              type="date"
+                              value={tanggalTerimaUang}
+                              onChange={(e) => onTanggalTerimaUangChange?.(e.target.value)}
+                              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full print:hidden"
+                            />
+                          </div>
                         ) : (
                           <span>{formatDateIndonesian(tanggalTerimaUang)}</span>
                         )}
@@ -309,7 +319,7 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
 
                   {/* Row 2c: signature name / NIP / jabatan */}
                   <tr>
-                    <td className="border-r-2 border-black align-bottom px-2 pt-6 pb-2 print:pt-4 print:pb-1.5 text-center">
+                    <td className="border-r-2 border-black align-bottom px-2 pt-15 pb-2 print:pt-4 print:pb-1.5 text-center vertical-align-bottom">
                       <div className="font-bold underline uppercase text-[11px]">
                         {masterDokumen.mdk_nama_bendahara || '...........................................'}
                       </div>
@@ -319,7 +329,7 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
                           : '...........................................'}
                       </div>
                     </td>
-                    <td className="align-bottom px-2 pt-6 pb-2 print:pt-4 print:pb-1.5 text-center">
+                    <td className="align-bottom px-2 pt-15 pb-2 print:pt-4 print:pb-1.5 text-center">
                       <div className="font-bold underline uppercase text-[11px]">
                         {masterDokumen.mdk_nama_pptk || '...........................................'}
                       </div>
@@ -329,7 +339,7 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
                           : '...........................................'}
                       </div>
                     </td>
-                    <td className="align-bottom px-2 pt-6 pb-2 print:pt-4 print:pb-1.5 text-center">
+                    <td className="align-bottom px-2 pt-20 pb-2 print:pt-4 print:pb-1.5 text-center">
                       <div className="font-bold underline uppercase text-[11px]">
                         {masterDokumen.mdk_nama_pimpinan_perusahaan || '...........................................'}
                       </div>

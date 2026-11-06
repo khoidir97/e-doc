@@ -11,6 +11,11 @@ export const BeritaAcaraItemSchema = z.object({
 
 export const batchBeritaAcaraSchema = z.object({
   bac_master_dokumen_id: z.coerce.number().positive('Pilih Master Dokumen yang valid'),
+  bac_master_jenis_ba_id: z.string().optional().default('001'),
+  bac_bukti_perikatan: z.string().optional().default('002'),
+  bac_nomor_bukti_perikatan: z.string().optional().default(''),
+  bac_nomor_surat_pemeriksaan: z.string().optional().default(''),
+  bac_nomor_surat_serah_terima: z.string().optional().default(''),
   bac_nomor_surat: z.string().optional().default(''),
   bac_paragraf_pertama: z.string().optional().default(''),
   bac_paragraf_kedua: z.string().optional().default(''),

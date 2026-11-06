@@ -17,7 +17,10 @@ export const BeritaAcaraPrintSheet: React.FC<BeritaAcaraPrintSheetProps> = ({
   items,
   judul = 'BERITA ACARA PEMERIKSAAN HASIL PEKERJAAN',
 }) => {
-  const nomorSurat = header?.bac_nomor_surat || '/SEKRETARIAT-027.2/VIII/2026';
+  const isPemeriksaan = judul.toUpperCase().includes('PEMERIKSAAN');
+  const nomorSurat = isPemeriksaan
+    ? (header?.bac_nomor_surat_pemeriksaan || header?.bac_nomor_surat || '/SEKRETARIAT-027.2/VIII/2026')
+    : (header?.bac_nomor_surat_serah_terima || header?.bac_nomor_surat || '/SEKRETARIAT-027.2/VIII/2026');
   const bacTanggalFormatted = formatDateIndonesian(header?.bac_tanggal);
   const labelPejabat = masterDokumen.mdk_jabatan_pejabat?.trim().toUpperCase() === 'PA'
     ? 'Pengguna Anggaran'
@@ -47,35 +50,33 @@ export const BeritaAcaraPrintSheet: React.FC<BeritaAcaraPrintSheetProps> = ({
     masterDokumen?.mdk_alamat ||
     'Jl. Tembusu Blok C. 25 No. 24, Perum Pandau Permai, Kel. Pandau Jaya, Kec. Siak Hulu, Kab Kampar';
 
-  const isPemeriksaan = judul.toUpperCase().includes('PEMERIKSAAN');
-
   return (
-    <div className="font-serif text-black leading-snug text-[11px] sm:text-xs space-y-2 max-w-[210mm] mx-auto px-6 py-0 bg-white">
+    <div className="font-sans text-black leading-normal text-[12pt] space-y-2.5 max-w-[210mm] mx-auto px-6 py-0 bg-white" style={{ fontFamily: 'Arial, sans-serif', fontSize: '12pt' }}>
       {/* Kop Surat */}
       <KopSuratBpkad className="!mb-2" />
 
       {/* Judul & Nomor */}
       <div className="text-center space-y-0.5">
-        <h1 className="text-sm sm:text-[13.5px] font-bold underline tracking-wide uppercase">
+        <h1 className="text-[13pt] font-bold underline tracking-wide uppercase">
           {judul}
         </h1>
-        <p className="text-xs font-semibold">
+        <p className="text-[11pt] font-semibold">
           Nomor : <span className="font-mono">{nomorSurat}</span>
         </p>
       </div>
 
       {/* Paragraf Pertama */}
-      <p className="text-justify indent-8 leading-snug">
+      <p className="text-justify indent-8 leading-normal">
         {paragrafPertama}
       </p>
 
       {/* Identitas Pihak Pertama & Kedua */}
       <div className="pl-6 space-y-2">
         {/* Pihak Pertama */}
-        <table className="leading-tight">
+        <table className="leading-tight text-[12pt]">
           <tbody>
             <tr>
-              <td className="w-24">Nama</td>
+              <td className="w-28">Nama</td>
               <td className="w-3">:</td>
               <td className="font-semibold">{kpaNama}</td>
             </tr>
@@ -91,13 +92,13 @@ export const BeritaAcaraPrintSheet: React.FC<BeritaAcaraPrintSheetProps> = ({
             </tr>
           </tbody>
         </table>
-        <p className="font-semibold text-[11px]">Selanjutnya disebut <span className="font-bold">PIHAK PERTAMA</span>,</p>
+        <p className="font-semibold text-[11.5pt]">Selanjutnya disebut <span className="font-bold">PIHAK PERTAMA</span>,</p>
 
         {/* Pihak Kedua */}
-        <table className="leading-tight">
+        <table className="leading-tight text-[12pt]">
           <tbody>
             <tr>
-              <td className="w-24">Nama</td>
+              <td className="w-28">Nama</td>
               <td className="w-3">:</td>
               <td className="font-semibold">{penyediaNamaPimpinan}</td>
             </tr>
@@ -118,11 +119,11 @@ export const BeritaAcaraPrintSheet: React.FC<BeritaAcaraPrintSheetProps> = ({
             </tr>
           </tbody>
         </table>
-        <p className="font-semibold text-[11px]">Selanjutnya disebut <span className="font-bold">PIHAK KEDUA</span>.</p>
+        <p className="font-semibold text-[11.5pt]">Selanjutnya disebut <span className="font-bold">PIHAK KEDUA</span>.</p>
       </div>
 
       {/* Paragraf Kedua */}
-      <p className="text-justify indent-8 leading-snug">
+      <p className="text-justify indent-8 leading-normal">
         {paragrafKedua}
       </p>
 
@@ -136,14 +137,14 @@ export const BeritaAcaraPrintSheet: React.FC<BeritaAcaraPrintSheetProps> = ({
           </div>
         ) : null}
 
-        <table className="w-full border-collapse border border-black text-center text-[10.5px]">
+        <table className="w-full border-collapse border border-black text-center text-[10.5pt]">
           <thead>
             <tr className="border-b border-black bg-gray-50 font-bold">
               <th className="border border-black px-2 py-1 text-center w-10">No</th>
               <th className="border border-black px-2 py-1 text-center">Uraian</th>
-              <th className="border border-black px-2 py-1 text-center w-16">Volume</th>
-              <th className="border border-black px-2 py-1 text-center w-16">Satuan</th>
-              <th className="border border-black px-2 py-1 text-center w-28">Status Pemeriksaan</th>
+              <th className="border border-black px-2 py-1 text-center w-20">Volume</th>
+              <th className="border border-black px-2 py-1 text-center w-20">Satuan</th>
+              <th className="border border-black px-2 py-1 text-center w-32">Status Pemeriksaan</th>
             </tr>
           </thead>
           <tbody>
@@ -178,7 +179,7 @@ export const BeritaAcaraPrintSheet: React.FC<BeritaAcaraPrintSheetProps> = ({
             </div>
             <div className="flex items-start gap-1">
               <span className="font-semibold">3.</span>
-              <p className="text-justify leading-snug">
+              <p className="text-justify leading-normal">
                 Selanjutnya dilanjutkan ke proses serah terima barang atas pekerjaan tersebut, sama dengan pada saat dilakukan pemeriksaan ini serta sesuai dengan ketentuan dan peraturan yang berlaku.
               </p>
             </div>
@@ -187,16 +188,16 @@ export const BeritaAcaraPrintSheet: React.FC<BeritaAcaraPrintSheetProps> = ({
       </div>
 
       {/* Penutup */}
-      <p className="indent-8 text-justify leading-snug">
+      <p className="indent-8 text-justify leading-normal">
         Demikian Berita Acara ini dibuat dengan sebenarnya untuk dipergunakan sebagaimana mestinya.
       </p>
 
       {!isPemeriksaan && (
-        <p className="text-end text-xs">Pekanbaru, {bacTanggalFormatted}</p>
+        <p className="text-end text-[11pt]">Pekanbaru, {bacTanggalFormatted}</p>
       )}
 
       {/* Tanda Tangan */}
-      <div className={`grid grid-cols-2 text-center gap-4 text-xs ${isPemeriksaan ? 'pt-2' : 'pt-1'}`}>
+      <div className={`grid grid-cols-2 text-center gap-4 text-[11pt] ${isPemeriksaan ? 'pt-2' : 'pt-1'}`}>
         {/* Pihak Kedua */}
         <div className="space-y-0.5">
           <p className="font-semibold">Pihak Kedua</p>

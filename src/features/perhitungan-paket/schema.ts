@@ -4,7 +4,8 @@ export const PerhitunganPaketItemSchema = z.object({
   pak_nilai_invoice: z.coerce.number().min(0, 'Nilai invoice wajib diisi'),
   pak_dpp: z.coerce.number().min(0, 'DPP wajib diisi'),
   pak_ppn: z.coerce.number().min(0, 'PPN wajib diisi'),
-  pak_pph23: z.coerce.number().min(0, 'PPh 23 wajib diisi'),
+  pak_pph23: z.coerce.number().min(0, 'PPh wajib diisi'),
+  pak_jenis_pph: z.string().optional().nullable(),
   pak_dibayar: z.coerce.number().min(0, 'Dibayar wajib diisi'),
 });
 

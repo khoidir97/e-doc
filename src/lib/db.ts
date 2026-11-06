@@ -468,6 +468,22 @@ export async function initDatabase(): Promise<void> {
       await addIndexIfNotExists('master_dokumen', 'idx_mdk_deleted_bdg', 'mdk_deleted_at, mdk_bidang_id, mdk_pagu_anggaran');
       await addIndexIfNotExists('master_dokumen', 'idx_mdk_created_deleted', 'mdk_deleted_at, mdk_created_at, mdk_id');
       await addIndexIfNotExists('nota_pencairan_dana', 'idx_dpd_deleted_pembayaran', 'dpd_deleted_at, dpd_saatini_pembayaran');
+
+      // Migration check: Ensure pak_jenis_pph and pkt_jenis_pph exist
+      const checkAndAddColumn = async (table: string, col: string, def: string) => {
+        try {
+          const [cols] = await connection.query<any[]>(
+            `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS 
+             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?`,
+            [table, col]
+          );
+          if (!cols || cols.length === 0) {
+            await connection.query(`ALTER TABLE ${table} ADD COLUMN ${col} ${def}`);
+          }
+        } catch (e) { }
+      };
+      await checkAndAddColumn('detail_perhitungan_paket', 'pak_jenis_pph', "VARCHAR(20) NOT NULL DEFAULT '23'");
+      await checkAndAddColumn('perhitungan_paket', 'pkt_jenis_pph', "VARCHAR(20) NOT NULL DEFAULT '23'");
       await addIndexIfNotExists('kwitansi', 'idx_kwt_deleted', 'kwt_deleted_at');
 
 

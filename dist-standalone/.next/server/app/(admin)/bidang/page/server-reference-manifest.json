@@ -1,6 +1,6 @@
 {
   "node": {
-    "70f14b051f937ba5721c611086356a205901417d13": {
+    "703bcc44be9f9b51f00c5ce7cdb0e95a23d72a0b7a": {
       "workers": {
         "app/(admin)/bidang/page": {
           "moduleId": 86564,
@@ -15,7 +15,7 @@
       "exportedName": "getBidangListAction",
       "filename": "src/features/bidang/actions.ts"
     },
-    "40540d22e01644559289941159b5f3016ba6e3dd3c": {
+    "404fd1e6e91d45f973e7629fc41ba245e450a94ee5": {
       "workers": {
         "app/(admin)/bidang/page": {
           "moduleId": 86564,
@@ -30,7 +30,7 @@
       "exportedName": "createBidangAction",
       "filename": "src/features/bidang/actions.ts"
     },
-    "40320b49a58007cd2d995a9fdd51608eb4cdde812c": {
+    "4014ad30745410158b8663663e8df6262dc6981570": {
       "workers": {
         "app/(admin)/bidang/page": {
           "moduleId": 86564,
@@ -45,7 +45,7 @@
       "exportedName": "updateBidangAction",
       "filename": "src/features/bidang/actions.ts"
     },
-    "40ca7c63108de115c0f1cb391a79ddb22577ef7639": {
+    "40cdba01069dccc753c22db4b0ba32b0df863c80e5": {
       "workers": {
         "app/(admin)/bidang/page": {
           "moduleId": 86564,

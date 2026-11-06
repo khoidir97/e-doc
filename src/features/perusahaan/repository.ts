@@ -24,7 +24,7 @@ export class PerusahaanRepository {
     // Data query
     const dataParams = [...params, Number(limit), Number(offset)];
     const [rows] = await pool.query<any[]>(
-      `SELECT psh_id, psh_nama, psh_nama_pimpinan, psh_jabatan, psh_alamat, psh_created_at, psh_updated_at 
+      `SELECT psh_id, psh_nama, psh_nama_pimpinan, psh_jabatan, psh_alamat, psh_npwp, psh_nomor_rekening, psh_nama_rekening, psh_nama_bank, psh_created_at, psh_updated_at 
        FROM perusahaan
        ${whereClause} 
        ORDER BY psh_id DESC 
@@ -41,7 +41,7 @@ export class PerusahaanRepository {
   static async findById(psh_id: number): Promise<Perusahaan | null> {
     await initDatabase();
     const [rows] = await pool.query<any[]>(
-      `SELECT psh_id, psh_nama, psh_nama_pimpinan, psh_jabatan, psh_alamat, psh_created_at, psh_updated_at 
+      `SELECT psh_id, psh_nama, psh_nama_pimpinan, psh_jabatan, psh_alamat, psh_npwp, psh_nomor_rekening, psh_nama_rekening, psh_nama_bank, psh_created_at, psh_updated_at 
        FROM perusahaan
        WHERE psh_id = ? AND psh_deleted_at IS NULL 
        LIMIT 1`,
@@ -54,7 +54,7 @@ export class PerusahaanRepository {
   static async findByName(psh_nama: string): Promise<Perusahaan | null> {
     await initDatabase();
     const [rows] = await pool.query<any[]>(
-      `SELECT psh_id, psh_nama, psh_nama_pimpinan, psh_jabatan, psh_alamat 
+      `SELECT psh_id, psh_nama, psh_nama_pimpinan, psh_jabatan, psh_alamat, psh_npwp, psh_nomor_rekening, psh_nama_rekening, psh_nama_bank 
        FROM perusahaan
        WHERE psh_nama = ? AND psh_deleted_at IS NULL 
        LIMIT 1`,
@@ -67,9 +67,9 @@ export class PerusahaanRepository {
   static async insert(input: CreatePerusahaanInput): Promise<number> {
     await initDatabase();
     const [result]: any = await pool.query(
-      `INSERT INTO perusahaan (psh_nama, psh_nama_pimpinan, psh_jabatan, psh_alamat, psh_created_by)
-       VALUES (?, ?, ?, ?, ?)`,
-      [input.psh_nama, input.psh_nama_pimpinan, input.psh_jabatan, input.psh_alamat, input.psh_created_by ?? null]
+      `INSERT INTO perusahaan (psh_nama, psh_nama_pimpinan, psh_jabatan, psh_alamat, psh_npwp, psh_nomor_rekening, psh_nama_rekening, psh_nama_bank, psh_created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [input.psh_nama, input.psh_nama_pimpinan, input.psh_jabatan, input.psh_alamat, input.psh_npwp, input.psh_nomor_rekening, input.psh_nama_rekening, input.psh_nama_bank, input.psh_created_by ?? null]
     );
     return result.insertId;
   }
@@ -78,9 +78,9 @@ export class PerusahaanRepository {
     await initDatabase();
     const [result]: any = await pool.query(
       `UPDATE perusahaan
-       SET psh_nama = ?, psh_nama_pimpinan = ?, psh_jabatan = ?, psh_alamat = ?, psh_updated_by = ?, psh_updated_at = NOW() 
+       SET psh_nama = ?, psh_nama_pimpinan = ?, psh_jabatan = ?, psh_alamat = ?, psh_npwp = ?, psh_nomor_rekening = ?, psh_nama_rekening = ?, psh_nama_bank = ?, psh_updated_by = ?, psh_updated_at = NOW() 
        WHERE psh_id = ? AND psh_deleted_at IS NULL`,
-      [input.psh_nama, input.psh_nama_pimpinan, input.psh_jabatan, input.psh_alamat, input.psh_updated_by ?? null, input.psh_id]
+      [input.psh_nama, input.psh_nama_pimpinan, input.psh_jabatan, input.psh_alamat, input.psh_npwp, input.psh_nomor_rekening, input.psh_nama_rekening, input.psh_nama_bank, input.psh_updated_by ?? null, input.psh_id]
     );
     return result.affectedRows > 0;
   }

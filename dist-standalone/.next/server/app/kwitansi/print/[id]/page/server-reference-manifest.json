@@ -1,6 +1,6 @@
 {
   "node": {
-    "4048a5c4d4f40b82e895c691869c2e0d5ddb087a2d": {
+    "405d1536b831ea9e8fed47ae910f76ccf051755662": {
       "workers": {
         "app/kwitansi/print/[id]/page": {
           "moduleId": 89293,
@@ -15,7 +15,7 @@
       "exportedName": "getKwitansiByMasterDokumenIdAction",
       "filename": "src/features/kwitansi/actions.ts"
     },
-    "00db1dd02b5c5b7fcb8e7071091f4fac3d2e15b2bb": {
+    "00846e4aaddcebd66184298c29e12f1beb3b677178": {
       "workers": {
         "app/kwitansi/print/[id]/page": {
           "moduleId": 89293,

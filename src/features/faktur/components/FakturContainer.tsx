@@ -104,50 +104,70 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
     initOptions();
   }, [initialMasterDokumenId]);
 
-  const handleCopyFromRAB = async () => {
+  // Salin rincian dari Negosiasi (Nego)
+  const handleCopyFromNego = async () => {
     if (!selectedMdkId || typeof selectedMdkId !== 'number') {
       showToast('error', 'Silakan pilih Master Dokumen terlebih dahulu.');
       return;
     }
     setLoadingFaktur(true);
-    const rabRes = await getRencanaAnggaranBiayaByMasterDokumenAction(selectedMdkId);
-    if (rabRes.success && rabRes.data && rabRes.data.length > 0) {
+    const negoRes = await getNegoByMasterDokumenAction(selectedMdkId);
+    if (negoRes.success && negoRes.data && negoRes.data.length > 0) {
       setFakturRows(
-        rabRes.data.map((item) => ({
-          fkt_master_dokumen_id: selectedMdkId,
-          fkt_jenis_spesifikasi: item.rab_uraian_pekerjaan || '',
-          fkt_unit: item.rab_volume || 0,
-          fkt_hari: String(item.rab_waktu || ''),
-          fkt_harga_satuan: item.rab_harga_satuan || 0,
-          fkt_total: item.rab_harga_perkiraan_sendiri || 0,
-        }))
+        negoRes.data.map((item) => {
+          const unit = parseNumber(item.nego_volume);
+          const hargaSatuan = Number(item.nego_negosiasi_harga_satuan) || 0;
+          const total = Number(item.nego_negosiasi_jumlah_harga) || Math.round(unit * hargaSatuan);
+          return {
+            fkt_master_dokumen_id: selectedMdkId,
+            fkt_jenis_spesifikasi: item.nego_uraian_kegiatan || '',
+            fkt_unit: unit,
+            fkt_hari: String(item.nego_waktu || ''),
+            fkt_harga_satuan: hargaSatuan,
+            fkt_total: total,
+          };
+        })
       );
-      showToast('success', 'Berhasil menyalin data dari Rencana Anggaran Biaya (RAB).');
+      showToast('success', 'Berhasil menyalin rincian data dari Negosiasi (Nego).');
     } else {
-      showToast('error', 'Tidak ada data Rencana Anggaran Biaya (RAB) untuk Master Dokumen ini.');
+      showToast('error', 'Tidak ada data Negosiasi (Nego) untuk Master Dokumen ini.');
     }
     setLoadingFaktur(false);
   };
 
-  // Isi otomatis dari Master Dokumen (pekerjaan, volume, satuan) + Nego (harga satuan negosiasi)
+  // Isi otomatis dari Nego (semua baris item negosiasi beserta harga hasil nego)
   const prefillFromMasterAndNego = useCallback(async (mdk: MasterDokumen) => {
     setLoadingFaktur(true);
     const negoRes = await getNegoByMasterDokumenAction(mdk.mdk_id);
-    const negoFirst = negoRes.success && negoRes.data && negoRes.data.length > 0 ? negoRes.data[0] : null;
-
-    const unit = parseNumber(mdk.mdk_volume);
-    const hargaSatuan = Number(negoFirst?.nego_negosiasi_harga_satuan) || 0;
-
-    setFakturRows([
-      {
-        fkt_master_dokumen_id: mdk.mdk_id,
-        fkt_jenis_spesifikasi: mdk.mdk_pekerjaan || '',
-        fkt_unit: unit,
-        fkt_hari: mdk.mdk_satuan || '',
-        fkt_harga_satuan: hargaSatuan,
-        fkt_total: Math.round(unit * hargaSatuan),
-      },
-    ]);
+    if (negoRes.success && negoRes.data && negoRes.data.length > 0) {
+      setFakturRows(
+        negoRes.data.map((item) => {
+          const unit = parseNumber(item.nego_volume);
+          const hargaSatuan = Number(item.nego_negosiasi_harga_satuan) || 0;
+          const total = Number(item.nego_negosiasi_jumlah_harga) || Math.round(unit * hargaSatuan);
+          return {
+            fkt_master_dokumen_id: mdk.mdk_id,
+            fkt_jenis_spesifikasi: item.nego_uraian_kegiatan || mdk.mdk_pekerjaan || '',
+            fkt_unit: unit,
+            fkt_hari: String(item.nego_waktu || mdk.mdk_satuan || ''),
+            fkt_harga_satuan: hargaSatuan,
+            fkt_total: total,
+          };
+        })
+      );
+    } else {
+      const unit = parseNumber(mdk.mdk_volume);
+      setFakturRows([
+        {
+          fkt_master_dokumen_id: mdk.mdk_id,
+          fkt_jenis_spesifikasi: mdk.mdk_pekerjaan || '',
+          fkt_unit: unit,
+          fkt_hari: mdk.mdk_satuan || '',
+          fkt_harga_satuan: 0,
+          fkt_total: 0,
+        },
+      ]);
+    }
     setLoadingFaktur(false);
   }, []);
 
@@ -417,14 +437,14 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
-                      onClick={handleCopyFromRAB}
-                      className="px-3.5 py-2 rounded-xl bg-blue-50 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400 font-semibold text-xs hover:bg-blue-100 transition-colors flex items-center gap-1.5 cursor-pointer"
-                      title="Salin rincian data dari Rencana Anggaran Biaya (RAB)"
+                      onClick={handleCopyFromNego}
+                      className="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400 font-semibold text-xs hover:bg-emerald-100 transition-colors flex items-center gap-1.5 cursor-pointer"
+                      title="Salin rincian data dari Negosiasi (Nego)"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                       </svg>
-                      Salin dari RAB
+                      Tarik dari Nego
                     </button>
                     <button
                       type="button"

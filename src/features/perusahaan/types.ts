@@ -4,6 +4,10 @@ export interface Perusahaan {
   psh_nama_pimpinan: string;
   psh_jabatan: string;
   psh_alamat: string;
+  psh_npwp?: string | null;
+  psh_nomor_rekening?: string | null;
+  psh_nama_rekening?: string | null;
+  psh_nama_bank?: string | null;
   psh_created_at?: string | Date;
   psh_created_by?: number | null;
   psh_updated_at?: string | Date;
@@ -17,6 +21,10 @@ export interface CreatePerusahaanInput {
   psh_nama_pimpinan: string;
   psh_jabatan: string;
   psh_alamat: string;
+  psh_npwp?: string | null;
+  psh_nomor_rekening?: string | null;
+  psh_nama_rekening?: string | null;
+  psh_nama_bank?: string | null;
   psh_created_by?: number | null;
 }
 
@@ -26,6 +34,10 @@ export interface UpdatePerusahaanInput {
   psh_nama_pimpinan: string;
   psh_jabatan: string;
   psh_alamat: string;
+  psh_npwp?: string | null;
+  psh_nomor_rekening?: string | null;
+  psh_nama_rekening?: string | null;
+  psh_nama_bank?: string | null;
   psh_updated_by?: number | null;
 }
 

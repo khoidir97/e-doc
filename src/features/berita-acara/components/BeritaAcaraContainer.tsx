@@ -7,11 +7,15 @@ import {
   getBeritaAcaraByMasterDokumenAction,
   getRencanaAnggaranBiayaByMasterDokumenAction,
   saveBeritaAcaraBatchAction,
+  getMasterJenisBeritaAcaraAction,
+  getMasterBaBuktiPerikatanAction,
 } from '../actions';
+import { getPaketByMasterDokumenAction } from '@/features/perhitungan-paket/actions';
 import { formatRupiah, terbilang } from '@/lib/terbilang';
-import { formatDateYYYYMMDD, formatDateIndonesian } from '@/lib/date';
+import { formatDateYYYYMMDD, formatDateIndonesian, formatDateToLegalWords } from '@/lib/date';
 import { MasterDokumenSelectorCard } from '../../master-dokumen/components/MasterDokumenSelectorCard';
 import { Toast } from '@/components/ui/Toast';
+import { MasterJenisBeritaAcara, MasterBaBuktiPerikatan } from '../types';
 
 interface BeritaAcaraItemRow {
   dba_id?: number;
@@ -44,12 +48,30 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
   const [selectedMdkId, setSelectedMdkId] = useState<number | ''>(initialMasterDokumenId || '');
   const [selectedMasterDokumen, setSelectedMasterDokumen] = useState<MasterDokumen | null>(null);
 
+  // Master Jenis BA & Bukti Perikatan Options
+  const [jenisBaOptions, setJenisBaOptions] = useState<MasterJenisBeritaAcara[]>([]);
+  const [buktiPerikatanOptions, setBuktiPerikatanOptions] = useState<MasterBaBuktiPerikatan[]>([]);
+  const [selectedJenisBa, setSelectedJenisBa] = useState<string>('001'); // '001': PEMERIKSAAN, '002': SERAH TERIMA
+  const [selectedBuktiPerikatan, setSelectedBuktiPerikatan] = useState<string>('002'); // '001': FAKTUR, '002': SPK, dll
+  const [bacNomorBuktiPerikatan, setBacNomorBuktiPerikatan] = useState<string>('');
+
   // Header Berita Acara State
-  const [bacNomorSurat, setBacNomorSurat] = useState('');
+  const [bacNomorSuratPemeriksaan, setBacNomorSuratPemeriksaan] = useState('');
+  const [bacNomorSuratSerahTerima, setBacNomorSuratSerahTerima] = useState('');
   const [bacParagrafPertama, setBacParagrafPertama] = useState('');
   const [bacParagrafKedua, setBacParagrafKedua] = useState('');
   const [bacHasilPemeriksaan, setBacHasilPemeriksaan] = useState('');
   const [bacTanggal, setBacTanggal] = useState(() => formatDateYYYYMMDD(new Date()));
+
+  // Nilai aktif nomor surat sesuai jenis berita acara yang dipilih
+  const activeNomorSurat = selectedJenisBa === '002' ? bacNomorSuratSerahTerima : bacNomorSuratPemeriksaan;
+  const setActiveNomorSurat = (val: string) => {
+    if (selectedJenisBa === '002') {
+      setBacNomorSuratSerahTerima(val);
+    } else {
+      setBacNomorSuratPemeriksaan(val);
+    }
+  };
 
   // Dynamic BeritaAcara Form Items
   const [BeritaAcaraRows, setBeritaAcaraRows] = useState<BeritaAcaraItemRow[]>([
@@ -67,118 +89,198 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
     setNotification({ type, message });
   };
 
-  // Sync nomor surat & tanggal ke dalam bacParagrafKedua setiap kali keduanya berubah
-  useEffect(() => {
-    if (!bacParagrafKedua) return;
-    const tanggalFormatted = formatDateIndonesian(bacTanggal);
-    const updated = bacParagrafKedua
-      // Ganti: "nomor : <...apapun...> tanggal" → pakai nilai terbaru
-      .replace(
-        /(nomor\s*:\s*)([^\n]+?)(\s+tanggal\s+)/i,
-        `$1${bacNomorSurat}$3`
-      )
-      // Ganti: "tanggal <...apapun...>. Setelah" → pakai tanggal terbaru
-      .replace(
-        /(\btanggal\s+)([\w\d\s]+?)(\. Setelah)/i,
-        `$1${tanggalFormatted}$3`
-      );
-    if (updated !== bacParagrafKedua) {
-      setBacParagrafKedua(updated);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bacNomorSurat, bacTanggal]);
+  // Helper untuk membuat template narasi otomatis
+  const generateNarratives = useCallback(
+    (
+      jenisKode: string,
+      buktiKode: string,
+      nomorBukti: string,
+      tanggalDoc: string,
+      mdk: MasterDokumen | null,
+      customNoPemeriksaan?: string
+    ) => {
+      const buktiObj = buktiPerikatanOptions.find((b) => b.mbk_kode === buktiKode);
+      const namaBukti = buktiObj ? buktiObj.mbk_nama : 'SPK';
+      const labelBukti = namaBukti === 'SPK' ? 'Surat Perintah Kerja (SPK)' : namaBukti;
 
-  // Load Master Dokumen list on mount
+      const uraianPekerjaan = mdk?.mdk_pekerjaan || mdk?.mdk_uraian_belanja || mdk?.mdk_kegiatan || 'Penyediaan Jasa';
+      const program = mdk?.mdk_program || 'Program Penunjang Urusan Pemerintahan Daerah';
+      const kegiatan = mdk?.mdk_kegiatan || 'Kegiatan Administrasi Umum Perangkat Daerah';
+      const subKeg = mdk?.mdk_sub_kegiatan || 'Sub Kegiatan Dukungan Pelaksanaan Sistem Pemerintahan Berbasis Elektronik pada SKPD';
+      const tahunAnggaran = mdk?.mdk_apbd
+        ? mdk.mdk_apbd.replace(/[^0-9]/g, '') || '2024'
+        : '2024';
+      const noBuktiStr = nomorBukti || '/SEKRETARIAT-027.2/VIII/2026';
+      const tglFormatted = formatDateIndonesian(tanggalDoc);
+
+      // Paragraf 1: Pembuka Tanggal Terbilang & Tempat
+      const { fullSentence } = formatDateToLegalWords(tanggalDoc);
+      const paragraf1 = fullSentence;
+
+      // Paragraf 2: Pernyataan Pemeriksaan / Serah Terima berdasarkan Bukti Perikatan
+      let paragraf2 = '';
+      let hasilPeriksa = '';
+
+      if (jenisKode === '002') {
+        // SERAH TERIMA -> Nomor berdasarkan Berita Acara Hasil Pemeriksaan diambil dari bac_nomor_surat_pemeriksaan
+        const noPemeriksaanTampil = customNoPemeriksaan || noBuktiStr;
+        paragraf2 = `Dengan ini menyatakan dengan sebenarnya telah melakukan Serah Terima Hasil Pekerjaan berupa ${uraianPekerjaan} ${program}, ${kegiatan}, ${subKeg} berdasarkan Berita Acara Hasil Pemeriksaan Nomor : ${noPemeriksaanTampil} tanggal ${tglFormatted}, dari PIHAK KEDUA kepada PIHAK PERTAMA dan PIHAK PERTAMA menerima dengan baik pelaksanaan pengadaan tersebut dengan uraian sebagai berikut :`;
+        hasilPeriksa = `"Pekerjaan/Barang telah diserahterimakan dalam keadaan baik dan lengkap serta dapat dipergunakan sebagaimana mestinya"`;
+      } else {
+        // PEMERIKSAAN (001)
+        paragraf2 = `Dengan ini menyatakan dengan sebenarnya PIHAK PERTAMA telah melakukan Pemeriksaan terhadap Pekerjaan ${uraianPekerjaan}, ${program}, ${kegiatan}, ${subKeg} pada Badan Pengelola Keuangan dan Aset Kota Pekanbaru Tahun Anggaran ${tahunAnggaran} di Pekanbaru berdasarkan ${labelBukti} ${uraianPekerjaan} Nomor : ${noBuktiStr} tanggal ${tglFormatted} dengan kesimpulan sebagai berikut :`;
+        hasilPeriksa = `"Barang/Jasa tersebut telah sesuai dengan spesifikasi, jumlah, dalam kondisi baik, lengkap dan dapat digunakan dengan sebagaimana mestinya serta disertai dengan kelengkapan-kelengkapannya"`;
+      }
+
+      return { paragraf1, paragraf2, hasilPeriksa };
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [buktiPerikatanOptions]
+  );
+
+  // Load Master Dokumen & Master Jenis / Bukti on mount
   useEffect(() => {
     async function initOptions() {
       setLoadingOptions(true);
-      const res = await getMasterDokumenOptionsAction();
-      if (res.success && res.data) {
-        setMasterDokumenList(res.data);
-        const targetId = initialMasterDokumenId || (res.data.length > 0 ? res.data[0].mdk_id : '');
+      const [resMdk, resJenis, resBukti] = await Promise.all([
+        getMasterDokumenOptionsAction(),
+        getMasterJenisBeritaAcaraAction(),
+        getMasterBaBuktiPerikatanAction(),
+      ]);
+
+      if (resJenis.success && resJenis.data) {
+        setJenisBaOptions(resJenis.data);
+      }
+      if (resBukti.success && resBukti.data) {
+        setBuktiPerikatanOptions(resBukti.data);
+      }
+
+      if (resMdk.success && resMdk.data) {
+        setMasterDokumenList(resMdk.data);
+        const targetId = initialMasterDokumenId || (resMdk.data.length > 0 ? resMdk.data[0].mdk_id : '');
         if (targetId) {
           setSelectedMdkId(targetId);
-          const found = res.data.find((m) => m.mdk_id === targetId) || null;
+          const found = resMdk.data.find((m) => m.mdk_id === targetId) || null;
           setSelectedMasterDokumen(found);
         }
       } else {
-        showToast('error', res.message || 'Gagal memuat opsi Master Dokumen.');
+        showToast('error', resMdk.message || 'Gagal memuat opsi Master Dokumen.');
       }
       setLoadingOptions(false);
     }
     initOptions();
   }, [initialMasterDokumenId]);
 
-  // Fetch BeritaAcara items & header whenever selected Master Dokumen changes
-  const loadBeritaAcaraForMdk = useCallback(async (mdkId: number, currentMdkObj?: MasterDokumen | null) => {
-    setLoadingBeritaAcara(true);
-    const res = await getBeritaAcaraByMasterDokumenAction(mdkId);
+  // Fetch BeritaAcara items & header whenever selected Master Dokumen or selectedJenisBa changes
+  const loadBeritaAcaraForMdk = useCallback(
+    async (
+      mdkId: number,
+      currentMdkObj?: MasterDokumen | null,
+      jenisKode = selectedJenisBa
+    ) => {
+      setLoadingBeritaAcara(true);
+      const [res, paketRes] = await Promise.all([
+        getBeritaAcaraByMasterDokumenAction(mdkId, jenisKode),
+        getPaketByMasterDokumenAction(mdkId),
+      ]);
 
-    if (res.success && res.data) {
-      const { header, items } = res.data;
-      const isSaved = Boolean(header?.bac_id || (items && items.length > 0));
-      setHasSavedData(isSaved);
+      const paket = paketRes.success && paketRes.data ? paketRes.data : null;
+      const paketNoSpk = paket?.pkt_no_spk_kwitansi?.trim() || '';
+      const paketBapp = paket?.pkt_bapp?.trim() || '';
+      const paketBast = paket?.pkt_bast?.trim() || '';
 
-      if (header) {
-        setBacNomorSurat(header.bac_nomor_surat || '');
-        setBacParagrafPertama(header.bac_paragraf_pertama || '');
-        setBacParagrafKedua(header.bac_paragraf_kedua || '');
-        setBacHasilPemeriksaan(header.bac_hasil_pemeriksaan || '');
-        setBacTanggal(formatDateYYYYMMDD(header.bac_tanggal) || formatDateYYYYMMDD(new Date()));
-      } else {
-        // Auto-fill template default values when header is empty
+      if (res.success && res.data) {
+        const { header, items } = res.data;
+        const isSaved = Boolean(header?.bac_id);
+        setHasSavedData(isSaved);
+
         const mdk = currentMdkObj || selectedMasterDokumen;
-        const uraianBelanja = mdk?.mdk_uraian_belanja || mdk?.mdk_kegiatan || 'Penyediaan Jasa';
-        const subKeg = mdk?.mdk_sub_kegiatan || 'Penyediaan Jasa Peralatan dan Perlengkapan Kantor';
 
-        setBacNomorSurat('/SEKRETARIAT-027.2/VIII/2026');
-        setBacParagrafPertama(
-          "Pada hari ini, Jum'at Tanggal empat belas Bulan Agustus Tahun Dua Ribu Dua Puluh Enam bertempat di Kantor Badan Pengelola Keuangan dan Aset Daerah (BPKAD) Kota Pekanbaru, berdasarkan Surat Keputusan Kepala BPKAD Kota Pekanbaru Nomor : 343 Tahun 2026 tentang penunjukkan Kuasa Pengguna Anggaran dilingkungan BPKAD Kota Pekanbaru Tahun Anggaran 2026, kami yang bertandatangan di bawah ini :"
-        );
-        setBacParagrafKedua(
-          `Dengan ini menyatakan dengan sebenarnya telah melakukan pemeriksaan hasil pekerjaan ${uraianBelanja}, pada Sub Kegiatan ${subKeg} sesuai dengan faktur pesanan BPKAD Kota Pekanbaru nomor : /SEKRETARIAT-027.2/VIII/2026 tanggal 13 Agustus 2026. Setelah dilakukan pemeriksaan, dengan ini menyatakan bahwa :`
-        );
-        setBacHasilPemeriksaan(
-          `"Jasa telah diterima sesuai dengan kuantitas serta kualitas layanan transportasi bus yang disepakati"`
-        );
-        setBacTanggal(formatDateYYYYMMDD(new Date()));
-      }
+        if (header) {
+          const loadedJenis = header.bac_master_jenis_ba_id || jenisKode;
+          const loadedBukti = header.bac_bukti_perikatan || '002';
+          // Gunakan yang tersimpan, jika kosong tarik dari perhitungan paket
+          const loadedNomorBukti = header.bac_nomor_bukti_perikatan || paketNoSpk || '';
+          const noPem = header.bac_nomor_surat_pemeriksaan || (loadedJenis === '001' ? header.bac_nomor_surat : '') || paketBapp || '';
+          const noSer = header.bac_nomor_surat_serah_terima || (loadedJenis === '002' ? header.bac_nomor_surat : '') || paketBast || '';
 
-      if (items && items.length > 0) {
-        setBeritaAcaraRows(
-          items.map((item) => ({
-            dba_id: item.dba_id,
-            dba_berita_acara_id: item.dba_berita_acara_id,
-            dba_master_dokumen_id: item.dba_master_dokumen_id,
-            dba_uraian: item.dba_uraian || '',
-            dba_volume: item.dba_volume || '',
-            dba_satuan: item.dba_satuan || '',
-            dba_status_pemeriksaan: item.dba_status_pemeriksaan || '100% Selesai',
-          }))
-        );
-      } else {
-        // Auto-fill detail items from Rencana Anggaran Biaya (RAB) if available
-        const rabRes = await getRencanaAnggaranBiayaByMasterDokumenAction(mdkId);
-        if (rabRes.success && rabRes.data && rabRes.data.length > 0) {
+          setSelectedJenisBa(loadedJenis);
+          setSelectedBuktiPerikatan(loadedBukti);
+          setBacNomorBuktiPerikatan(loadedNomorBukti);
+          setBacNomorSuratPemeriksaan(noPem);
+          setBacNomorSuratSerahTerima(noSer);
+          setBacParagrafPertama(header.bac_paragraf_pertama || '');
+          setBacParagrafKedua(header.bac_paragraf_kedua || '');
+          setBacHasilPemeriksaan(header.bac_hasil_pemeriksaan || '');
+          setBacTanggal(formatDateYYYYMMDD(header.bac_tanggal) || formatDateYYYYMMDD(new Date()));
+        } else {
+          // Generate template narasi awal sesuai jenis & bukti perikatan yang aktif
+          const defaultTanggal = formatDateYYYYMMDD(new Date());
+          const defaultNoSurat = '/SEKRETARIAT-027.2/VIII/2026';
+          const defaultNoBukti = paketNoSpk || mdk?.mdk_no_dpa || '/SEKRETARIAT-027.2/VIII/2026';
+          const defaultBuktiKode = '002';
+
+          const noPem = paketBapp || defaultNoSurat;
+          const noSer = paketBast || defaultNoSurat;
+
+          setBacNomorSuratPemeriksaan(noPem);
+          setBacNomorSuratSerahTerima(noSer);
+          setSelectedBuktiPerikatan(defaultBuktiKode);
+          setBacNomorBuktiPerikatan(defaultNoBukti);
+          setBacTanggal(defaultTanggal);
+
+          const { paragraf1, paragraf2, hasilPeriksa } = generateNarratives(
+            jenisKode,
+            defaultBuktiKode,
+            defaultNoBukti,
+            defaultTanggal,
+            mdk,
+            noPem
+          );
+
+          setBacParagrafPertama(paragraf1);
+          setBacParagrafKedua(paragraf2);
+          setBacHasilPemeriksaan(hasilPeriksa);
+        }
+
+        if (items && items.length > 0) {
           setBeritaAcaraRows(
-            rabRes.data.map((item) => ({
-              dba_master_dokumen_id: mdkId,
-              dba_uraian: item.rab_uraian_pekerjaan || '',
-              dba_volume: item.rab_volume || '',
-              dba_satuan: item.rab_waktu || '',
-              dba_status_pemeriksaan: '100% Selesai',
+            items.map((item) => ({
+              dba_id: item.dba_id,
+              dba_berita_acara_id: item.dba_berita_acara_id,
+              dba_master_dokumen_id: item.dba_master_dokumen_id,
+              dba_uraian: item.dba_uraian || '',
+              dba_volume: item.dba_volume || '',
+              dba_satuan: item.dba_satuan || '',
+              dba_status_pemeriksaan: item.dba_status_pemeriksaan || '100% Selesai',
             }))
           );
         } else {
-          setBeritaAcaraRows([createEmptyRow()]);
+          // Auto-fill detail items from Rencana Anggaran Biaya (RAB) if available
+          const rabRes = await getRencanaAnggaranBiayaByMasterDokumenAction(mdkId);
+          if (rabRes.success && rabRes.data && rabRes.data.length > 0) {
+            setBeritaAcaraRows(
+              rabRes.data.map((item) => ({
+                dba_master_dokumen_id: mdkId,
+                dba_uraian: item.rab_uraian_pekerjaan || '',
+                dba_volume: item.rab_volume || '',
+                dba_satuan: item.rab_waktu || '',
+                dba_status_pemeriksaan: '100% Selesai',
+              }))
+            );
+          } else {
+            setBeritaAcaraRows([createEmptyRow()]);
+          }
         }
+      } else {
+        setHasSavedData(false);
+        setBeritaAcaraRows([createEmptyRow()]);
       }
-    } else {
-      setHasSavedData(false);
-      setBeritaAcaraRows([createEmptyRow()]);
-    }
-    setLoadingBeritaAcara(false);
-  }, [selectedMasterDokumen]);
+      setLoadingBeritaAcara(false);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selectedMasterDokumen, generateNarratives]
+  );
 
   const handleCopyFromRAB = async () => {
     if (!selectedMdkId || typeof selectedMdkId !== 'number') {
@@ -202,7 +304,43 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
       showToast('error', 'Tidak ada data Rencana Anggaran Biaya (RAB) untuk Master Dokumen ini.');
     }
     setLoadingBeritaAcara(false);
+  };
 
+  const handlePullFromPaket = async () => {
+    if (!selectedMdkId || typeof selectedMdkId !== 'number') {
+      showToast('error', 'Silakan pilih Master Dokumen terlebih dahulu.');
+      return;
+    }
+    setLoadingBeritaAcara(true);
+    const paketRes = await getPaketByMasterDokumenAction(selectedMdkId);
+    if (paketRes.success && paketRes.data) {
+      const p = paketRes.data;
+      const noSpk = p.pkt_no_spk_kwitansi?.trim() || '';
+      const bapp = p.pkt_bapp?.trim() || '';
+      const bast = p.pkt_bast?.trim() || '';
+
+      if (noSpk) setBacNomorBuktiPerikatan(noSpk);
+      if (bapp) setBacNomorSuratPemeriksaan(bapp);
+      if (bast) setBacNomorSuratSerahTerima(bast);
+
+      // Refresh narasi paragraf sesuai data baru
+      const { paragraf1, paragraf2, hasilPeriksa } = generateNarratives(
+        selectedJenisBa,
+        selectedBuktiPerikatan,
+        noSpk || bacNomorBuktiPerikatan,
+        bacTanggal,
+        selectedMasterDokumen,
+        bapp || bacNomorSuratPemeriksaan
+      );
+      setBacParagrafPertama(paragraf1);
+      setBacParagrafKedua(paragraf2);
+      setBacHasilPemeriksaan(hasilPeriksa);
+
+      showToast('success', 'Berhasil menarik data Nomor SPK/Kwitansi, BAPP, dan BAST dari Perhitungan Paket!');
+    } else {
+      showToast('error', 'Data Perhitungan Paket belum tersedia atau belum disimpan.');
+    }
+    setLoadingBeritaAcara(false);
   };
 
   useEffect(() => {
@@ -213,7 +351,8 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
     } else {
       setSelectedMasterDokumen(null);
       setHasSavedData(false);
-      setBacNomorSurat('');
+      setBacNomorSuratPemeriksaan('');
+      setBacNomorSuratSerahTerima('');
       setBacParagrafPertama('');
       setBacParagrafKedua('');
       setBacHasilPemeriksaan('');
@@ -243,6 +382,103 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
     });
   };
 
+  // Handler ketika Jenis Berita Acara berubah
+  const handleJenisBaChange = async (newJenisKode: string) => {
+    setSelectedJenisBa(newJenisKode);
+
+    // Dapatkan nomor pemeriksaan yang ada untuk acuan serah terima
+    let noPemeriksaanAcuan = bacNomorSuratPemeriksaan;
+    if (newJenisKode === '002' && (!noPemeriksaanAcuan || noPemeriksaanAcuan.trim() === '')) {
+      if (selectedMdkId && typeof selectedMdkId === 'number') {
+        const headerPem = await getBeritaAcaraByMasterDokumenAction(selectedMdkId, '001');
+        if (headerPem.success && headerPem.data?.header?.bac_nomor_surat_pemeriksaan) {
+          noPemeriksaanAcuan = headerPem.data.header.bac_nomor_surat_pemeriksaan;
+          setBacNomorSuratPemeriksaan(noPemeriksaanAcuan);
+        }
+      }
+    }
+
+    // Langsung update Paragraf 2 sesuai template jenis berita acara yang dipilih
+    const { paragraf1, paragraf2, hasilPeriksa } = generateNarratives(
+      newJenisKode,
+      selectedBuktiPerikatan,
+      bacNomorBuktiPerikatan,
+      bacTanggal,
+      selectedMasterDokumen,
+      noPemeriksaanAcuan
+    );
+    setBacParagrafPertama(paragraf1);
+    setBacParagrafKedua(paragraf2);
+    setBacHasilPemeriksaan(hasilPeriksa);
+
+    if (selectedMdkId && typeof selectedMdkId === 'number') {
+      loadBeritaAcaraForMdk(selectedMdkId, selectedMasterDokumen, newJenisKode);
+    }
+  };
+
+  // Handler ketika Bukti Perikatan berubah
+  const handleBuktiPerikatanChange = (newBuktiKode: string) => {
+    setSelectedBuktiPerikatan(newBuktiKode);
+    // Refresh narasi dengan bukti perikatan baru
+    const { paragraf1, paragraf2 } = generateNarratives(
+      selectedJenisBa,
+      newBuktiKode,
+      bacNomorBuktiPerikatan,
+      bacTanggal,
+      selectedMasterDokumen
+    );
+    setBacParagrafPertama(paragraf1);
+    setBacParagrafKedua(paragraf2);
+  };
+
+  // Handler ketika Nomor Bukti Perikatan berubah
+  const handleNomorBuktiPerikatanChange = (newNomorBukti: string) => {
+    setBacNomorBuktiPerikatan(newNomorBukti);
+    const { paragraf1, paragraf2 } = generateNarratives(
+      selectedJenisBa,
+      selectedBuktiPerikatan,
+      newNomorBukti,
+      bacTanggal,
+      selectedMasterDokumen
+    );
+    setBacParagrafPertama(paragraf1);
+    setBacParagrafKedua(paragraf2);
+  };
+
+  // Handler ketika Tanggal Berita Acara berubah -> otomatis update narasi Paragraf 1 (hari & tanggal terbilang) & tanggal di Paragraf 2
+  const handleTanggalChange = (newDateStr: string) => {
+    setBacTanggal(newDateStr);
+    const { fullSentence } = formatDateToLegalWords(newDateStr);
+    setBacParagrafPertama(fullSentence);
+
+    // Update juga tanggal di bacParagrafKedua jika ada
+    if (bacParagrafKedua) {
+      const tglFormatted = formatDateIndonesian(newDateStr);
+      const updatedPar2 = bacParagrafKedua.replace(
+        /(\btanggal\s+)([\w\d\s]+?)(\s+dengan\s+kesimpulan)/i,
+        `$1${tglFormatted}$3`
+      );
+      if (updatedPar2 !== bacParagrafKedua) {
+        setBacParagrafKedua(updatedPar2);
+      }
+    }
+  };
+
+  // Handler regenerate narasi sesuai data master dokumen terbaru
+  const handleRegenerateNarasi = () => {
+    const { paragraf1, paragraf2, hasilPeriksa } = generateNarratives(
+      selectedJenisBa,
+      selectedBuktiPerikatan,
+      bacNomorBuktiPerikatan,
+      bacTanggal,
+      selectedMasterDokumen
+    );
+    setBacParagrafPertama(paragraf1);
+    setBacParagrafKedua(paragraf2);
+    setBacHasilPemeriksaan(hasilPeriksa);
+    showToast('success', 'Narasi berhasil di-generate ulang sesuai template standar.');
+  };
+
   // Save Batch Data
   const saveBatch = async () => {
     if (!selectedMdkId || typeof selectedMdkId !== 'number') return false;
@@ -251,7 +487,12 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
 
     const res = await saveBeritaAcaraBatchAction({
       bac_master_dokumen_id: selectedMdkId,
-      bac_nomor_surat: bacNomorSurat,
+      bac_master_jenis_ba_id: selectedJenisBa,
+      bac_bukti_perikatan: selectedBuktiPerikatan,
+      bac_nomor_bukti_perikatan: bacNomorBuktiPerikatan,
+      bac_nomor_surat_pemeriksaan: bacNomorSuratPemeriksaan,
+      bac_nomor_surat_serah_terima: bacNomorSuratSerahTerima,
+      bac_nomor_surat: activeNomorSurat,
       bac_paragraf_pertama: bacParagrafPertama,
       bac_paragraf_kedua: bacParagrafKedua,
       bac_hasil_pemeriksaan: bacHasilPemeriksaan,
@@ -287,7 +528,7 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
     if (success) {
       showToast('success', 'Berhasil menyimpan data Berita Acara!');
       setHasSavedData(true);
-      loadBeritaAcaraForMdk(selectedMdkId, selectedMasterDokumen);
+      // loadBeritaAcaraForMdk(selectedMdkId, selectedMasterDokumen, selectedJenisBa, selectedBuktiPerikatan);
     } else {
       showToast('error', 'Gagal menyimpan data Berita Acara.');
     }
@@ -301,8 +542,8 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
       await saveBatch();
       setHasSavedData(true);
     }
-    window.open(`/berita-acara/print/${selectedMdkId}`, '_blank');
-  }, [selectedMdkId, BeritaAcaraRows, bacNomorSurat, bacParagrafPertama, bacParagrafKedua, bacHasilPemeriksaan]);
+    window.open(`/berita-acara/print/${selectedMdkId}?jenis=${selectedJenisBa}`, '_blank');
+  }, [selectedMdkId, BeritaAcaraRows, activeNomorSurat, bacParagrafPertama, bacParagrafKedua, bacHasilPemeriksaan, selectedJenisBa, saveBatch]);
 
   // Calculation metrics
   const paguNominal = Number(selectedMasterDokumen?.mdk_pagu_anggaran) || 0;
@@ -363,31 +604,137 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Card 1: Informasi Header & Teks Paragraf Berita Acara */}
               <div className="p-5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
-                <div className="pb-3 border-b border-gray-100 dark:border-gray-800">
-                  <h2 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                    <span className="p-1.5 rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
-                      📄
-                    </span>
-                    Informasi & Teks Paragraf Berita Acara
-                  </h2>
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Atur nomor surat dan narasi paragraf Berita Acara Pemeriksaan Hasil Pekerjaan
-                  </p>
+                <div className="pb-3 border-b border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                  <div>
+                    <h2 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                      <span className="p-1.5 rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+                        📄
+                      </span>
+                      Informasi & Teks Paragraf Berita Acara
+                    </h2>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      Pilih jenis berita acara, dasar bukti perikatan, serta nomor surat dan narasi
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={handlePullFromPaket}
+                      className="self-start sm:self-auto px-3 py-1.5 rounded-lg bg-brand-50 hover:bg-brand-100 dark:bg-brand-900/40 dark:hover:bg-brand-900/60 text-brand-700 dark:text-brand-300 text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                      title="Tarik otomatis No. SPK/Kwitansi, BAPP, dan BAST dari Perhitungan Paket"
+                    >
+                      <svg className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
+                      Tarik dari Perhitungan Paket
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleRegenerateNarasi}
+                      className="self-start sm:self-auto px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs font-medium flex items-center gap-1.5 transition-colors cursor-pointer"
+                      title="Generate ulang narasi sesuai data Master Dokumen & Bukti Perikatan"
+                    >
+                      <svg className="w-3.5 h-3.5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                      </svg>
+                      Reset Template Narasi
+                    </button>
+                  </div>
                 </div>
 
                 <div className="space-y-4">
+                  {/* Row 1: Combo Box Jenis Berita Acara, Bukti Perikatan, & Nomor Bukti Perikatan */}
+                  <div
+                    className={`grid gap-4 p-3.5 rounded-xl bg-gray-50/80 dark:bg-gray-800/40 border border-gray-200/80 dark:border-gray-700/60 ${selectedJenisBa === '002' ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-3'
+                      }`}
+                  >
+                    {/* Jenis Berita Acara */}
+                    <div>
+                      <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                        Jenis Berita Acara <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={selectedJenisBa}
+                        onChange={(e) => handleJenisBaChange(e.target.value)}
+                        className="w-full px-3 py-2 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition-all cursor-pointer"
+                      >
+                        {jenisBaOptions.length > 0 ? (
+                          jenisBaOptions.map((opt) => (
+                            <option key={opt.mba_id} value={opt.mba_kode}>
+                              {opt.mba_nama}
+                            </option>
+                          ))
+                        ) : (
+                          <>
+                            <option value="001">PEMERIKSAAN</option>
+                            <option value="002">SERAH TERIMA</option>
+                          </>
+                        )}
+                      </select>
+                    </div>
+
+                    {/* Bukti Perikatan (Hanya tampil untuk Pemeriksaan) */}
+                    {selectedJenisBa !== '002' && (
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                          Bukti Perikatan <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={selectedBuktiPerikatan}
+                          onChange={(e) => handleBuktiPerikatanChange(e.target.value)}
+                          className="w-full px-3 py-2 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-semibold focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition-all cursor-pointer"
+                        >
+                          {buktiPerikatanOptions.length > 0 ? (
+                            buktiPerikatanOptions.map((opt) => (
+                              <option key={opt.mbk_id} value={opt.mbk_kode}>
+                                {opt.mbk_nama}
+                              </option>
+                            ))
+                          ) : (
+                            <>
+                              <option value="001">FAKTUR</option>
+                              <option value="002">SPK</option>
+                              <option value="003">SURAT PESANAN</option>
+                              <option value="004">SURAT PERJANJIAN/KONTRAK</option>
+                            </>
+                          )}
+                        </select>
+                      </div>
+                    )}
+
+                    {/* Nomor Bukti Perikatan (Hanya tampil untuk Pemeriksaan) */}
+                    {selectedJenisBa !== '002' && (
+                      <div>
+                        <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                          Nomor Bukti Perikatan
+                        </label>
+                        <input
+                          type="text"
+                          placeholder="Contoh: 13/SPK-SEKRE/... atau nomor faktur"
+                          value={bacNomorBuktiPerikatan}
+                          onChange={(e) => handleNomorBuktiPerikatanChange(e.target.value)}
+                          className="w-full px-3 py-2 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition-all font-mono"
+                        />
+                      </div>
+                    )}
+                  </div>
+
                   {/* Nomor Surat & Tanggal — 2 kolom */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     {/* Nomor Surat Berita Acara */}
                     <div>
                       <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                        Nomor Surat Berita Acara <span className="text-red-500">*</span>
+                        Nomor Surat Berita Acara ({selectedJenisBa === '002' ? 'Serah Terima' : 'Pemeriksaan'}) <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
-                        placeholder="Contoh: /SEKRETARIAT-027.2/VIII/2026"
-                        value={bacNomorSurat}
-                        onChange={(e) => setBacNomorSurat(e.target.value)}
+                        placeholder={
+                          selectedJenisBa === '002'
+                            ? 'Contoh: 341/SEKR-027.2/III/2024'
+                            : 'Contoh: 340/SEKR-027.2/III/2024'
+                        }
+                        value={activeNomorSurat}
+                        onChange={(e) => setActiveNomorSurat(e.target.value)}
                         className="w-full px-3.5 py-2.5 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition-all font-mono"
                       />
                     </div>
@@ -401,7 +748,7 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
                         <input
                           type="date"
                           value={bacTanggal}
-                          onChange={(e) => setBacTanggal(e.target.value)}
+                          onChange={(e) => handleTanggalChange(e.target.value)}
                           onClick={(e) => e.currentTarget.showPicker && e.currentTarget.showPicker()}
                           className="w-full pl-10 pr-3.5 py-2.5 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition-all font-sans cursor-pointer"
                         />
@@ -434,7 +781,7 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
                       Paragraf Kedua (Keterangan SPK / Faktur Pesanan)
                     </label>
                     <textarea
-                      rows={3}
+                      rows={4}
                       placeholder="Contoh: Dengan ini menyatakan dengan sebenarnya telah melakukan pemeriksaan..."
                       value={bacParagrafKedua}
                       onChange={(e) => setBacParagrafKedua(e.target.value)}

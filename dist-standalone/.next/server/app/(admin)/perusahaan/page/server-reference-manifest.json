@@ -1,6 +1,6 @@
 {
   "node": {
-    "7033a413240da5062cf74c6d21cfced3d5a3106b03": {
+    "70648f592d909446ad874ae75c84e896d41b79d240": {
       "workers": {
         "app/(admin)/perusahaan/page": {
           "moduleId": 2648,
@@ -15,7 +15,7 @@
       "exportedName": "getPerusahaanListAction",
       "filename": "src/features/perusahaan/actions.ts"
     },
-    "40f25d896b810286fa12f8bf0a46b0a3e06bf509ab": {
+    "40b0849a2c0eba2f596e92325ec19a1dc5b269c2cb": {
       "workers": {
         "app/(admin)/perusahaan/page": {
           "moduleId": 2648,
@@ -30,7 +30,7 @@
       "exportedName": "createPerusahaanAction",
       "filename": "src/features/perusahaan/actions.ts"
     },
-    "400d71d5f75a82c26587e0e417889ea25037f4c733": {
+    "40ad676717b94d81182bb386ebfcd0aafa23a86d1a": {
       "workers": {
         "app/(admin)/perusahaan/page": {
           "moduleId": 2648,
@@ -45,7 +45,7 @@
       "exportedName": "updatePerusahaanAction",
       "filename": "src/features/perusahaan/actions.ts"
     },
-    "409b92cacceb26cb3c6088a88e3443d0db609f1f98": {
+    "40451649f061a30398a4ee841536648f0920c06611": {
       "workers": {
         "app/(admin)/perusahaan/page": {
           "moduleId": 2648,

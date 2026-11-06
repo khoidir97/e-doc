@@ -19,9 +19,17 @@ export class BeritaAcaraService {
     };
   }
 
-  static async getHeaderByMasterDokumenId(mdk_id: number): Promise<BeritaAcaraHeader | null> {
+  static async getMasterJenisBeritaAcara() {
+    return await BeritaAcaraRepository.getMasterJenisBeritaAcara();
+  }
+
+  static async getMasterBaBuktiPerikatan() {
+    return await BeritaAcaraRepository.getMasterBaBuktiPerikatan();
+  }
+
+  static async getHeaderByMasterDokumenId(mdk_id: number, jenis_ba_kode?: string): Promise<BeritaAcaraHeader | null> {
     if (!mdk_id || mdk_id <= 0) return null;
-    return await BeritaAcaraRepository.findHeaderByMasterDokumenId(mdk_id);
+    return await BeritaAcaraRepository.findHeaderByMasterDokumenId(mdk_id, jenis_ba_kode);
   }
 
   static async getByMasterDokumenId(mdk_id: number): Promise<BeritaAcara[]> {
@@ -29,10 +37,10 @@ export class BeritaAcaraService {
     return await BeritaAcaraRepository.findByMasterDokumenId(mdk_id);
   }
 
-  static async getFullDataByMasterDokumenId(mdk_id: number): Promise<BeritaAcaraFullData> {
+  static async getFullDataByMasterDokumenId(mdk_id: number, jenis_ba_kode?: string): Promise<BeritaAcaraFullData> {
     if (!mdk_id || mdk_id <= 0) return { header: null, items: [] };
     const [header, items] = await Promise.all([
-      BeritaAcaraRepository.findHeaderByMasterDokumenId(mdk_id),
+      BeritaAcaraRepository.findHeaderByMasterDokumenId(mdk_id, jenis_ba_kode),
       BeritaAcaraRepository.findByMasterDokumenId(mdk_id),
     ]);
     return { header, items };
@@ -40,7 +48,18 @@ export class BeritaAcaraService {
 
   static async saveBatch(
     mdk_id: number,
-    header: { bac_nomor_surat: string; bac_paragraf_pertama: string; bac_paragraf_kedua: string; bac_hasil_pemeriksaan: string; bac_tanggal: Date | string },
+    header: {
+      bac_master_jenis_ba_id?: string;
+      bac_bukti_perikatan?: string;
+      bac_nomor_bukti_perikatan?: string;
+      bac_nomor_surat_pemeriksaan?: string;
+      bac_nomor_surat_serah_terima?: string;
+      bac_nomor_surat?: string;
+      bac_paragraf_pertama: string;
+      bac_paragraf_kedua: string;
+      bac_hasil_pemeriksaan: string;
+      bac_tanggal: Date | string;
+    },
     items: { dba_uraian: string; dba_volume: string; dba_satuan: string; dba_status_pemeriksaan: string }[],
     userId?: number | null
   ): Promise<boolean> {

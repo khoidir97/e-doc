@@ -2,16 +2,45 @@ import pool, { initDatabase } from '@/lib/db';
 import { BeritaAcara, BeritaAcaraHeader, CreateBeritaAcaraInput, UpdateBeritaAcaraInput } from './types';
 
 export class BeritaAcaraRepository {
-  static async findHeaderByMasterDokumenId(mdk_id: number): Promise<BeritaAcaraHeader | null> {
+  static async getMasterJenisBeritaAcara(): Promise<{ mba_id: number; mba_kode: string; mba_nama: string }[]> {
     await initDatabase();
     const [rows] = await pool.query<any[]>(
-      `SELECT bac_id, bac_master_dokumen_id, bac_nomor_surat, bac_paragraf_pertama, bac_paragraf_kedua, bac_hasil_pemeriksaan, bac_tanggal, bac_created_at
-       FROM berita_acara 
-       WHERE bac_master_dokumen_id = ? AND bac_deleted_at IS NULL 
-       ORDER BY bac_id DESC 
-       LIMIT 1`,
-      [mdk_id]
+      `SELECT mba_id, mba_kode, mba_nama FROM master_jenis_berita_acara WHERE mba_deleted_at IS NULL ORDER BY mba_id ASC`
     );
+    return rows;
+  }
+
+  static async getMasterBaBuktiPerikatan(): Promise<{ mbk_id: number; mbk_kode: string; mbk_nama: string }[]> {
+    await initDatabase();
+    const [rows] = await pool.query<any[]>(
+      `SELECT mbk_id, mbk_kode, mbk_nama FROM master_ba_bukti_perikatan WHERE mbk_deleted_at IS NULL ORDER BY mbk_id ASC`
+    );
+    return rows;
+  }
+
+  static async findHeaderByMasterDokumenId(mdk_id: number, jenis_ba_kode?: string): Promise<BeritaAcaraHeader | null> {
+    await initDatabase();
+    let query = `SELECT bac_id, bac_master_dokumen_id, bac_master_jenis_ba_id, bac_bukti_perikatan, bac_nomor_bukti_perikatan,
+                        bac_nomor_surat_pemeriksaan, bac_nomor_surat_serah_terima,
+                        COALESCE(
+                          IF(bac_master_jenis_ba_id = '002', bac_nomor_surat_serah_terima, bac_nomor_surat_pemeriksaan),
+                          bac_nomor_surat_pemeriksaan,
+                          bac_nomor_surat_serah_terima,
+                          ''
+                        ) AS bac_nomor_surat,
+                        bac_paragraf_pertama, bac_paragraf_kedua, bac_hasil_pemeriksaan, bac_tanggal, bac_created_at
+                 FROM berita_acara 
+                 WHERE bac_master_dokumen_id = ? AND bac_deleted_at IS NULL`;
+    const params: any[] = [mdk_id];
+
+    if (jenis_ba_kode) {
+      query += ` AND bac_master_jenis_ba_id = ?`;
+      params.push(jenis_ba_kode);
+    }
+
+    query += ` ORDER BY bac_id DESC LIMIT 1`;
+
+    const [rows] = await pool.query<any[]>(query, params);
     if (!rows || rows.length === 0) return null;
     return rows[0] as BeritaAcaraHeader;
   }
@@ -83,7 +112,18 @@ export class BeritaAcaraRepository {
 
   static async saveBatch(
     mdk_id: number,
-    header: { bac_nomor_surat: string; bac_paragraf_pertama: string; bac_paragraf_kedua: string; bac_hasil_pemeriksaan: string; bac_tanggal: Date | string },
+    header: {
+      bac_master_jenis_ba_id?: string;
+      bac_bukti_perikatan?: string;
+      bac_nomor_bukti_perikatan?: string;
+      bac_nomor_surat_pemeriksaan?: string;
+      bac_nomor_surat_serah_terima?: string;
+      bac_nomor_surat?: string;
+      bac_paragraf_pertama: string;
+      bac_paragraf_kedua: string;
+      bac_hasil_pemeriksaan: string;
+      bac_tanggal: Date | string;
+    },
     items: { dba_uraian: string; dba_volume: string; dba_satuan: string; dba_status_pemeriksaan: string }[],
     userId?: number | null
   ): Promise<boolean> {
@@ -94,9 +134,17 @@ export class BeritaAcaraRepository {
       await connection.beginTransaction();
 
       // 1. Check existing header record in berita_acara table
+      const jenisBa = header.bac_master_jenis_ba_id || '001';
+      const noPemeriksaan = header.bac_nomor_surat_pemeriksaan || (jenisBa === '001' ? header.bac_nomor_surat : '') || '';
+      const noSerahTerima = header.bac_nomor_surat_serah_terima || (jenisBa === '002' ? header.bac_nomor_surat : '') || '';
+
       const [existingHeader] = await connection.query<any[]>(
-        `SELECT bac_id FROM berita_acara WHERE bac_master_dokumen_id = ? AND bac_deleted_at IS NULL LIMIT 1`,
-        [mdk_id]
+        `SELECT bac_id FROM berita_acara 
+         WHERE bac_master_dokumen_id = ? 
+           AND (bac_master_jenis_ba_id = ? OR bac_master_jenis_ba_id IS NULL) 
+           AND bac_deleted_at IS NULL 
+         ORDER BY bac_id DESC LIMIT 1`,
+        [mdk_id, jenisBa]
       );
 
       let beritaAcaraId: number;
@@ -105,10 +153,16 @@ export class BeritaAcaraRepository {
         beritaAcaraId = existingHeader[0].bac_id;
         await connection.query(
           `UPDATE berita_acara 
-           SET bac_nomor_surat = ?, bac_paragraf_pertama = ?, bac_paragraf_kedua = ?, bac_hasil_pemeriksaan = ?, bac_tanggal = ?, bac_updated_at = NOW(), bac_updated_by = ?
+           SET bac_master_jenis_ba_id = ?, bac_bukti_perikatan = ?, bac_nomor_bukti_perikatan = ?,
+               bac_nomor_surat_pemeriksaan = ?, bac_nomor_surat_serah_terima = ?,
+               bac_paragraf_pertama = ?, bac_paragraf_kedua = ?, bac_hasil_pemeriksaan = ?, bac_tanggal = ?, bac_updated_at = NOW(), bac_updated_by = ?
            WHERE bac_id = ?`,
           [
-            header.bac_nomor_surat || '',
+            jenisBa,
+            header.bac_bukti_perikatan || '002',
+            header.bac_nomor_bukti_perikatan || '',
+            noPemeriksaan,
+            noSerahTerima,
             header.bac_paragraf_pertama || '',
             header.bac_paragraf_kedua || '',
             header.bac_hasil_pemeriksaan || '',
@@ -119,11 +173,15 @@ export class BeritaAcaraRepository {
         );
       } else {
         const [insertHeaderResult]: any = await connection.query(
-          `INSERT INTO berita_acara (bac_master_dokumen_id, bac_nomor_surat, bac_paragraf_pertama, bac_paragraf_kedua, bac_hasil_pemeriksaan, bac_tanggal, bac_created_by)
-           VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT INTO berita_acara (bac_master_dokumen_id, bac_master_jenis_ba_id, bac_bukti_perikatan, bac_nomor_bukti_perikatan, bac_nomor_surat_pemeriksaan, bac_nomor_surat_serah_terima, bac_paragraf_pertama, bac_paragraf_kedua, bac_hasil_pemeriksaan, bac_tanggal, bac_created_by)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             mdk_id,
-            header.bac_nomor_surat || '',
+            jenisBa,
+            header.bac_bukti_perikatan || '002',
+            header.bac_nomor_bukti_perikatan || '',
+            noPemeriksaan,
+            noSerahTerima,
             header.bac_paragraf_pertama || '',
             header.bac_paragraf_kedua || '',
             header.bac_hasil_pemeriksaan || '',

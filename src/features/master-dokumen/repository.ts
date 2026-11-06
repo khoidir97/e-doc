@@ -47,6 +47,10 @@ export class MasterDokumenRepository {
          p_sh.psh_nama AS mdk_nama_perusahaan,
          p_sh.psh_nama AS psh_nama,
          p_sh.psh_alamat AS psh_alamat,
+         p_sh.psh_npwp AS psh_npwp,
+         p_sh.psh_nomor_rekening AS psh_nomor_rekening,
+         p_sh.psh_nama_rekening AS psh_nama_rekening,
+         p_sh.psh_nama_bank AS psh_nama_bank,
          b.bdg_nama AS bdg_nama,
          b.bdg_nama AS mdk_bagian
        FROM master_dokumen md
@@ -85,6 +89,10 @@ export class MasterDokumenRepository {
          p_sh.psh_nama AS mdk_nama_perusahaan,
          p_sh.psh_nama AS psh_nama,
          p_sh.psh_alamat AS psh_alamat,
+         p_sh.psh_npwp AS psh_npwp,
+         p_sh.psh_nomor_rekening AS psh_nomor_rekening,
+         p_sh.psh_nama_rekening AS psh_nama_rekening,
+         p_sh.psh_nama_bank AS psh_nama_bank,
          b.bdg_nama AS bdg_nama,
          b.bdg_nama AS mdk_bagian
        FROM master_dokumen md

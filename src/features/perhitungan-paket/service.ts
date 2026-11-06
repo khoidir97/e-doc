@@ -26,7 +26,7 @@ export class PerhitunganPaketService {
 
   static async saveBatch(
     mdk_id: number,
-    items: { pak_nilai_invoice: number; pak_dpp: number; pak_ppn: number; pak_pph23: number; pak_dibayar: number }[],
+    items: { pak_nilai_invoice: number; pak_dpp: number; pak_ppn: number; pak_pph23: number; pak_jenis_pph?: string | null; pak_dibayar: number }[],
     userId?: number | null
   ): Promise<boolean> {
     if (!mdk_id || mdk_id <= 0) {

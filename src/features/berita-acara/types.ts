@@ -1,7 +1,24 @@
+export interface MasterJenisBeritaAcara {
+  mba_id: number;
+  mba_kode: string;
+  mba_nama: string;
+}
+
+export interface MasterBaBuktiPerikatan {
+  mbk_id: number;
+  mbk_kode: string;
+  mbk_nama: string;
+}
+
 export interface BeritaAcaraHeader {
   bac_id?: number;
   bac_master_dokumen_id: number;
-  bac_nomor_surat: string;
+  bac_master_jenis_ba_id?: string | null;
+  bac_bukti_perikatan?: string | null;
+  bac_nomor_bukti_perikatan?: string | null;
+  bac_nomor_surat_pemeriksaan?: string | null;
+  bac_nomor_surat_serah_terima?: string | null;
+  bac_nomor_surat?: string; // backwards compatibility / virtual getter
   bac_paragraf_pertama: string;
   bac_paragraf_kedua: string;
   bac_hasil_pemeriksaan: string;

@@ -23,6 +23,10 @@ export const PerusahaanFormModal: React.FC<PerusahaanFormModalProps> = ({
   const [pshNamaPimpinan, setPshNamaPimpinan] = useState('');
   const [pshJabatan, setPshJabatan] = useState('');
   const [pshAlamat, setPshAlamat] = useState('');
+  const [pshNpwp, setPshNpwp] = useState('');
+  const [pshNomorRekening, setPshNomorRekening] = useState('');
+  const [pshNamaRekening, setPshNamaRekening] = useState('');
+  const [pshNamaBank, setPshNamaBank] = useState('');
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -31,11 +35,19 @@ export const PerusahaanFormModal: React.FC<PerusahaanFormModalProps> = ({
       setPshNamaPimpinan(initialData.psh_nama_pimpinan);
       setPshJabatan(initialData.psh_jabatan);
       setPshAlamat(initialData.psh_alamat);
+      setPshNpwp(initialData.psh_npwp || '');
+      setPshNomorRekening(initialData.psh_nomor_rekening || '');
+      setPshNamaRekening(initialData.psh_nama_rekening || '');
+      setPshNamaBank(initialData.psh_nama_bank || '');
     } else {
       setPshNama('');
       setPshNamaPimpinan('');
       setPshJabatan('');
       setPshAlamat('');
+      setPshNpwp('');
+      setPshNomorRekening('');
+      setPshNamaRekening('');
+      setPshNamaBank('');
     }
     setError('');
   }, [initialData, isOpen]);
@@ -69,6 +81,10 @@ export const PerusahaanFormModal: React.FC<PerusahaanFormModalProps> = ({
           psh_nama_pimpinan: pshNamaPimpinan.trim(),
           psh_jabatan: pshJabatan.trim(),
           psh_alamat: pshAlamat.trim(),
+          psh_npwp: pshNpwp.trim() || null,
+          psh_nomor_rekening: pshNomorRekening.trim() || null,
+          psh_nama_rekening: pshNamaRekening.trim() || null,
+          psh_nama_bank: pshNamaBank.trim() || null,
         });
       } else {
         await onSubmit({
@@ -76,6 +92,10 @@ export const PerusahaanFormModal: React.FC<PerusahaanFormModalProps> = ({
           psh_nama_pimpinan: pshNamaPimpinan.trim(),
           psh_jabatan: pshJabatan.trim(),
           psh_alamat: pshAlamat.trim(),
+          psh_npwp: pshNpwp.trim() || null,
+          psh_nomor_rekening: pshNomorRekening.trim() || null,
+          psh_nama_rekening: pshNamaRekening.trim() || null,
+          psh_nama_bank: pshNamaBank.trim() || null,
         });
       }
     } catch (err: any) {
@@ -144,6 +164,58 @@ export const PerusahaanFormModal: React.FC<PerusahaanFormModalProps> = ({
               placeholder="Masukkan Jabatan"
               value={pshJabatan || ''}
               onChange={(e) => setPshJabatan(e.target.value)}
+              className="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              NPWP <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Masukkan NPWP"
+              value={pshNpwp || ''}
+              onChange={(e) => setPshNpwp(e.target.value)}
+              className="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Nomor Rekening <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Masukkan Nomor Rekening"
+              value={pshNomorRekening || ''}
+              onChange={(e) => setPshNomorRekening(e.target.value)}
+              className="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Nama Rekening <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Masukkan Nama Rekening"
+              value={pshNamaRekening || ''}
+              onChange={(e) => setPshNamaRekening(e.target.value)}
+              className="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none transition-all"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Nama Bank <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Masukkan Nama Bank"
+              value={pshNamaBank || ''}
+              onChange={(e) => setPshNamaBank(e.target.value)}
               className="w-full px-4 py-2.5 text-sm rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none transition-all"
             />
           </div>
