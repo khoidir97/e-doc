@@ -1,5 +1,6 @@
 import pool, { initDatabase } from '@/lib/db';
 import { Kwitansi } from './types';
+import { formatDateYYYYMMDD } from '@/lib/date';
 
 export class KwitansiRepository {
   static async findByMasterDokumenId(mdk_id: number): Promise<Kwitansi | null> {
@@ -109,8 +110,8 @@ export class KwitansiRepository {
     userId?: number | null
   ): Promise<Kwitansi | null> {
     await initDatabase();
-    const tglLunas = tanggalLunasDibayar ? new Date(tanggalLunasDibayar) : new Date();
-    const tglTerima = tanggalTerimaUang ? new Date(tanggalTerimaUang) : new Date();
+    const tglLunas = tanggalLunasDibayar ? (formatDateYYYYMMDD(tanggalLunasDibayar) || null) : null;
+    const tglTerima = tanggalTerimaUang ? (formatDateYYYYMMDD(tanggalTerimaUang) || null) : null;
     const nominalInt = Math.round(Number(uangSejumlah)) || 0;
     const cleanBukuKasNo = (bukuKasNo || '').trim();
     const cleanNoSp2d = (noSp2d || '').trim();
@@ -118,7 +119,7 @@ export class KwitansiRepository {
 
     const [result]: any = await pool.query(
       `INSERT INTO kwitansi (kwt_master_dokumen_id, kwt_buku_kas_umum_no, kwt_sudah_terima_dari, kwt_yaitu, kwt_uang_sejumlah, kwt_tanggal_lunas_dibayar, kwt_tanggal_terima_uang, kwt_no_sp2d, kwt_status_lunas, kwt_created_at, kwt_created_by) 
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?)`,
       [mdk_id, cleanBukuKasNo, sudahTerimaDari, yaituKet, nominalInt, tglLunas, tglTerima, cleanNoSp2d, cleanStatusLunas, userId ?? null]
     );
 
@@ -141,8 +142,8 @@ export class KwitansiRepository {
     userId?: number | null
   ): Promise<boolean> {
     await initDatabase();
-    const tglLunas = tanggalLunasDibayar ? new Date(tanggalLunasDibayar) : new Date();
-    const tglTerima = tanggalTerimaUang ? new Date(tanggalTerimaUang) : new Date();
+    const tglLunas = tanggalLunasDibayar ? (formatDateYYYYMMDD(tanggalLunasDibayar) || null) : null;
+    const tglTerima = tanggalTerimaUang ? (formatDateYYYYMMDD(tanggalTerimaUang) || null) : null;
     const nominalInt = Math.round(Number(uangSejumlah)) || 0;
     const cleanBukuKasNo = (bukuKasNo || '').trim();
     const cleanNoSp2d = (noSp2d || '').trim();

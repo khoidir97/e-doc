@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { MasterDokumen } from '../../master-dokumen/types';
 import { getMasterDokumenOptionsAction } from '@/features/faktur/actions';
 import { formatRupiah } from '@/lib/terbilang';
+import { formatDateYYYYMMDD } from '@/lib/date';
 import { parseKwitansiRupiahInput } from '../kwitansiDecimalUtils';
 import { SearchableSelect, SearchableOption } from '@/components/form/SearchableSelect';
 import { BpkadApiService, Sp2dItem } from '@/services/bpkadApiService';
@@ -38,7 +39,7 @@ export const KwitansiContainer: React.FC<KwitansiContainerProps> = ({
   initialMasterDokumenId,
   hideMasterDokumenSelector = false,
 }) => {
-  const todayYmd = new Date().toISOString().split('T')[0];
+  const todayYmd = formatDateYYYYMMDD(new Date());
 
   const [masterDokumenList, setMasterDokumenList] = useState<MasterDokumen[]>([]);
   const [selectedMdkId, setSelectedMdkId] = useState<number | ''>(initialMasterDokumenId || '');
@@ -67,8 +68,7 @@ export const KwitansiContainer: React.FC<KwitansiContainerProps> = ({
 
   const formatDateStr = (val: string | Date | null | undefined): string => {
     if (!val) return todayYmd;
-    const d = new Date(val);
-    return !isNaN(d.getTime()) ? d.toISOString().split('T')[0] : todayYmd;
+    return formatDateYYYYMMDD(val) || todayYmd;
   };
 
   useEffect(() => {

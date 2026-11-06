@@ -2,7 +2,7 @@ import React from 'react';
 import { MasterDokumen } from '@/features/master-dokumen/types';
 import { terbilang } from '@/lib/terbilang';
 import { formatKwitansiRupiahInput, parseKwitansiRupiahInput } from '../kwitansiDecimalUtils';
-import { formatDateIndonesian } from '@/lib/date';
+import { formatDateIndonesian, formatDateYYYYMMDD } from '@/lib/date';
 
 interface KwitansiOfficialSheetProps {
   masterDokumen: MasterDokumen;
@@ -262,17 +262,17 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
                       <div className="mt-1 font-normal text-[11px] flex items-center gap-1">
                         <span className="shrink-0">Pada Tanggal :</span>
                         {isEditable ? (
-                          <div className="relative inline-flex items-center">
-                            <span className="text-black bg-transparent dark:text-black border-b border-dashed border-gray-400 focus-within:border-black px-1 text-xs min-w-28 print:border-none print:min-w-0 cursor-pointer">
-                              {tanggalLunasDibayar ? formatDateIndonesian(tanggalLunasDibayar) : 'Pilih tanggal...'}
-                            </span>
+                          <>
                             <input
                               type="date"
-                              value={tanggalLunasDibayar}
+                              value={formatDateYYYYMMDD(tanggalLunasDibayar)}
                               onChange={(e) => onTanggalLunasDibayarChange?.(e.target.value)}
-                              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full print:hidden"
+                              className="text-black bg-transparent dark:text-black border-b border-dashed border-gray-400 focus:border-black outline-none px-1 text-xs w-28 print:hidden cursor-pointer"
                             />
-                          </div>
+                            <span className="hidden print:inline font-normal">
+                              {formatDateIndonesian(tanggalLunasDibayar)}
+                            </span>
+                          </>
                         ) : (
                           <span>{formatDateIndonesian(tanggalLunasDibayar)}</span>
                         )}
@@ -295,17 +295,17 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
                       <div className="flex items-center justify-center gap-1">
                         <span>Pekanbaru,</span>
                         {isEditable ? (
-                          <div className="relative inline-flex items-center">
-                            <span className="text-black bg-transparent dark:text-black border-b border-dashed border-gray-400 focus-within:border-black px-1 text-xs min-w-28 print:border-none print:min-w-0 cursor-pointer">
-                              {tanggalTerimaUang ? formatDateIndonesian(tanggalTerimaUang) : 'Pilih tanggal...'}
-                            </span>
+                          <>
                             <input
                               type="date"
-                              value={tanggalTerimaUang}
+                              value={formatDateYYYYMMDD(tanggalTerimaUang)}
                               onChange={(e) => onTanggalTerimaUangChange?.(e.target.value)}
-                              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full print:hidden"
+                              className="text-black bg-transparent dark:text-black border-b border-dashed border-gray-400 focus:border-black outline-none px-1 text-xs w-28 print:hidden cursor-pointer"
                             />
-                          </div>
+                            <span className="hidden print:inline font-normal">
+                              {formatDateIndonesian(tanggalTerimaUang)}
+                            </span>
+                          </>
                         ) : (
                           <span>{formatDateIndonesian(tanggalTerimaUang)}</span>
                         )}
