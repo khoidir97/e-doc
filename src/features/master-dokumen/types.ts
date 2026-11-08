@@ -17,6 +17,7 @@ export interface MasterDokumen {
   mdk_nama_bendahara_id: number;
   mdk_nama_bendahara?: string;
   mdk_nip_bendahara?: string;
+  mdk_jabatan_bendahara?: string;
   mdk_nama_perusahaan_id: number;
   mdk_nama_perusahaan?: string;
   mdk_nama_pimpinan_perusahaan?: string;

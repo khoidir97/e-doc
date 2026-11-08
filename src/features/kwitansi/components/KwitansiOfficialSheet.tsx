@@ -285,7 +285,7 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
                   {/* Row 2b: the three signature labels */}
                   <tr>
                     <td className="border-r-2 border-black align-top px-3 pt-3 text-center leading-snug vertical-align-bottom">
-                      Bendahara Pengeluaran Pembantu
+                      {masterDokumen.mdk_jabatan_bendahara || 'Bendahara Pengeluaran Pembantu'}
                     </td>
                     <td className="align-top px-3 pt-3 text-center leading-snug">
                       <div>Mengetahui</div>

@@ -341,6 +341,7 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
   const isLocked = selectedMasterDokumen?.mdk_is_lock === 1;
   const selisihNominal = paguNominal - totalHargaFaktur;
   const countPPN = totalHargaFaktur * (11 / 100);
+  const totalAkhir = totalHargaFaktur - countPPN;
   const isSaved = hasSavedData || FakturRows.some((r) => Boolean(r.fkt_id));
 
   return (
@@ -580,9 +581,18 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
                   <div>
                     <span className="text-gray-500 dark:text-gray-400 block">PPN</span>
                     <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400`}
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-400`}
                     >
                       {formatRupiah(countPPN)}
+                    </span>
+                  </div>
+
+                  <div>
+                    <span className="text-gray-500 dark:text-gray-400 block">Total</span>
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400`}
+                    >
+                      {formatRupiah(totalAkhir)}
                     </span>
                   </div>
 

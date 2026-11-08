@@ -767,7 +767,7 @@ export const BeritaAcaraContainer: React.FC<BeritaAcaraContainerProps> = ({
                       Paragraf Pertama (Pembuka & Dasar Pelaksanaan)
                     </label>
                     <textarea
-                      rows={3}
+                      rows={2}
                       placeholder="Contoh: Pada hari ini, Jum'at Tanggal empat belas Bulan Agustus..."
                       value={bacParagrafPertama}
                       onChange={(e) => setBacParagrafPertama(e.target.value)}
