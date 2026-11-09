@@ -13,7 +13,7 @@ import { getBidangListAction } from '@/features/bidang/actions';
 import { Bidang } from '@/features/bidang/types';
 import { RupiahInput } from '@/components/form/RupiahInput';
 import { SearchableSelect } from '@/components/form/SearchableSelect';
-import { BpkadApiService, Program, Kegiatan, SubKegiatan, RekeningBelanja } from '@/services/bpkadApiService';
+import { BpkadApiService, Program, Kegiatan, SubKegiatan, RekeningBelanja, RincianObjek } from '@/services/bpkadApiService';
 
 interface MasterDokumenFormModalProps {
   isOpen: boolean;
@@ -49,6 +49,15 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
   const [loadingKegiatan, setLoadingKegiatan] = useState(false);
   const [loadingSubKegiatan, setLoadingSubKegiatan] = useState(false);
   const [loadingRekBel, setLoadingRekBel] = useState(false);
+
+  // Rincian Objek (Item Barang Belanja) dari Api-RO
+  const [rincianObjekList, setRincianObjekList] = useState<RincianObjek[]>([]);
+  const [loadingRincianObjek, setLoadingRincianObjek] = useState(false);
+  const [selectedKodeStandarHarga, setSelectedKodeStandarHarga] = useState<string[]>([]);
+  const [savedItemObjects, setSavedItemObjects] = useState<RincianObjek[]>([]);
+  const [expandedSpecs, setExpandedSpecs] = useState<Record<string, boolean>>({});
+  const [searchRincianKeyword, setSearchRincianKeyword] = useState('');
+  const [appliedNotice, setAppliedNotice] = useState<string | null>(null);
 
   // Form states matching all 24 mdk_* fields
   const [mdkNamaPejabatId, setMdkNamaPejabatId] = useState<number | string>(0);
@@ -132,6 +141,26 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
       setMdkNoDpa(initialData.mdk_no_dpa || '');
       setMdkVolume(initialData.mdk_volume || '');
       setMdkKeterangan(initialData.mdk_keterangan || '');
+
+      // Parse and restore selected mdk_item_barang
+      if (initialData.mdk_item_barang) {
+        try {
+          const parsed = typeof initialData.mdk_item_barang === 'string'
+            ? JSON.parse(initialData.mdk_item_barang)
+            : initialData.mdk_item_barang;
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setSavedItemObjects(parsed);
+            setSelectedKodeStandarHarga(parsed.map((item: any) => item.KODE_STANDAR_HARGA).filter(Boolean));
+          } else {
+            setSavedItemObjects([]);
+          }
+        } catch (err) {
+          console.error('Error parsing mdk_item_barang:', err);
+          setSavedItemObjects([]);
+        }
+      } else {
+        setSavedItemObjects([]);
+      }
     } else {
       setMdkNamaPejabatId(0);
       setMdkBidangId(0);
@@ -171,6 +200,11 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
       setMdkVolume('');
       setMdkSatuan(0);
       setMdkKeterangan('');
+      setRincianObjekList([]);
+      setSelectedKodeStandarHarga([]);
+      setSavedItemObjects([]);
+      setSearchRincianKeyword('');
+      setAppliedNotice(null);
     }
     setActiveTab(1);
     setError('');
@@ -295,6 +329,170 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
     fetchRekBel();
   }, [isOpen, mdkKodeSubKegiatan]);
 
+  // ── Fetch Rincian Objek (Item Barang Belanja) saat mdkKodeSubKegiatan & mdkRekeningBelanja terisi ────
+  useEffect(() => {
+    if (!isOpen || !mdkKodeSubKegiatan || !mdkRekeningBelanja) {
+      setRincianObjekList([]);
+      setSelectedKodeStandarHarga([]);
+      return;
+    }
+
+    let isMounted = true;
+    const fetchRincianObjek = async () => {
+      setLoadingRincianObjek(true);
+      try {
+        const data = await BpkadApiService.getRincianObjek(mdkKodeSubKegiatan, mdkRekeningBelanja);
+        if (!isMounted) return;
+        setRincianObjekList(data);
+
+        // Pre-select items: prioritize mdk_item_barang if exists
+        if (initialData?.mdk_item_barang) {
+          try {
+            const parsed = typeof initialData.mdk_item_barang === 'string'
+              ? JSON.parse(initialData.mdk_item_barang)
+              : initialData.mdk_item_barang;
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              const savedCodes = parsed.map((item: any) => item.KODE_STANDAR_HARGA).filter(Boolean);
+              if (savedCodes.length > 0) {
+                setSelectedKodeStandarHarga(savedCodes);
+                const sumPagu = data
+                  .filter((item) => savedCodes.includes(item.KODE_STANDAR_HARGA))
+                  .reduce((sum, item) => sum + (Number(item.PAGU_TOTAL) || 0), 0);
+                if (sumPagu > 0) {
+                  setMdkPaguAnggaran(sumPagu);
+                }
+                return;
+              }
+            }
+          } catch (e) {
+            console.error('Error checking mdk_item_barang in fetchRincianObjek:', e);
+          }
+        }
+
+        // Fallback: match item names with initialData mdk_pekerjaan
+        if (initialData?.mdk_pekerjaan) {
+          const matchedCodes = data
+            .filter((item) =>
+              initialData.mdk_pekerjaan?.toLowerCase().includes(item.NAMA_STANDAR_HARGA.toLowerCase())
+            )
+            .map((item) => item.KODE_STANDAR_HARGA);
+          if (matchedCodes.length > 0) {
+            setSelectedKodeStandarHarga(matchedCodes);
+            const sumPagu = data
+              .filter((item) => matchedCodes.includes(item.KODE_STANDAR_HARGA))
+              .reduce((sum, item) => sum + (Number(item.PAGU_TOTAL) || 0), 0);
+            if (sumPagu > 0) {
+              setMdkPaguAnggaran(sumPagu);
+            }
+          }
+        }
+      } catch (err) {
+        if (!isMounted) return;
+        console.error('Gagal mengambil rincian objek BPKAD:', err);
+        setRincianObjekList([]);
+      } finally {
+        if (isMounted) setLoadingRincianObjek(false);
+      }
+    };
+
+    fetchRincianObjek();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isOpen, mdkKodeSubKegiatan, mdkRekeningBelanja, initialData]);
+
+  const toggleSelectItem = (kode: string) => {
+    setSelectedKodeStandarHarga((prev) => {
+      const next = prev.includes(kode) ? prev.filter((k) => k !== kode) : [...prev, kode];
+      const sumPagu = rincianObjekList
+        .filter((item) => next.includes(item.KODE_STANDAR_HARGA))
+        .reduce((sum, item) => sum + (Number(item.PAGU_TOTAL) || 0), 0);
+      setMdkPaguAnggaran(sumPagu);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedKodeStandarHarga.length === rincianObjekList.length) {
+      setSelectedKodeStandarHarga([]);
+      setMdkPaguAnggaran(0);
+    } else {
+      const allCodes = rincianObjekList.map((item) => item.KODE_STANDAR_HARGA);
+      setSelectedKodeStandarHarga(allCodes);
+      const sumPagu = rincianObjekList.reduce((sum, item) => sum + (Number(item.PAGU_TOTAL) || 0), 0);
+      setMdkPaguAnggaran(sumPagu);
+    }
+  };
+
+  const toggleExpandSpec = (kode: string) => {
+    setExpandedSpecs((prev) => ({ ...prev, [kode]: !prev[kode] }));
+  };
+
+  const selectedRincianItems = rincianObjekList.filter((item) =>
+    selectedKodeStandarHarga.includes(item.KODE_STANDAR_HARGA)
+  );
+
+  const totalSelectedPagu = selectedRincianItems.reduce(
+    (sum, item) => sum + (Number(item.PAGU_TOTAL) || 0),
+    0
+  );
+
+  const filteredRincianList = rincianObjekList.filter((item) => {
+    if (!searchRincianKeyword.trim()) return true;
+    const term = searchRincianKeyword.toLowerCase();
+    return (
+      item.NAMA_STANDAR_HARGA?.toLowerCase().includes(term) ||
+      item.KODE_STANDAR_HARGA?.toLowerCase().includes(term) ||
+      item.SPESIFIKASI?.toLowerCase().includes(term)
+    );
+  });
+
+  const applySelectedItemsToForm = () => {
+    if (selectedRincianItems.length === 0) return;
+
+    // 1. Set mdkPekerjaan
+    const namaList = selectedRincianItems.map((i) => i.NAMA_STANDAR_HARGA.trim()).filter(Boolean);
+    const pekerjaanText = namaList.length === 1 ? namaList[0] : namaList.join(', ');
+    setMdkPekerjaan(pekerjaanText);
+
+    // 2. Set mdkPaguAnggaran
+    setMdkPaguAnggaran(totalSelectedPagu);
+
+    // 3. Set mdkVolume & mdkSatuan
+    if (selectedRincianItems.length === 1) {
+      setMdkVolume(selectedRincianItems[0].KOOFISIEN || '1');
+      if (selectedRincianItems[0].SATUAN) {
+        const foundSatuan = masterSatuanList.find(
+          (s) => s.st_nama?.trim().toLowerCase() === selectedRincianItems[0].SATUAN.trim().toLowerCase()
+        );
+        if (foundSatuan) {
+          setMdkSatuan(foundSatuan.st_id);
+        }
+      }
+    } else {
+      const totalVol = selectedRincianItems.reduce((acc, curr) => acc + (Number(curr.KOOFISIEN) || 0), 0);
+      setMdkVolume(totalVol > 0 ? totalVol.toString() : selectedRincianItems.length.toString());
+
+      const uniqueSatuans = Array.from(new Set(selectedRincianItems.map((i) => i.SATUAN?.trim().toLowerCase())));
+      if (uniqueSatuans.length === 1 && uniqueSatuans[0]) {
+        const foundSatuan = masterSatuanList.find(
+          (s) => s.st_nama?.trim().toLowerCase() === uniqueSatuans[0]
+        );
+        if (foundSatuan) {
+          setMdkSatuan(foundSatuan.st_id);
+        }
+      }
+    }
+
+    setAppliedNotice(
+      `✓ Berhasil menerapkan ${selectedRincianItems.length} item barang ke Pekerjaan, Pagu (Rp ${totalSelectedPagu.toLocaleString('id-ID')}), Volume & Satuan.`
+    );
+    setTimeout(() => {
+      setAppliedNotice(null);
+    }, 4500);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -306,6 +504,14 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
         finalUraianBelanja = foundRek.NAMA_REKENING.trim();
       }
     }
+
+    // Ambil item rincian objek yang dicentang user untuk disimpan ke mdk_item_barang
+    const selectedFromApi = rincianObjekList.filter((item) =>
+      selectedKodeStandarHarga.includes(item.KODE_STANDAR_HARGA)
+    );
+    const finalItems = selectedFromApi.length > 0
+      ? selectedFromApi
+      : savedItemObjects.filter((item) => selectedKodeStandarHarga.includes(item.KODE_STANDAR_HARGA));
 
     const payload = {
       mdk_nama_pejabat_id: Number(mdkNamaPejabatId) || 0,
@@ -342,6 +548,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
       mdk_no_dpa: mdkNoDpa.trim(),
       mdk_volume: mdkVolume.trim(),
       mdk_satuan: Number(mdkSatuan) || 0,
+      mdk_item_barang: finalItems.length > 0 ? finalItems : null,
     };
 
     try {
@@ -359,12 +566,11 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
   };
 
   const tabs = [
-    { id: 1, label: 'Program & Kegiatan', icon: '📊' },
-    { id: 2, label: 'Rincian Belanja & DPA', icon: '📝' },
+    { id: 1, label: 'Program, Kegiatan & Rekening', icon: '📊' },
+    { id: 2, label: 'Pekerjaan & DPA', icon: '📝' },
     { id: 3, label: 'Pejabat & Bagian', icon: '👤' },
     { id: 4, label: 'Tim Pengadaan & PPTK', icon: '👥' },
     { id: 5, label: 'Perusahaan / Penyedia', icon: '🏢' },
-
   ];
 
   const formatRupiah = (val: number | string) => {
@@ -448,7 +654,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                 )}
               </>
             ) : (
-              <span className="text-gray-400 italic text-[11px]">Belum dipilih (Tab 2)</span>
+              <span className="text-gray-400 italic text-[11px]">Belum dipilih (Tab 1)</span>
             )}
           </p>
         </div>
@@ -466,8 +672,8 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
   );
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} className="max-w-5xl p-6 lg:p-8">
-      <div className="flex flex-col h-full max-h-[85vh]">
+    <Modal isOpen={isOpen} onClose={onClose} className="max-w-7xl w-[96vw] p-6 lg:p-8">
+      <div className="flex flex-col h-full max-h-[88vh]">
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-gray-100 dark:border-gray-800">
           <div className="flex items-center gap-3">
@@ -520,15 +726,21 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
 
         {/* Form Body with Scroll */}
         <form id="master-dokumen-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto py-4 space-y-4 pr-1">
-          {/* TAB 1: Program & Kegiatan */}
+          {/* TAB 1: Program, Kegiatan & Rekening Belanja */}
           {activeTab === 1 && (
             <div className="space-y-4 animate-in fade-in duration-200">
-              <div className="p-3 bg-brand-50/50 dark:bg-brand-900/10 rounded-xl text-xs text-brand-700 dark:text-brand-300 font-medium">
-                📊 Bagian 1: Pengodean & Struktur Program Kegiatan
+              <div className="p-3 bg-brand-50/50 dark:bg-brand-900/10 rounded-xl text-xs text-brand-700 dark:text-brand-300 font-medium flex flex-wrap items-center justify-between gap-2">
+                <span>📊 Bagian 1: Pengodean Program, Kegiatan, Rekening Belanja &amp; Item Standar Harga</span>
+                {totalSelectedPagu > 0 && (
+                  <span className="font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800 text-[11px]">
+                    Total Pagu Terpilih: {formatRupiah(totalSelectedPagu)}
+                  </span>
+                )}
               </div>
 
-              <div className="grid grid-cols-1 gap-4">
-                {/* Program */}
+              {/* Grid 2 Kolom untuk Form Select agar rapi dan tidak terlalu panjang ke samping */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* 1. Program (Kolom Kiri) */}
                 <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Program
@@ -556,13 +768,16 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                       const found = programList.find((p) => p.KODE_PROGRAM === val);
                       setMdkKodeProgram(val);
                       setMdkProgram(found?.NAMA_PROGRAM ?? '');
-                      // Reset turunan (Kegiatan, Sub Kegiatan, Rekening Belanja)
+                      // Reset turunan (Kegiatan, Sub Kegiatan, Rekening Belanja, Items)
                       setMdkKodeKegiatan('');
                       setMdkKegiatan('');
                       setMdkKodeSubKegiatan('');
                       setMdkSubKegiatan('');
                       setMdkRekeningBelanja('');
                       setRekeningBelanjaList([]);
+                      setRincianObjekList([]);
+                      setSelectedKodeStandarHarga([]);
+                      setMdkPaguAnggaran(0);
                     }}
                   />
                   {mdkKodeProgram && (
@@ -572,7 +787,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                   )}
                 </div>
 
-                {/* Kegiatan (Dependent pada Program via POST API BPKAD) */}
+                {/* 2. Kegiatan (Kolom Kanan) */}
                 <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Kegiatan
@@ -611,11 +826,14 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                       const found = kegiatanList.find((k) => k.KODE_KEGIATAN === val);
                       setMdkKodeKegiatan(val);
                       setMdkKegiatan(found?.NAMA_KEGIATAN ?? '');
-                      // Reset turunan (Sub Kegiatan, Rekening Belanja)
+                      // Reset turunan (Sub Kegiatan, Rekening Belanja, Items)
                       setMdkKodeSubKegiatan('');
                       setMdkSubKegiatan('');
                       setMdkRekeningBelanja('');
                       setRekeningBelanjaList([]);
+                      setRincianObjekList([]);
+                      setSelectedKodeStandarHarga([]);
+                      setMdkPaguAnggaran(0);
                     }}
                   />
                   {mdkKodeKegiatan && (
@@ -625,7 +843,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                   )}
                 </div>
 
-                {/* Sub Kegiatan (Dependent pada Kegiatan via POST API BPKAD) */}
+                {/* 3. Sub Kegiatan (Kolom Kiri) */}
                 <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Sub Kegiatan
@@ -664,9 +882,12 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                       const found = subKegiatanList.find((sk) => sk.KODE_SUB_KEGIATAN === val);
                       setMdkKodeSubKegiatan(val);
                       setMdkSubKegiatan(found?.NAMA_SUB_KEGIATAN ?? '');
-                      // Reset rekening belanja karena berubah berdasarkan sub kegiatan
+                      // Reset rekening belanja & item rincian
                       setMdkRekeningBelanja('');
                       setRekeningBelanjaList([]);
+                      setRincianObjekList([]);
+                      setSelectedKodeStandarHarga([]);
+                      setMdkPaguAnggaran(0);
                     }}
                   />
                   {mdkKodeSubKegiatan && (
@@ -675,23 +896,14 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                     </p>
                   )}
                 </div>
-              </div>
-            </div>
-          )}
 
-          {/* TAB 2: Rincian Belanja & DPA */}
-          {activeTab === 2 && (
-            <div className="space-y-4 animate-in fade-in duration-200">
-              <div className="p-3 bg-brand-50/50 dark:bg-brand-900/10 rounded-xl text-xs text-brand-700 dark:text-brand-300 font-medium">
-                📝 Bagian 2: Uraian Belanja, Rekening, APBD & Dokumen DPA
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="md:col-span-2">
+                {/* 4. Rekening Belanja (Kolom Kanan) */}
+                <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Rekening Belanja
                     {!mdkKodeSubKegiatan && (
                       <span className="ml-2 text-gray-400 dark:text-gray-500 font-normal">
-                        ⚠ Pilih Sub Kegiatan terlebih dahulu (Tab 1)
+                        (Pilih Sub Kegiatan terlebih dahulu)
                       </span>
                     )}
                   </label>
@@ -701,13 +913,13 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
                       </svg>
-                      Mengambil rekening belanja untuk sub kegiatan terpilih...
+                      Mengambil rekening belanja dari BPKAD...
                     </div>
                   )}
                   <SearchableSelect
                     placeholder={
                       !mdkKodeSubKegiatan
-                        ? 'Pilih Sub Kegiatan dulu di Tab 1...'
+                        ? 'Pilih Sub Kegiatan terlebih dahulu...'
                         : loadingRekBel
                           ? 'Memuat data rekening...'
                           : 'Pilih Rekening Belanja...'
@@ -723,11 +935,11 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                     onChange={(val: string) => {
                       const found = rekeningBelanjaList.find((r) => r.KODE_REKENING === val);
                       setMdkRekeningBelanja(val);
+                      setSelectedKodeStandarHarga([]);
+                      setRincianObjekList([]);
+                      setMdkPaguAnggaran(0);
                       if (found) {
                         setMdkUraianBelanja(found.NAMA_REKENING || '');
-                        if (found.PAGU) {
-                          setMdkPaguAnggaran(Number(found.PAGU) || 0);
-                        }
                         setMdkKodeLevel1(found.KODE_LEVEL_I || '');
                         setMdkNamaLevel1(found.NAMA_LEVEL_I || '');
                         setMdkKodeLevel2(found.KODE_LEVEL_II || '');
@@ -763,7 +975,234 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                     </p>
                   )}
                 </div>
+              </div>
 
+              {/* Pemilihan Item Barang (Daftar Rincian Belanja Standar Harga dari Api-RO) */}
+              {mdkRekeningBelanja && (
+                <div className="mt-2 p-4 sm:p-5 rounded-2xl bg-gray-50/80 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700/80 space-y-3.5 transition-all">
+                  {/* Header */}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-gray-200 dark:border-gray-700">
+                    <div className="flex items-center gap-2.5">
+                      <span className="p-2 rounded-xl bg-brand-100 dark:bg-brand-950/60 text-brand-600 dark:text-brand-400">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                      </span>
+                      <div>
+                        <h4 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+                          Daftar Rincian Belanja (Standar Harga)
+                        </h4>
+                        <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                          Pilih item belanja yang akan dimasukkan ke dalam paket pekerjaan ini. Nilai pagu dokumen akan otomatis dihitung dari item yang dicentang.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2.5 self-start sm:self-auto">
+                      <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+                        {rincianObjekList.length} Item
+                      </span>
+                      {rincianObjekList.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={toggleSelectAll}
+                          className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 hover:underline cursor-pointer"
+                        >
+                          {selectedKodeStandarHarga.length === rincianObjekList.length ? 'Batalkan Semua' : 'Pilih Semua'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Notifikasi Terapkan */}
+                  {appliedNotice && (
+                    <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/50 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold text-emerald-700 dark:text-emerald-300 flex items-center justify-between animate-in fade-in">
+                      <div className="flex items-center gap-2">
+                        <svg className="w-4 h-4 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>{appliedNotice}</span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setAppliedNotice(null)}
+                        className="text-emerald-500 hover:text-emerald-700 font-bold ml-2 text-sm leading-none cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Loading State */}
+                  {loadingRincianObjek ? (
+                    <div className="py-8 text-center space-y-2.5 bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
+                      <div className="w-7 h-7 border-3 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto" />
+                      <p className="text-xs font-medium text-gray-500 dark:text-gray-400">
+                        Mengambil data rincian belanja (Api-RO) dari server BPKAD...
+                      </p>
+                    </div>
+                  ) : rincianObjekList.length === 0 ? (
+                    <div className="py-6 text-center text-xs text-gray-400 dark:text-gray-500 bg-white/60 dark:bg-gray-900/40 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
+                      Tidak ditemukan item rincian objek belanja untuk rekening ini.
+                    </div>
+                  ) : (
+                    <>
+                      {/* Search bar when items > 2 */}
+                      {rincianObjekList.length > 2 && (
+                        <div className="relative">
+                          <input
+                            type="text"
+                            value={searchRincianKeyword}
+                            onChange={(e) => setSearchRincianKeyword(e.target.value)}
+                            placeholder="Filter rincian barang berdasarkan nama, kode, atau spesifikasi..."
+                            className="w-full pl-8 pr-3 py-2 text-xs rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-800 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+                          />
+                          <svg
+                            className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                        </div>
+                      )}
+
+                      {/* Selected Summary & Quick Apply Action */}
+                      {selectedKodeStandarHarga.length > 0 && (
+                        <div className="p-3 bg-gradient-to-r from-brand-500/10 via-indigo-500/10 to-blue-500/10 dark:from-brand-950/40 dark:via-indigo-950/40 dark:to-blue-950/40 border border-brand-200 dark:border-brand-800/80 rounded-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 shadow-xs animate-in fade-in">
+                          <div className="flex items-center gap-3">
+                            <span className="w-8 h-8 rounded-full bg-brand-600 text-white font-bold text-xs flex items-center justify-center shrink-0 shadow-sm">
+                              {selectedKodeStandarHarga.length}
+                            </span>
+                            <div>
+                              <span className="text-xs font-bold text-gray-900 dark:text-white block">
+                                {selectedKodeStandarHarga.length} dari {rincianObjekList.length} item dipilih
+                              </span>
+                              <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                                Total Pagu Terpilih: Rp {totalSelectedPagu.toLocaleString('id-ID')}
+                              </span>
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={applySelectedItemsToForm}
+                            className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer self-stretch sm:self-auto"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                            </svg>
+                            Terapkan ke Form (Pekerjaan, Volume &amp; Satuan)
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Grid 2 Kolom untuk Item Cards */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 max-h-[440px] overflow-y-auto pr-1">
+                        {filteredRincianList.map((item) => {
+                          const isChecked = selectedKodeStandarHarga.includes(item.KODE_STANDAR_HARGA);
+                          const isExpanded = Boolean(expandedSpecs[item.KODE_STANDAR_HARGA]);
+                          const hargaSatuanNum = Number(item.HARGA_SATUAN) || 0;
+                          const paguTotalNum = Number(item.PAGU_TOTAL) || 0;
+
+                          return (
+                            <div
+                              key={item.KODE_STANDAR_HARGA}
+                              onClick={() => toggleSelectItem(item.KODE_STANDAR_HARGA)}
+                              className={`p-3.5 rounded-xl border transition-all cursor-pointer select-none flex flex-col justify-between ${
+                                isChecked
+                                  ? 'border-brand-500 bg-brand-50/40 dark:bg-brand-950/30 ring-1.5 ring-brand-500/20 shadow-xs'
+                                  : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'
+                              }`}
+                            >
+                              <div className="flex items-start gap-3">
+                                <div className="pt-0.5">
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={() => toggleSelectItem(item.KODE_STANDAR_HARGA)}
+                                    onClick={(e) => e.stopPropagation()}
+                                    className="w-4 h-4 rounded text-brand-600 border-gray-300 dark:border-gray-600 focus:ring-brand-500 cursor-pointer"
+                                  />
+                                </div>
+
+                                <div className="flex-1 min-w-0 space-y-2">
+                                  {/* Header: Title and Kode */}
+                                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1.5">
+                                    <h5 className="text-xs font-bold text-gray-900 dark:text-white leading-snug">
+                                      {item.NAMA_STANDAR_HARGA}
+                                    </h5>
+                                    <span className="font-mono text-[10px] text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded border border-gray-200/60 dark:border-gray-700 shrink-0">
+                                      {item.KODE_STANDAR_HARGA}
+                                    </span>
+                                  </div>
+
+                                  {/* Price, Koofisien & Total Pagu Badges */}
+                                  <div className="flex flex-wrap items-center gap-2 text-xs">
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-blue-50 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 font-semibold text-[11px]">
+                                      📦 Vol: {item.KOOFISIEN} {item.SATUAN}
+                                    </span>
+                                    <span className="text-gray-500 dark:text-gray-400 text-[11px]">
+                                      @ Rp {hargaSatuanNum.toLocaleString('id-ID')}
+                                    </span>
+                                    <span className="ml-auto font-mono font-bold text-emerald-600 dark:text-emerald-400 text-xs">
+                                      Pagu: Rp {paguTotalNum.toLocaleString('id-ID')}
+                                    </span>
+                                  </div>
+
+                                  {/* Spesifikasi Toggle */}
+                                  {item.SPESIFIKASI && (
+                                    <div className="pt-0.5">
+                                      <button
+                                        type="button"
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          toggleExpandSpec(item.KODE_STANDAR_HARGA);
+                                        }}
+                                        className="text-[11px] font-semibold text-gray-500 dark:text-gray-400 hover:text-brand-600 dark:hover:text-brand-400 flex items-center gap-1 cursor-pointer"
+                                      >
+                                        <svg
+                                          className={`w-3 h-3 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                                          fill="none"
+                                          stroke="currentColor"
+                                          viewBox="0 0 24 24"
+                                        >
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                        {isExpanded ? 'Tutup Spesifikasi' : 'Lihat Spesifikasi'}
+                                      </button>
+
+                                      {isExpanded && (
+                                        <div
+                                          onClick={(e) => e.stopPropagation()}
+                                          className="mt-2 p-2.5 rounded-xl bg-gray-100/80 dark:bg-gray-800/80 text-[11px] text-gray-700 dark:text-gray-300 leading-relaxed font-sans whitespace-pre-wrap border border-gray-200/70 dark:border-gray-700"
+                                        >
+                                          {item.SPESIFIKASI}
+                                        </div>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* TAB 2: Pekerjaan & Dokumen DPA */}
+          {activeTab === 2 && (
+            <div className="space-y-4 animate-in fade-in duration-200">
+              <div className="p-3 bg-brand-50/50 dark:bg-brand-900/10 rounded-xl text-xs text-brand-700 dark:text-brand-300 font-medium">
+                📝 Bagian 2: APBD, Nomor DPA, Uraian Pekerjaan, Volume &amp; Satuan
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                     APBD / Tahun Anggaran
@@ -790,20 +1229,27 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                   />
                 </div>
 
-                <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Pekerjaan
-                  </label>
+                <div className="md:col-span-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">
+                      Pekerjaan
+                    </label>
+                    {selectedRincianItems.length > 0 && (
+                      <span className="text-[11px] text-brand-600 dark:text-brand-400 font-medium">
+                        (Dapat otomatis terisi dari tombol &quot;Terapkan ke Form&quot; di Tab 1)
+                      </span>
+                    )}
+                  </div>
                   <textarea
                     rows={2}
-                    placeholder="Pekerjaan"
+                    placeholder="Nama paket pekerjaan"
                     value={mdkPekerjaan}
                     onChange={(e) => setMdkPekerjaan(e.target.value)}
                     className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none transition-all"
                   />
                 </div>
 
-                <div>
+                <div className="md:col-span-2">
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Keterangan Tambahan
                   </label>
@@ -843,7 +1289,6 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                     onChange={(val) => setMdkSatuan(Number(val))}
                     placeholder="-- Pilih Satuan --"
                     searchPlaceholder="Cari berdasarkan nama..."
-                  // disabled={masterSatuanList.length === 0}
                   />
                 </div>
               </div>
@@ -906,6 +1351,9 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                       <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">
                         Pagu Anggaran (Rp)
                       </label>
+                      <span className="text-[11px] text-brand-600 dark:text-brand-400 font-medium">
+                        (Otomatis dari total item checklist Tab 1)
+                      </span>
                     </div>
                     <RupiahInput
                       placeholder="Masukkan Nilai Pagu (contoh: 50000000)"

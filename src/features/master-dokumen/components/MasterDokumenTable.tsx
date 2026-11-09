@@ -58,7 +58,7 @@ export const MasterDokumenTable: React.FC<MasterDokumenTableProps> = ({
               <th className="px-5 py-3.5 whitespace-nowrap">Bidang & Pagu Anggaran</th>
               <th className="px-5 py-3.5 whitespace-nowrap">Program & Sub Kegiatan</th>
               <th className="px-5 py-3.5 whitespace-nowrap">Uraian & Rek. Belanja</th>
-              <th className="px-5 py-3.5 whitespace-nowrap">No. DPA & APBD</th>
+              <th className="px-5 py-3.5 whitespace-nowrap">PPTK & Pekerjaan</th>
               <th className="px-5 py-3.5 text-center whitespace-nowrap">Detail</th>
               <th className="px-5 py-3.5 text-right pr-6 sticky right-0 bg-gray-50/95 dark:bg-gray-800/95 backdrop-blur-xs">
                 Aksi
@@ -171,7 +171,7 @@ export const MasterDokumenTable: React.FC<MasterDokumenTableProps> = ({
                         </div>
                         {item.mdk_rekening_belanja && (
                           <div className="text-[11px] font-mono text-gray-500 dark:text-gray-400 mt-0.5">
-                            {item.mdk_pekerjaan}
+                            {item.mdk_apbd}
                           </div>
                         )}
                       </td>
@@ -179,11 +179,11 @@ export const MasterDokumenTable: React.FC<MasterDokumenTableProps> = ({
                       {/* No DPA & APBD */}
                       <td className="px-5 py-3.5 whitespace-nowrap">
                         <div className="font-medium text-gray-800 dark:text-gray-200">
-                          {item.mdk_no_dpa || '-'}
+                          {item.mdk_nama_pptk || '-'}
                         </div>
                         {item.mdk_apbd && (
                           <div className="mt-1 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border border-blue-200/50 dark:border-blue-800/40">
-                            {item.mdk_apbd}
+                            {item.mdk_pekerjaan}
                           </div>
                         )}
                       </td>
@@ -346,9 +346,9 @@ export const MasterDokumenTable: React.FC<MasterDokumenTableProps> = ({
                                   )}
                                 </div>
                                 <div>
-                                  <span className="text-gray-500 dark:text-gray-400 block text-[10px]">PPTK:</span>
+                                  <span className="text-gray-500 dark:text-gray-400 block text-[10px]">No DPA:</span>
                                   <span className="font-medium text-gray-800 dark:text-gray-200">
-                                    {item.mdk_nama_pptk || (item.mdk_nama_pptk_id > 0 ? `ID: ${item.mdk_nama_pptk_id}` : '-')}
+                                    {item.mdk_no_dpa || '-'}
                                   </span>
                                 </div>
                                 <div>
@@ -432,7 +432,7 @@ export const MasterDokumenTable: React.FC<MasterDokumenTableProps> = ({
                                 </div>
                                 <div>
                                   <span className="text-gray-500 dark:text-gray-400 block text-[10px]">Satuan:</span>
-                                  <span className="text-gray-600 dark:text-gray-400">{item.mdk_satuan || '-'}</span>
+                                  <span className="text-gray-600 dark:text-gray-400">{item.st_nama || '-'}</span>
                                 </div>
                               </div>
                             </div>

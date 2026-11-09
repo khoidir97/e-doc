@@ -21,6 +21,8 @@ const ENDPOINT_MAP: Record<string, { path: string; method: 'GET' | 'POST' }> = {
   'kegiatan':         { path: '/Api-Kegiatan',    method: 'POST' },
   'sub-kegiatan':     { path: '/Api-SubKegiatan', method: 'POST' },
   'rekening-belanja': { path: '/Api-RekBel',      method: 'POST' },
+  'rincian-objek':    { path: '/Api-RO',          method: 'POST' },
+  'ro':               { path: '/Api-RO',          method: 'POST' },
   'sp2d':             { path: '/Api-SP2D',        method: 'POST' },
 };
 

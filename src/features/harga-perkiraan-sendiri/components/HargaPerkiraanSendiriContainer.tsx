@@ -253,6 +253,16 @@ export const HargaPerkiraanSendiriContainer: React.FC<HargaPerkiraanSendiriConta
     window.open(`/harga-perkiraan-sendiri/print/${selectedMdkId}`, '_blank');
   }, [selectedMdkId, HargaPerkiraanSendiriRows]);
 
+  // Open Surat Penetapan HPS PDF in new tab
+  const handlePrintPenetapanPdf = useCallback(async () => {
+    if (!selectedMdkId) return;
+    const validRows = HargaPerkiraanSendiriRows.filter((r) => r.hps_uraian_pekerjaan.trim() !== '');
+    if (validRows.length > 0) {
+      await saveBatch();
+    }
+    window.open(`/harga-perkiraan-sendiri/penetapan/${selectedMdkId}`, '_blank');
+  }, [selectedMdkId, HargaPerkiraanSendiriRows]);
+
   // Calculation metrics
   const totalHargaHargaPerkiraanSendiri = HargaPerkiraanSendiriRows.reduce(
     (acc, curr) => acc + (Number(curr.hps_harga_perkiraan_sendiri) || 0),
@@ -288,15 +298,29 @@ export const HargaPerkiraanSendiriContainer: React.FC<HargaPerkiraanSendiriConta
           </div>
 
           {selectedMasterDokumen && (
-            <button
-              onClick={handlePrintPdf}
-              className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer self-start sm:self-auto"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-              </svg>
-              Cetak HPS PDF
-            </button>
+            <div className="flex flex-wrap items-center gap-2 self-start sm:self-auto">
+              <button
+                type="button"
+                onClick={handlePrintPdf}
+                className="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                Cetak HPS PDF
+              </button>
+
+              <button
+                type="button"
+                onClick={handlePrintPenetapanPdf}
+                className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Cetak Penetapan HPS
+              </button>
+            </div>
           )}
         </div>
       )}
@@ -513,10 +537,21 @@ export const HargaPerkiraanSendiriContainer: React.FC<HargaPerkiraanSendiriConta
                       onClick={handlePrintPdf}
                       className="flex-1 sm:flex-initial px-4 py-3 rounded-xl bg-amber-500 hover:bg-amber-600 dark:bg-amber-600 dark:hover:bg-amber-700 text-white dark:text-white font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
-                      <svg className="w-4 h-4 text-white-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                       </svg>
                       Cetak PDF
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handlePrintPenetapanPdf}
+                      className="flex-1 sm:flex-initial px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Cetak Penetapan HPS
                     </button>
 
                     <button

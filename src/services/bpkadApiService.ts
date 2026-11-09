@@ -58,6 +58,16 @@ export interface RekeningBelanja {
   NAMA_LEVEL_V?: string;
 }
 
+export interface RincianObjek {
+  KODE_STANDAR_HARGA: string;
+  NAMA_STANDAR_HARGA: string;
+  SPESIFIKASI: string;
+  KOOFISIEN: string;
+  SATUAN: string;
+  HARGA_SATUAN: string;
+  PAGU_TOTAL: string;
+}
+
 export interface Sp2dItem {
   NOMOR_SP2D: string;
   TANGGAL_SP2D?: string;
@@ -119,6 +129,23 @@ export const BpkadApiService = {
 
     const res = await apiClient.post<RekeningBelanja[]>('/api/bpkad/rekening-belanja', {
       body: { KODE_SUB_KEGIATAN: kodeSubKegiatan },
+    });
+    return res.data ?? [];
+  },
+
+  /**
+   * Ambil daftar Rincian Objek Belanja berdasarkan KODE_SUB_KEGIATAN & KODE_REKENING.
+   * Proxy: POST /api/bpkad/rincian-objek → POST http://20.40.40.16/Api-RO
+   * Body: { "KODE_SUB_KEGIATAN": "5.02.01.2.06.0011", "KODE_REKENING": "5.2.02.10.002.00004" }
+   */
+  async getRincianObjek(kodeSubKegiatan: string, kodeRekening: string): Promise<RincianObjek[]> {
+    if (!kodeSubKegiatan.trim() || !kodeRekening.trim()) return [];
+
+    const res = await apiClient.post<RincianObjek[]>('/api/bpkad/rincian-objek', {
+      body: {
+        KODE_SUB_KEGIATAN: kodeSubKegiatan.trim(),
+        KODE_REKENING: kodeRekening.trim(),
+      },
     });
     return res.data ?? [];
   },

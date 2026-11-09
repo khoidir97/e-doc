@@ -45,6 +45,11 @@ const navItems: NavItem[] = [
     path: "/master-dokumen",
   },
   {
+    icon: <ListIcon />,
+    name: "Kerangka Acuan Kerja",
+    path: "/kerangka-acuan-kerja",
+  },
+  {
     name: "Dokumen",
     icon: <ListIcon />,
     subItems: [
@@ -64,6 +69,7 @@ const navItems: NavItem[] = [
         path: "/harga-perkiraan-sendiri",
         pro: false
       },
+
       {
         name: "Penawaran",
         path: "/penawaran",

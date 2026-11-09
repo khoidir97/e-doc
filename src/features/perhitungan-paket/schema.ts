@@ -11,6 +11,7 @@ export const PerhitunganPaketItemSchema = z.object({
 
 export const batchPerhitunganPaketSchema = z.object({
   pak_master_dokumen_id: z.coerce.number().positive('Pilih Master Dokumen yang valid'),
+  pak_paket_id: z.coerce.number().optional().nullable(),
   items: z.array(PerhitunganPaketItemSchema),
 });
 

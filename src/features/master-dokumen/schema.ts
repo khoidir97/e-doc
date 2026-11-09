@@ -35,6 +35,7 @@ export const createMasterDokumenSchema = z.object({
   mdk_no_dpa: z.string().default(''),
   mdk_volume: z.string().default(''),
   mdk_satuan: z.coerce.number().default(0),
+  mdk_item_barang: z.any().optional(),
 });
 
 export const updateMasterDokumenSchema = createMasterDokumenSchema.extend({

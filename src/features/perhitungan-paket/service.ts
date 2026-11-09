@@ -27,12 +27,13 @@ export class PerhitunganPaketService {
   static async saveBatch(
     mdk_id: number,
     items: { pak_nilai_invoice: number; pak_dpp: number; pak_ppn: number; pak_pph23: number; pak_jenis_pph?: string | null; pak_dibayar: number }[],
-    userId?: number | null
+    userId?: number | null,
+    paketId?: number | null
   ): Promise<boolean> {
     if (!mdk_id || mdk_id <= 0) {
       throw new Error('Master Dokumen ID tidak valid.');
     }
-    return await PerhitunganPaketRepository.saveBatch(mdk_id, items, userId);
+    return await PerhitunganPaketRepository.saveBatch(mdk_id, items, userId, paketId);
   }
 
   static async getById(pak_id: number): Promise<PerhitunganPaket> {

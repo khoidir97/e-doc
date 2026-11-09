@@ -349,7 +349,7 @@ export const RencanaAnggaranBiayaContainer: React.FC<RencanaAnggaranBiayaContain
                               value={row.rab_uraian_pekerjaan}
                               onChange={(value) => handleRowChange(index, 'rab_uraian_pekerjaan', value)}
                               className="w-full px-3 py-2 text-xs rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition-all"
-                              rows={1}
+                              rows={3}
                             />
                           </div>
 

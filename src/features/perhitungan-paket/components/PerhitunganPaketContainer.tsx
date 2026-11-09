@@ -117,7 +117,6 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
   const [pktNamaRekening, setPktNamaRekening] = useState('');
   const [pktNamaBank, setPktNamaBank] = useState('');
   const [pktJenisPph, setPktJenisPph] = useState<'23' | '22'>('23');
-  const [savingPaket, setSavingPaket] = useState(false);
 
   // Detail rows state (tabel detail_perhitungan_paket)
   const [PerhitunganPaketRows, setPerhitunganPaketRows] = useState<PerhitunganPaketItemRow[]>([createEmptyRow()]);
@@ -328,19 +327,6 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
     pkt_jenis_pph: pktJenisPph || '23',
   });
 
-  const handleSavePaket = async () => {
-    if (!selectedMdkId || typeof selectedMdkId !== 'number') return;
-    setSavingPaket(true);
-    const res = await savePaketAction(getPaketInputPayload(selectedMdkId));
-    setSavingPaket(false);
-    if (res.success) {
-      showToast('success', 'Info dokumen berhasil disimpan!');
-      loadPaketForMdk(selectedMdkId);
-    } else {
-      showToast('error', res.message);
-    }
-  };
-
   const handleSubmitDetail = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedMdkId || typeof selectedMdkId !== 'number') {
@@ -353,27 +339,36 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
       return;
     }
     setSaving(true);
-    const [paketRes, batchRes] = await Promise.all([
-      savePaketAction(getPaketInputPayload(selectedMdkId)),
-      savePerhitunganPaketBatchAction({
-        pak_master_dokumen_id: selectedMdkId,
-        items: validRows.map((r) => ({
-          pak_nilai_invoice: r.pak_nilai_invoice,
-          pak_dpp: r.pak_dpp,
-          pak_ppn: r.pak_ppn,
-          pak_pph23: r.pak_pph23,
-          pak_jenis_pph: r.pak_jenis_pph || pktJenisPph || '23',
-          pak_dibayar: r.pak_dibayar,
-        })),
-      }),
-    ]);
+
+    // 1. Simpan Header Info Dokumen terlebih dahulu untuk mendapatkan pkt_id
+    const paketRes = await savePaketAction(getPaketInputPayload(selectedMdkId));
+    if (!paketRes.success) {
+      setSaving(false);
+      showToast('error', paketRes.message || 'Gagal menyimpan Info Dokumen');
+      return;
+    }
+
+    const savedPaketId = paketRes.data || paketData?.pkt_id || null;
+
+    // 2. Simpan Rincian Paket dengan menyertakan pak_paket_id
+    const batchRes = await savePerhitunganPaketBatchAction({
+      pak_master_dokumen_id: selectedMdkId,
+      pak_paket_id: savedPaketId,
+      items: validRows.map((r) => ({
+        pak_nilai_invoice: r.pak_nilai_invoice,
+        pak_dpp: r.pak_dpp,
+        pak_ppn: r.pak_ppn,
+        pak_pph23: r.pak_pph23,
+        pak_jenis_pph: r.pak_jenis_pph || pktJenisPph || '23',
+        pak_dibayar: r.pak_dibayar,
+      })),
+    });
+
     setSaving(false);
-    if (paketRes.success && batchRes.success) {
-      showToast('success', 'Info Dokumen & Rincian Paket berhasil disimpan!');
+    if (batchRes.success) {
+      showToast('success', 'Data Perhitungan Paket & Info Dokumen berhasil disimpan!');
       loadPaketForMdk(selectedMdkId);
       loadPerhitunganPaketForMdk(selectedMdkId);
-    } else if (!paketRes.success) {
-      showToast('error', paketRes.message || 'Gagal menyimpan Info Dokumen');
     } else {
       showToast('error', batchRes.message || 'Gagal menyimpan Rincian Paket');
     }
@@ -381,8 +376,27 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
 
   const handlePrintPdf = async () => {
     if (!selectedMdkId || typeof selectedMdkId !== 'number') return;
-    // Auto-save both before printing
-    await handleSavePaket();
+    // Auto-save before printing if valid rows exist
+    const validRows = PerhitunganPaketRows.filter((r) => r.pak_nilai_invoice > 0);
+    if (validRows.length > 0) {
+      const paketRes = await savePaketAction(getPaketInputPayload(selectedMdkId));
+      if (paketRes.success) {
+        await savePerhitunganPaketBatchAction({
+          pak_master_dokumen_id: selectedMdkId,
+          pak_paket_id: paketRes.data || paketData?.pkt_id || null,
+          items: validRows.map((r) => ({
+            pak_nilai_invoice: r.pak_nilai_invoice,
+            pak_dpp: r.pak_dpp,
+            pak_ppn: r.pak_ppn,
+            pak_pph23: r.pak_pph23,
+            pak_jenis_pph: r.pak_jenis_pph || pktJenisPph || '23',
+            pak_dibayar: r.pak_dibayar,
+          })),
+        });
+      }
+    } else {
+      await savePaketAction(getPaketInputPayload(selectedMdkId));
+    }
     window.open(`/perhitungan-paket/print/${selectedMdkId}`, '_blank');
   };
 
@@ -457,19 +471,9 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
             <>
               {/* ── Section 1: Info Dokumen (Paket Header) ── */}
               <div className="p-5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm space-y-4">
-                <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
-                  <div>
-                    <h2 className="text-base font-bold text-gray-900 dark:text-white">Info Dokumen</h2>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">SPK/Kuitansi, BAPP, BAST, BAP, NPWP, Rekening</p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleSavePaket}
-                    disabled={savingPaket || isLocked}
-                    className="px-3.5 py-2 rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-400 font-semibold text-xs hover:bg-brand-100 transition-colors flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-                  >
-                    {savingPaket ? 'Menyimpan...' : 'Simpan Info'}
-                  </button>
+                <div className="pb-3 border-b border-gray-100 dark:border-gray-800">
+                  <h2 className="text-base font-bold text-gray-900 dark:text-white">Info Dokumen</h2>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">SPK/Kuitansi, BAPP, BAST, BAP, NPWP, Rekening</p>
                 </div>
 
                 {/* Compact multi-column grid layout */}

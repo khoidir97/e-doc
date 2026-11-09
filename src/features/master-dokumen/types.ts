@@ -53,6 +53,7 @@ export interface MasterDokumen {
   mdk_no_dpa: string;
   mdk_volume: string;
   mdk_satuan: number;
+  mdk_item_barang?: any;
   st_nama?: string;
   mdk_is_lock?: number;
   mdk_created_at: string | Date;
@@ -98,6 +99,7 @@ export interface CreateMasterDokumenInput {
   mdk_no_dpa: string;
   mdk_volume: string;
   mdk_satuan: number;
+  mdk_item_barang?: any;
   mdk_created_by?: number | null;
 }
 
@@ -137,6 +139,7 @@ export interface UpdateMasterDokumenInput {
   mdk_no_dpa: string;
   mdk_volume: string;
   mdk_satuan: number;
+  mdk_item_barang?: any;
   mdk_updated_by?: number | null;
 }
 

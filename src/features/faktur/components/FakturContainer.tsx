@@ -341,7 +341,7 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
   const isLocked = selectedMasterDokumen?.mdk_is_lock === 1;
   const selisihNominal = paguNominal - totalHargaFaktur;
   const countPPN = totalHargaFaktur * (11 / 100);
-  const totalAkhir = totalHargaFaktur - countPPN;
+  const totalAkhir = totalHargaFaktur + countPPN;
   const isSaved = hasSavedData || FakturRows.some((r) => Boolean(r.fkt_id));
 
   return (

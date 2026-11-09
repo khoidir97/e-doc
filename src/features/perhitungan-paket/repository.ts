@@ -136,9 +136,19 @@ export class PerhitunganPaketRepository {
   static async saveBatch(
     mdk_id: number,
     items: { pak_nilai_invoice: number; pak_dpp: number; pak_ppn: number; pak_pph23: number; pak_jenis_pph?: string | null; pak_dibayar: number }[],
-    userId?: number | null
+    userId?: number | null,
+    paketId?: number | null
   ): Promise<boolean> {
     await initDatabase();
+
+    // Jika paketId belum disediakan, coba cari dari perhitungan_paket berdasarkan mdk_id
+    let effectivePaketId = paketId;
+    if (!effectivePaketId) {
+      const paket = await PaketRepository.findByMasterDokumenId(mdk_id);
+      if (paket) {
+        effectivePaketId = paket.pkt_id;
+      }
+    }
 
     const connection = await pool.getConnection();
     try {
@@ -156,9 +166,9 @@ export class PerhitunganPaketRepository {
       for (const item of items) {
         if (item.pak_nilai_invoice) {
           await connection.query(
-            `INSERT INTO detail_perhitungan_paket (pak_master_dokumen_id, pak_nilai_invoice, pak_dpp, pak_ppn, pak_pph23, pak_jenis_pph, pak_dibayar, pak_created_by) 
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-            [mdk_id, item.pak_nilai_invoice, item.pak_dpp, item.pak_ppn, item.pak_pph23, item.pak_jenis_pph || '23', item.pak_dibayar, userId ?? null]
+            `INSERT INTO detail_perhitungan_paket (pak_paket_id, pak_master_dokumen_id, pak_nilai_invoice, pak_dpp, pak_ppn, pak_pph23, pak_jenis_pph, pak_dibayar, pak_created_by) 
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [effectivePaketId ?? null, mdk_id, item.pak_nilai_invoice, item.pak_dpp, item.pak_ppn, item.pak_pph23, item.pak_jenis_pph || '23', item.pak_dibayar, userId ?? null]
           );
         }
       }

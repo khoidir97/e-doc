@@ -118,6 +118,10 @@ export class MasterDokumenRepository {
 
   static async insert(input: CreateMasterDokumenInput): Promise<number> {
     await initDatabase();
+    const itemBarangJson = input.mdk_item_barang !== undefined && input.mdk_item_barang !== null
+      ? (typeof input.mdk_item_barang === 'string' ? input.mdk_item_barang : JSON.stringify(input.mdk_item_barang))
+      : null;
+
     const [result]: any = await pool.query(
       `INSERT INTO master_dokumen (
         mdk_nama_pejabat_id, mdk_bidang_id, mdk_pagu_anggaran, 
@@ -132,8 +136,9 @@ export class MasterDokumenRepository {
         mdk_kode_level4, mdk_nama_level4,
         mdk_kode_level5, mdk_nama_level5,
         mdk_keterangan, mdk_apbd, mdk_no_dpa, mdk_volume, mdk_satuan, 
+        mdk_item_barang,
         mdk_created_by
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         input.mdk_nama_pejabat_id ?? 0,
         input.mdk_bidang_id ?? 0,
@@ -169,6 +174,7 @@ export class MasterDokumenRepository {
         input.mdk_no_dpa ?? '',
         input.mdk_volume ?? '',
         input.mdk_satuan ?? 0,
+        itemBarangJson,
         input.mdk_created_by ?? null,
       ]
     );
@@ -177,6 +183,10 @@ export class MasterDokumenRepository {
 
   static async update(input: UpdateMasterDokumenInput): Promise<boolean> {
     await initDatabase();
+    const itemBarangJson = input.mdk_item_barang !== undefined && input.mdk_item_barang !== null
+      ? (typeof input.mdk_item_barang === 'string' ? input.mdk_item_barang : JSON.stringify(input.mdk_item_barang))
+      : null;
+
     const [result]: any = await pool.query(
       `UPDATE master_dokumen 
        SET mdk_nama_pejabat_id = ?, mdk_bidang_id = ?, mdk_pagu_anggaran = ?, 
@@ -190,7 +200,9 @@ export class MasterDokumenRepository {
            mdk_kode_level3 = ?, mdk_nama_level3 = ?,
            mdk_kode_level4 = ?, mdk_nama_level4 = ?,
            mdk_kode_level5 = ?, mdk_nama_level5 = ?,
-           mdk_keterangan = ?, mdk_apbd = ?, mdk_no_dpa = ?, mdk_volume = ?, mdk_satuan = ?, mdk_updated_by = ?, mdk_updated_at = NOW() 
+           mdk_keterangan = ?, mdk_apbd = ?, mdk_no_dpa = ?, mdk_volume = ?, mdk_satuan = ?, 
+           mdk_item_barang = ?,
+           mdk_updated_by = ?, mdk_updated_at = NOW() 
        WHERE mdk_id = ? AND mdk_deleted_at IS NULL`,
       [
         input.mdk_nama_pejabat_id ?? 0,
@@ -227,6 +239,7 @@ export class MasterDokumenRepository {
         input.mdk_no_dpa ?? '',
         input.mdk_volume ?? '',
         input.mdk_satuan ?? 0,
+        itemBarangJson,
         input.mdk_updated_by ?? null,
         input.mdk_id,
       ]

@@ -127,7 +127,8 @@ export async function savePerhitunganPaketBatchAction(input: BatchPerhitunganPak
     await PerhitunganPaketService.saveBatch(
       validation.data.pak_master_dokumen_id,
       validation.data.items,
-      activeUserId
+      activeUserId,
+      validation.data.pak_paket_id
     );
 
     revalidatePath('/perhitungan-paket');
