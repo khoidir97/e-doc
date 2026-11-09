@@ -217,8 +217,8 @@ export const MasterDokumenTable: React.FC<MasterDokumenTableProps> = ({
                             <button
                               onClick={() => onToggleLock(item)}
                               className={`p-1.5 rounded-lg transition-colors cursor-pointer ${item.mdk_is_lock === 1
-                                  ? 'text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-400'
-                                  : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
+                                ? 'text-amber-600 hover:text-amber-700 bg-amber-50 hover:bg-amber-100 dark:bg-amber-950/40 dark:text-amber-400'
+                                : 'text-gray-400 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800'
                                 }`}
                               title={item.mdk_is_lock === 1 ? 'Dokumen Terkunci (Klik untuk Buka Kunci)' : 'Dokumen Terbuka (Klik untuk Kunci)'}
                             >

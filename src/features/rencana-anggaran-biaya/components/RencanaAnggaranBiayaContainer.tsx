@@ -111,7 +111,8 @@ export const RencanaAnggaranBiayaContainer: React.FC<RencanaAnggaranBiayaContain
       const found = masterDokumenList.find((m) => m.mdk_id === selectedMdkId) || null;
       setSelectedMasterDokumen(found);
       const defaultUraianText = found?.mdk_pekerjaan || found?.mdk_uraian_belanja || '';
-      loadRencanaAnggaranBiayaForMdk(selectedMdkId, defaultUraianText, found?.mdk_volume || '', found?.mdk_satuan || '');
+      const defaultSatuan = found?.st_nama || (found?.mdk_satuan ? String(found.mdk_satuan) : '');
+      loadRencanaAnggaranBiayaForMdk(selectedMdkId, defaultUraianText, found?.mdk_volume || '', defaultSatuan);
     } else {
       setSelectedMasterDokumen(null);
       setHasSavedData(false);
@@ -122,17 +123,19 @@ export const RencanaAnggaranBiayaContainer: React.FC<RencanaAnggaranBiayaContain
   // Handle Dynamic Rows
   const handleAddRow = () => {
     const defaultUraianText = selectedMasterDokumen?.mdk_pekerjaan || selectedMasterDokumen?.mdk_uraian_belanja || '';
+    const defaultSatuan = selectedMasterDokumen?.st_nama || (selectedMasterDokumen?.mdk_satuan ? String(selectedMasterDokumen.mdk_satuan) : '');
     setRencanaAnggaranBiayaRows((prev) => [
       ...prev,
-      createEmptyRow(defaultUraianText, selectedMasterDokumen?.mdk_volume || '', selectedMasterDokumen?.mdk_satuan || ''),
+      createEmptyRow(defaultUraianText, selectedMasterDokumen?.mdk_volume || '', defaultSatuan),
     ]);
   };
 
   const handleRemoveRow = (index: number) => {
     const defaultUraianText = selectedMasterDokumen?.mdk_pekerjaan || selectedMasterDokumen?.mdk_uraian_belanja || '';
+    const defaultSatuan = selectedMasterDokumen?.st_nama || (selectedMasterDokumen?.mdk_satuan ? String(selectedMasterDokumen.mdk_satuan) : '');
     if (RencanaAnggaranBiayaRows.length === 1) {
       setRencanaAnggaranBiayaRows([
-        createEmptyRow(defaultUraianText, selectedMasterDokumen?.mdk_volume || '', selectedMasterDokumen?.mdk_satuan || ''),
+        createEmptyRow(defaultUraianText, selectedMasterDokumen?.mdk_volume || '', defaultSatuan),
       ]);
       return;
     }

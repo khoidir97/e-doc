@@ -53,7 +53,8 @@ export class MasterDokumenRepository {
          p_sh.psh_nama_rekening AS psh_nama_rekening,
          p_sh.psh_nama_bank AS psh_nama_bank,
          b.bdg_nama AS bdg_nama,
-         b.bdg_nama AS mdk_bagian
+         b.bdg_nama AS mdk_bagian,
+         s.st_nama AS st_nama
        FROM master_dokumen md
        LEFT JOIN pegawai p_pejabat ON md.mdk_nama_pejabat_id = p_pejabat.pgw_id
        LEFT JOIN pegawai p_pptk ON md.mdk_nama_pptk_id = p_pptk.pgw_id
@@ -61,6 +62,7 @@ export class MasterDokumenRepository {
        LEFT JOIN pegawai p_pejabat_pengadaan ON md.mdk_nama_pejabat_pengadaan_id = p_pejabat_pengadaan.pgw_id
        LEFT JOIN perusahaan p_sh ON md.mdk_nama_perusahaan_id = p_sh.psh_id
        LEFT JOIN bidang b ON md.mdk_bidang_id = b.bdg_id
+       LEFT JOIN satuan s ON md.mdk_satuan = s.st_id
        ${whereClause} 
        ORDER BY md.mdk_id DESC 
        LIMIT ? OFFSET ?`,
@@ -96,7 +98,8 @@ export class MasterDokumenRepository {
          p_sh.psh_nama_rekening AS psh_nama_rekening,
          p_sh.psh_nama_bank AS psh_nama_bank,
          b.bdg_nama AS bdg_nama,
-         b.bdg_nama AS mdk_bagian
+         b.bdg_nama AS mdk_bagian,
+         s.st_nama AS st_nama
        FROM master_dokumen md
        LEFT JOIN pegawai p_pejabat ON md.mdk_nama_pejabat_id = p_pejabat.pgw_id
        LEFT JOIN pegawai p_pptk ON md.mdk_nama_pptk_id = p_pptk.pgw_id
@@ -104,6 +107,7 @@ export class MasterDokumenRepository {
        LEFT JOIN pegawai p_pejabat_pengadaan ON md.mdk_nama_pejabat_pengadaan_id = p_pejabat_pengadaan.pgw_id
        LEFT JOIN perusahaan p_sh ON md.mdk_nama_perusahaan_id = p_sh.psh_id
        LEFT JOIN bidang b ON md.mdk_bidang_id = b.bdg_id
+       LEFT JOIN satuan s ON md.mdk_satuan = s.st_id
        WHERE md.mdk_id = ? AND md.mdk_deleted_at IS NULL 
        LIMIT 1`,
       [mdk_id]
@@ -127,9 +131,9 @@ export class MasterDokumenRepository {
         mdk_kode_level3, mdk_nama_level3,
         mdk_kode_level4, mdk_nama_level4,
         mdk_kode_level5, mdk_nama_level5,
-        mdk_keterangan, mdk_apbd, mdk_no_dpa, 
+        mdk_keterangan, mdk_apbd, mdk_no_dpa, mdk_volume, mdk_satuan, 
         mdk_created_by
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         input.mdk_nama_pejabat_id ?? 0,
         input.mdk_bidang_id ?? 0,
@@ -164,7 +168,7 @@ export class MasterDokumenRepository {
         input.mdk_apbd ?? '',
         input.mdk_no_dpa ?? '',
         input.mdk_volume ?? '',
-        input.mdk_satuan ?? '',
+        input.mdk_satuan ?? 0,
         input.mdk_created_by ?? null,
       ]
     );
@@ -222,7 +226,7 @@ export class MasterDokumenRepository {
         input.mdk_apbd ?? '',
         input.mdk_no_dpa ?? '',
         input.mdk_volume ?? '',
-        input.mdk_satuan ?? '',
+        input.mdk_satuan ?? 0,
         input.mdk_updated_by ?? null,
         input.mdk_id,
       ]

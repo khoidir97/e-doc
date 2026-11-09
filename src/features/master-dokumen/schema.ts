@@ -34,7 +34,7 @@ export const createMasterDokumenSchema = z.object({
   mdk_apbd: z.string().default(''),
   mdk_no_dpa: z.string().default(''),
   mdk_volume: z.string().default(''),
-  mdk_satuan: z.string().default(''),
+  mdk_satuan: z.coerce.number().default(0),
 });
 
 export const updateMasterDokumenSchema = createMasterDokumenSchema.extend({

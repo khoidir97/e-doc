@@ -9,6 +9,7 @@ import {
   deleteNotaPencairanDanaAction,
 } from '../actions';
 import { getKwitansiByMasterDokumenIdAction } from '@/features/kwitansi/actions';
+import { getNegoByMasterDokumenAction } from '@/features/nego/actions';
 import { formatRupiah, terbilang } from '@/lib/terbilang';
 import { SearchableSelect } from '@/components/form/SearchableSelect';
 import { MasterDokumenSelectorCard } from '@/features/master-dokumen/components/MasterDokumenSelectorCard';
@@ -106,15 +107,16 @@ export const NotaPencairanDanaContainer: React.FC<NotaPencairanDanaContainerProp
   const loadNotaPencairanDanaForMdk = useCallback(
     async (mdkId: number, targetMaster?: MasterDokumen | null) => {
       setLoadingNotaPencairanDana(true);
-      const [res, kwtRes] = await Promise.all([
+      const [res, kwtRes, negoRes] = await Promise.all([
         getNotaPencairanDanaByMasterDokumenAction(mdkId),
         getKwitansiByMasterDokumenIdAction(mdkId),
+        getNegoByMasterDokumenAction(mdkId),
       ]);
 
       const effectiveMaster = targetMaster ?? selectedMasterDokumen;
       const defaultUraianText = effectiveMaster?.mdk_pekerjaan || effectiveMaster?.mdk_uraian_belanja || '';
       const defaultDpaVolume = effectiveMaster?.mdk_volume || '';
-      const defaultDpaSatuan = effectiveMaster?.mdk_satuan || '';
+      const defaultDpaSatuan = effectiveMaster?.st_nama || (effectiveMaster?.mdk_satuan ? String(effectiveMaster.mdk_satuan) : '');
       const defaultSaatiniVolume = effectiveMaster?.mdk_volume || '';
       const defaultSebelumnyaVolume = effectiveMaster?.mdk_volume || '';
       const defaultSisaVolume = effectiveMaster?.mdk_volume || '';
@@ -181,7 +183,43 @@ export const NotaPencairanDanaContainer: React.FC<NotaPencairanDanaContainerProp
         );
       } else {
         setHasSavedData(false);
-        setNotaPencairanDanaRows([createEmptyRow(defaultUraianText, paguNilai, calcBelumNilai, calcSaatIniNilai, defaultDpaVolume, defaultDpaSatuan, defaultSaatiniVolume, defaultSebelumnyaVolume, defaultSisaVolume)]);
+        // Jika belum ada data tersimpan, cek apakah data nego tersedia
+        if (negoRes.success && negoRes.data && negoRes.data.length > 0) {
+          const rowsFromNego = negoRes.data.map((n) => {
+            const rowUraian = n.nego_uraian_kegiatan || defaultUraianText;
+            const rowVolume = n.nego_volume || defaultDpaVolume;
+            const rowSatuan = n.nego_waktu || defaultDpaSatuan;
+            const rowNilaiNego = Number(n.nego_negosiasi_jumlah_harga) || 0;
+            // DPA nilai per item dari nego, atau pagu jika 1 baris
+            const rowDpaNilai = rowNilaiNego > 0 ? rowNilaiNego : paguNilai;
+            return createEmptyRow(
+              rowUraian,
+              rowDpaNilai,
+              calcBelumNilai,
+              calcSaatIniNilai,
+              rowVolume,
+              rowSatuan,
+              rowVolume,
+              rowVolume,
+              rowVolume
+            );
+          });
+          setNotaPencairanDanaRows(rowsFromNego);
+        } else {
+          setNotaPencairanDanaRows([
+            createEmptyRow(
+              defaultUraianText,
+              paguNilai,
+              calcBelumNilai,
+              calcSaatIniNilai,
+              defaultDpaVolume,
+              defaultDpaSatuan,
+              defaultSaatiniVolume,
+              defaultSebelumnyaVolume,
+              defaultSisaVolume
+            ),
+          ]);
+        }
       }
       setLoadingNotaPencairanDana(false);
     },
@@ -204,7 +242,7 @@ export const NotaPencairanDanaContainer: React.FC<NotaPencairanDanaContainerProp
     const defaultUraianText = selectedMasterDokumen?.mdk_pekerjaan || selectedMasterDokumen?.mdk_uraian_belanja || '';
     const paguNilai = selectedMasterDokumen?.mdk_pagu_anggaran ? Math.round(Number(selectedMasterDokumen.mdk_pagu_anggaran)) : 0;
     const defaultDpaVolume = selectedMasterDokumen?.mdk_volume || '';
-    const defaultDpaSatuan = selectedMasterDokumen?.mdk_satuan || '';
+    const defaultDpaSatuan = selectedMasterDokumen?.st_nama || (selectedMasterDokumen?.mdk_satuan ? String(selectedMasterDokumen.mdk_satuan) : '');
     const defaultSaatiniVolume = selectedMasterDokumen?.mdk_volume || '';
     const defaultSebelumnyaVolume = selectedMasterDokumen?.mdk_volume || '';
     const defaultSisaVolume = selectedMasterDokumen?.mdk_volume || '';
@@ -215,7 +253,7 @@ export const NotaPencairanDanaContainer: React.FC<NotaPencairanDanaContainerProp
     const defaultUraianText = selectedMasterDokumen?.mdk_pekerjaan || selectedMasterDokumen?.mdk_uraian_belanja || '';
     const paguNilai = selectedMasterDokumen?.mdk_pagu_anggaran ? Math.round(Number(selectedMasterDokumen.mdk_pagu_anggaran)) : 0;
     const defaultDpaVolume = selectedMasterDokumen?.mdk_volume || '';
-    const defaultDpaSatuan = selectedMasterDokumen?.mdk_satuan || '';
+    const defaultDpaSatuan = selectedMasterDokumen?.st_nama || (selectedMasterDokumen?.mdk_satuan ? String(selectedMasterDokumen.mdk_satuan) : '');
     const defaultSaatiniVolume = selectedMasterDokumen?.mdk_volume || '';
     const defaultSebelumnyaVolume = selectedMasterDokumen?.mdk_volume || '';
     const defaultSisaVolume = selectedMasterDokumen?.mdk_volume || '';

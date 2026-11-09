@@ -96,7 +96,7 @@ export const MasterDokumenHeaderDetail: React.FC<MasterDokumenHeaderDetailProps>
           </h5>
           {masterDokumen.mdk_pekerjaan && (
             <p className="text-xs text-gray-500 dark:text-gray-400 italic">
-              &ldquo;{masterDokumen.mdk_pekerjaan} | {masterDokumen.mdk_volume} {masterDokumen.mdk_satuan} &rdquo;
+              &ldquo;{masterDokumen.mdk_pekerjaan} | {masterDokumen.mdk_volume} {masterDokumen.st_nama || masterDokumen.mdk_satuan} &rdquo;
             </p>
           )}
         </div>

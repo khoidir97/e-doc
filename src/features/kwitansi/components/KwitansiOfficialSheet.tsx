@@ -49,7 +49,7 @@ export const KwitansiOfficialSheet: React.FC<KwitansiOfficialSheetProps> = ({
   const defaultSudahTerima = masterDokumen.mdk_jabatan_pejabat === 'PA'
     ? `PENGGUNA ANGGARAN/PEJABAT PEMBUAT KOMITMEN BADAN PENGELOLA KEUANGAN DAN ASET DAERAH KOTA PEKANBARU`
     : `KUASA PENGGUNA ANGGARAN/PEJABAT PEMBUAT KOMITMEN BADAN PENGELOLA KEUANGAN DAN ASET DAERAH KOTA PEKANBARU`;
-  const defaultYaitu = `Pembayaran ${masterDokumen.mdk_uraian_belanja || '-'} ${masterDokumen.mdk_pekerjaan || '-'} ${masterDokumen.mdk_volume || '-'} ${masterDokumen.mdk_satuan || '-'}${masterDokumen.mdk_sub_kegiatan ? ` Pada Sub Kegiatan ${masterDokumen.mdk_sub_kegiatan}` : ''
+  const defaultYaitu = `Pembayaran ${masterDokumen.mdk_uraian_belanja || '-'} ${masterDokumen.mdk_pekerjaan || '-'} ${masterDokumen.mdk_volume || '-'} ${masterDokumen.st_nama || masterDokumen.mdk_satuan || '-'}${masterDokumen.mdk_sub_kegiatan ? ` Pada Sub Kegiatan ${masterDokumen.mdk_sub_kegiatan}` : ''
     }`;
   const currentSudahTerima = sudahTerimaDari && sudahTerimaDari.trim() !== '' ? sudahTerimaDari : defaultSudahTerima;
   const currentYaituKet = yaituKet && yaituKet.trim() !== '' ? yaituKet : defaultYaitu;

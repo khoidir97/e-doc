@@ -198,7 +198,7 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
     setLoadingPerhitunganPaket(false);
   }, [pktJenisPph]);
 
-  const loadPaketForMdk = useCallback(async (mdkId: number) => {
+  const loadPaketForMdk = useCallback(async (mdkId: number, currentMaster?: MasterDokumen | null) => {
     const res = await getPaketByMasterDokumenAction(mdkId);
     if (res.success && res.data) {
       const p = res.data;
@@ -214,13 +214,20 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
       setPktTanggal(
         p.pkt_tanggal ? formatDateYYYYMMDD(p.pkt_tanggal) : todayYmd
       );
-      setPktNpwp(p.pkt_npwp || '');
-      setPktNoRekening(p.pkt_no_rekening || '');
-      setPktNamaRekening(p.pkt_nama_rekening || '');
-      setPktNamaBank(p.pkt_nama_bank || '');
+      // Jika di tabel perhitungan_paket masih kosong, tarik otomatis dari data perusahaan di master dokumen terpilih
+      setPktNpwp(p.pkt_npwp || currentMaster?.psh_npwp || '');
+      setPktNoRekening(p.pkt_no_rekening || currentMaster?.psh_nomor_rekening || '');
+      setPktNamaRekening(p.pkt_nama_rekening || currentMaster?.psh_nama_rekening || '');
+      setPktNamaBank(p.pkt_nama_bank || currentMaster?.psh_nama_bank || '');
       if (p.pkt_jenis_pph === '22' || p.pkt_jenis_pph === '23') {
         setPktJenisPph(p.pkt_jenis_pph);
       }
+    } else {
+      // Jika belum ada data paket sama sekali, default ambil dari master perusahaan di master dokumen terpilih
+      setPktNpwp(currentMaster?.psh_npwp || '');
+      setPktNoRekening(currentMaster?.psh_nomor_rekening || '');
+      setPktNamaRekening(currentMaster?.psh_nama_rekening || '');
+      setPktNamaBank(currentMaster?.psh_nama_bank || '');
     }
   }, []);
 
@@ -229,7 +236,7 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
       const found = masterDokumenList.find((m) => m.mdk_id === selectedMdkId) || null;
       setSelectedMasterDokumen(found);
       loadPerhitunganPaketForMdk(selectedMdkId);
-      loadPaketForMdk(selectedMdkId);
+      loadPaketForMdk(selectedMdkId, found);
     } else {
       setSelectedMasterDokumen(null);
       setHasSavedData(false);

@@ -20,6 +20,12 @@ export interface MasterDokumen {
   mdk_jabatan_bendahara?: string;
   mdk_nama_perusahaan_id: number;
   mdk_nama_perusahaan?: string;
+  psh_nama?: string;
+  psh_alamat?: string;
+  psh_npwp?: string | null;
+  psh_nomor_rekening?: string | null;
+  psh_nama_rekening?: string | null;
+  psh_nama_bank?: string | null;
   mdk_nama_pimpinan_perusahaan?: string;
   mdk_jabatan_pimpinan_perusahaan?: string;
   mdk_pekerjaan?: string;
@@ -46,7 +52,8 @@ export interface MasterDokumen {
   mdk_apbd: string;
   mdk_no_dpa: string;
   mdk_volume: string;
-  mdk_satuan: string;
+  mdk_satuan: number;
+  st_nama?: string;
   mdk_is_lock?: number;
   mdk_created_at: string | Date;
   mdk_created_by: number | null;
@@ -90,7 +97,7 @@ export interface CreateMasterDokumenInput {
   mdk_apbd: string;
   mdk_no_dpa: string;
   mdk_volume: string;
-  mdk_satuan: string;
+  mdk_satuan: number;
   mdk_created_by?: number | null;
 }
 
@@ -129,7 +136,7 @@ export interface UpdateMasterDokumenInput {
   mdk_apbd: string;
   mdk_no_dpa: string;
   mdk_volume: string;
-  mdk_satuan: string;
+  mdk_satuan: number;
   mdk_updated_by?: number | null;
 }
 

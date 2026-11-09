@@ -5,6 +5,8 @@ import { Modal } from '@/components/ui/modal';
 import { MasterDokumen, CreateMasterDokumenInput, UpdateMasterDokumenInput } from '../types';
 import { getPegawaiListAction } from '@/features/pegawai/actions';
 import { Pegawai } from '@/features/pegawai/types';
+import { getMasterSatuanListAction } from '@/features/master-satuan/actions';
+import { MasterSatuan } from '@/features/master-satuan/types';
 import { getPerusahaanListAction } from '@/features/perusahaan/actions';
 import { Perusahaan } from '@/features/perusahaan/types';
 import { getBidangListAction } from '@/features/bidang/actions';
@@ -32,6 +34,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
 
   // Pegawai & Perusahaan options state
   const [pegawaiList, setPegawaiList] = useState<Pegawai[]>([]);
+  const [masterSatuanList, setMasterSatuanList] = useState<MasterSatuan[]>([]);
   const [perusahaanList, setPerusahaanList] = useState<Perusahaan[]>([]);
   const [bidangList, setBidangList] = useState<Bidang[]>([]);
   const [loadingPegawai, setLoadingPegawai] = useState(false);
@@ -51,7 +54,6 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
   const [mdkNamaPejabatId, setMdkNamaPejabatId] = useState<number | string>(0);
   const [mdkBidangId, setMdkBidangId] = useState(0);
   const [mdkPaguAnggaran, setMdkPaguAnggaran] = useState<number | string>(0);
-
   const [mdkNamaPejabatPengadaanId, setMdkNamaPejabatPengadaanId] = useState<number | string>(0);
   const [mdkNamaPptk, setMdkNamaPptk] = useState(0);
   const [mdkNamaBendaharaId, setMdkNamaBendaharaId] = useState<number | string>(0);
@@ -85,7 +87,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
   const [mdkApbd, setMdkApbd] = useState('');
   const [mdkNoDpa, setMdkNoDpa] = useState('');
   const [mdkVolume, setMdkVolume] = useState('');
-  const [mdkSatuan, setMdkSatuan] = useState('');
+  const [mdkSatuan, setMdkSatuan] = useState<number | string>(0);
   const [mdkKeterangan, setMdkKeterangan] = useState('');
 
   const [error, setError] = useState('');
@@ -95,6 +97,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
       setMdkNamaPejabatId(initialData.mdk_nama_pejabat_id ?? 0);
       setMdkBidangId(initialData.mdk_bidang_id || 0);
       setMdkPaguAnggaran(initialData.mdk_pagu_anggaran ?? 0);
+      setMdkSatuan(initialData.mdk_satuan ?? 0);
 
       setMdkNamaPejabatPengadaanId(initialData.mdk_nama_pejabat_pengadaan_id ?? 0);
       setMdkNamaPptk(initialData.mdk_nama_pptk_id || 0);
@@ -128,7 +131,6 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
       setMdkApbd(initialData.mdk_apbd || '');
       setMdkNoDpa(initialData.mdk_no_dpa || '');
       setMdkVolume(initialData.mdk_volume || '');
-      setMdkSatuan(initialData.mdk_satuan || '');
       setMdkKeterangan(initialData.mdk_keterangan || '');
     } else {
       setMdkNamaPejabatId(0);
@@ -167,7 +169,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
       setMdkApbd('APBD Kota Pekanbaru Tahun 2026');
       setMdkNoDpa('');
       setMdkVolume('');
-      setMdkSatuan('');
+      setMdkSatuan(0);
       setMdkKeterangan('');
     }
     setActiveTab(1);
@@ -181,10 +183,11 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
     const fetchInternalOptions = async () => {
       setLoadingPegawai(true);
       try {
-        const [pegawaiRes, perusahaanRes, bidangRes] = await Promise.allSettled([
+        const [pegawaiRes, perusahaanRes, bidangRes, satuanRes] = await Promise.allSettled([
           getPegawaiListAction('', 1, 500),
           getPerusahaanListAction('', 1, 500),
           getBidangListAction('', 1, 500),
+          getMasterSatuanListAction('', 1, 500),
         ]);
 
         if (pegawaiRes.status === 'fulfilled' && pegawaiRes.value.success && pegawaiRes.value.data) {
@@ -195,6 +198,9 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
         }
         if (bidangRes.status === 'fulfilled' && bidangRes.value.success && bidangRes.value.data) {
           setBidangList(bidangRes.value.data.data);
+        }
+        if (satuanRes.status === 'fulfilled' && satuanRes.value.success && satuanRes.value.data) {
+          setMasterSatuanList(satuanRes.value.data.data);
         }
       } catch (err) {
         console.error('Gagal mengambil data internal:', err);
@@ -335,7 +341,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
       mdk_apbd: mdkApbd.trim(),
       mdk_no_dpa: mdkNoDpa.trim(),
       mdk_volume: mdkVolume.trim(),
-      mdk_satuan: mdkSatuan.trim(),
+      mdk_satuan: Number(mdkSatuan) || 0,
     };
 
     try {
@@ -827,12 +833,17 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Satuan
                   </label>
-                  <input
-                    type="text"
-                    placeholder="Masukkan Satuan"
+
+                  <SearchableSelect
+                    options={masterSatuanList.map((satuan) => ({
+                      value: satuan.st_id,
+                      label: satuan.st_nama || '',
+                    }))}
                     value={mdkSatuan}
-                    onChange={(e) => setMdkSatuan(e.target.value)}
-                    className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none transition-all"
+                    onChange={(val) => setMdkSatuan(Number(val))}
+                    placeholder="-- Pilih Satuan --"
+                    searchPlaceholder="Cari berdasarkan nama..."
+                  // disabled={masterSatuanList.length === 0}
                   />
                 </div>
               </div>

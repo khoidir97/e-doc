@@ -83,7 +83,7 @@ export async function initDatabase(): Promise<void> {
           mdk_apbd VARCHAR(100) NOT NULL DEFAULT '',
           mdk_no_dpa VARCHAR(100) NOT NULL DEFAULT '',
           mdk_volume VARCHAR(255) NOT NULL DEFAULT '',
-          mdk_satuan VARCHAR(255) NOT NULL DEFAULT '',
+          mdk_satuan INT NULL DEFAULT 0,
           mdk_created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
           mdk_created_by INT NULL,
           mdk_updated_at TIMESTAMP NULL ON UPDATE CURRENT_TIMESTAMP,

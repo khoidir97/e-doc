@@ -162,7 +162,7 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
           fkt_master_dokumen_id: mdk.mdk_id,
           fkt_jenis_spesifikasi: mdk.mdk_pekerjaan || '',
           fkt_unit: unit,
-          fkt_hari: mdk.mdk_satuan || '',
+          fkt_hari: mdk.st_nama || String(mdk.mdk_satuan || ''),
           fkt_harga_satuan: 0,
           fkt_total: 0,
         },

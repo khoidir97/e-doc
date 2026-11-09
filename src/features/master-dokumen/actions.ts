@@ -227,7 +227,7 @@ export async function copyMasterDokumenAction(mdk_id: number): Promise<ActionRes
       mdk_apbd: existing.mdk_apbd || '',
       mdk_no_dpa: existing.mdk_no_dpa || '',
       mdk_volume: existing.mdk_volume || '',
-      mdk_satuan: existing.mdk_satuan || '',
+      mdk_satuan: Number(existing.mdk_satuan) || 0,
       mdk_created_by: activeUserId,
     };
 
