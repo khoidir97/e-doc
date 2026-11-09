@@ -4,7 +4,7 @@ import React, { useEffect, useState, use } from 'react';
 import { getPenawaranWithDetailsAction } from '@/features/penawaran/actions';
 import { Penawaran } from '@/features/penawaran/types';
 import { MasterDokumen } from '@/features/master-dokumen/types';
-import { formatRupiah, terbilang } from '@/lib/terbilang';
+import { formatRupiah, isBelowPajakThreshold, terbilang } from '@/lib/terbilang';
 
 export default function PenawaranPrintPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -64,7 +64,7 @@ export default function PenawaranPrintPage({ params }: { params: Promise<{ id: s
 
   // Calculation Metrics
   const jumlahPenawaran = items.reduce((sum, item) => sum + (Number(item.pnw_harga_perkiraan_sendiri) || 0), 0);
-  const ppnPenawaran = Math.round(jumlahPenawaran * 0.11);
+  const ppnPenawaran = isBelowPajakThreshold(jumlahPenawaran) ? Math.round(jumlahPenawaran * 0.11) : 0;
   const totalKeseluruhan = jumlahPenawaran + ppnPenawaran;
   const pembulatan = totalKeseluruhan;
   const terbilangText = terbilang(pembulatan);

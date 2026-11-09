@@ -31,6 +31,80 @@ const createEmptyRow = (defaultUraian = '', defaultVolume = '', defaultWaktu = '
   rab_harga_perkiraan_sendiri: 0,
 });
 
+const parseItemBarang = (raw: any): any[] => {
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw);
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  }
+  return [];
+};
+
+const createRowsFromItemBarang = (
+  items: any[],
+  mdkId: number,
+  fallbackSatuan = ''
+): RencanaAnggaranBiayaItemRow[] => {
+  return items.map((item: any) => {
+    const namaStandar = (
+      item.NAMA_STANDAR_HARGA ||
+      item.nama_standar_harga ||
+      item.NAMA_BARANG ||
+      item.nama_barang ||
+      ''
+    ).trim();
+
+    const spesifikasi = (
+      item.SPESIFIKASI ||
+      item.spesifikasi ||
+      ''
+    ).trim();
+
+    let uraian = namaStandar;
+    if (spesifikasi) {
+      uraian = uraian ? `${uraian}\n${spesifikasi}` : spesifikasi;
+    }
+
+    const koefisien = String(
+      item.KOOFISIEN ??
+      item.koofisien ??
+      item.KOEFISIEN ??
+      item.koefisien ??
+      '1'
+    ).trim();
+
+    const satuan = (
+      item.SATUAN ||
+      item.satuan ||
+      fallbackSatuan ||
+      ''
+    ).trim();
+
+    const hargaSatuan = Number(item.HARGA_SATUAN || item.harga_satuan) || 0;
+    const paguTotal = Number(item.PAGU_TOTAL || item.pagu_total) || 0;
+
+    const volMatch = koefisien.match(/[\d,.]+/);
+    const volNum = volMatch
+      ? parseFloat(volMatch[0].replace(/\./g, '').replace(',', '.')) || 1
+      : 1;
+    const hps = paguTotal > 0 ? paguTotal : Math.round(volNum * hargaSatuan);
+
+    return {
+      rab_master_dokumen_id: mdkId,
+      rab_uraian_pekerjaan: uraian,
+      rab_volume: koefisien,
+      rab_waktu: satuan,
+      rab_harga_satuan: hargaSatuan,
+      rab_harga_perkiraan_sendiri: hps,
+    };
+  });
+};
+
 interface RencanaAnggaranBiayaContainerProps {
   initialMasterDokumenId?: number;
   hideMasterDokumenSelector?: boolean;
@@ -83,28 +157,58 @@ export const RencanaAnggaranBiayaContainer: React.FC<RencanaAnggaranBiayaContain
   }, [initialMasterDokumenId]);
 
   // Fetch RencanaAnggaranBiaya items whenever selected Master Dokumen changes
-  const loadRencanaAnggaranBiayaForMdk = useCallback(async (mdkId: number, defaultUraianText = '', defaultVolume = '', defaultWaktu = '') => {
-    setLoadingRencanaAnggaranBiaya(true);
-    const res = await getRencanaAnggaranBiayaByMasterDokumenAction(mdkId);
-    const isSaved = Boolean(res.success && res.data && res.data.length > 0);
-    setHasSavedData(isSaved);
-    if (isSaved && res.data) {
-      setRencanaAnggaranBiayaRows(
-        res.data.map((item) => ({
-          rab_id: item.rab_id,
-          rab_master_dokumen_id: item.rab_master_dokumen_id,
-          rab_uraian_pekerjaan: (item.rab_uraian_pekerjaan && item.rab_uraian_pekerjaan.trim() !== '') ? item.rab_uraian_pekerjaan : defaultUraianText,
-          rab_volume: (item.rab_volume && item.rab_volume.trim() !== '') ? item.rab_volume : defaultVolume,
-          rab_waktu: (item.rab_waktu && item.rab_waktu.trim() !== '') ? item.rab_waktu : defaultWaktu,
-          rab_harga_satuan: item.rab_harga_satuan || 0,
-          rab_harga_perkiraan_sendiri: item.rab_harga_perkiraan_sendiri || 0,
-        }))
-      );
-    } else {
-      setRencanaAnggaranBiayaRows([createEmptyRow(defaultUraianText, defaultVolume, defaultWaktu)]);
-    }
-    setLoadingRencanaAnggaranBiaya(false);
-  }, []);
+  const loadRencanaAnggaranBiayaForMdk = useCallback(
+    async (
+      mdkId: number,
+      defaultUraianText = '',
+      defaultVolume = '',
+      defaultWaktu = '',
+      itemBarangRaw: any = null
+    ) => {
+      setLoadingRencanaAnggaranBiaya(true);
+      const res = await getRencanaAnggaranBiayaByMasterDokumenAction(mdkId);
+      const isSaved = Boolean(res.success && res.data && res.data.length > 0);
+      setHasSavedData(isSaved);
+
+      if (isSaved && res.data) {
+        setRencanaAnggaranBiayaRows(
+          res.data.map((item) => ({
+            rab_id: item.rab_id,
+            rab_master_dokumen_id: item.rab_master_dokumen_id,
+            rab_uraian_pekerjaan:
+              item.rab_uraian_pekerjaan && item.rab_uraian_pekerjaan.trim() !== ''
+                ? item.rab_uraian_pekerjaan
+                : defaultUraianText,
+            rab_volume:
+              item.rab_volume && item.rab_volume.trim() !== ''
+                ? item.rab_volume
+                : defaultVolume,
+            rab_waktu:
+              item.rab_waktu && item.rab_waktu.trim() !== ''
+                ? item.rab_waktu
+                : defaultWaktu,
+            rab_harga_satuan: item.rab_harga_satuan || 0,
+            rab_harga_perkiraan_sendiri: item.rab_harga_perkiraan_sendiri || 0,
+          }))
+        );
+      } else {
+        // Jika data RAB belum disimpan di database:
+        // Cek apakah master_dokumen.mdk_item_barang terisi (hasil checklist standar harga)
+        const items = parseItemBarang(itemBarangRaw);
+        if (items.length > 0) {
+          const rowsFromItems = createRowsFromItemBarang(items, mdkId, defaultWaktu);
+          setRencanaAnggaranBiayaRows(rowsFromItems);
+        } else {
+          // Kalau mdk_item_barang kosong, tarik datanya dari pekerjaan master dokumen
+          setRencanaAnggaranBiayaRows([
+            createEmptyRow(defaultUraianText, defaultVolume, defaultWaktu),
+          ]);
+        }
+      }
+      setLoadingRencanaAnggaranBiaya(false);
+    },
+    []
+  );
 
   useEffect(() => {
     if (selectedMdkId && typeof selectedMdkId === 'number') {
@@ -112,7 +216,13 @@ export const RencanaAnggaranBiayaContainer: React.FC<RencanaAnggaranBiayaContain
       setSelectedMasterDokumen(found);
       const defaultUraianText = found?.mdk_pekerjaan || found?.mdk_uraian_belanja || '';
       const defaultSatuan = found?.st_nama || (found?.mdk_satuan ? String(found.mdk_satuan) : '');
-      loadRencanaAnggaranBiayaForMdk(selectedMdkId, defaultUraianText, found?.mdk_volume || '', defaultSatuan);
+      loadRencanaAnggaranBiayaForMdk(
+        selectedMdkId,
+        defaultUraianText,
+        found?.mdk_volume || '',
+        defaultSatuan,
+        found?.mdk_item_barang
+      );
     } else {
       setSelectedMasterDokumen(null);
       setHasSavedData(false);
@@ -120,13 +230,36 @@ export const RencanaAnggaranBiayaContainer: React.FC<RencanaAnggaranBiayaContain
     }
   }, [selectedMdkId, masterDokumenList, loadRencanaAnggaranBiayaForMdk]);
 
+  // Handle Tarik Ulang dari Item Barang Master Dokumen
+  const handleLoadFromItemBarang = () => {
+    if (!selectedMdkId || typeof selectedMdkId !== 'number' || !selectedMasterDokumen) return;
+    const items = parseItemBarang(selectedMasterDokumen.mdk_item_barang);
+    const defaultSatuan =
+      selectedMasterDokumen.st_nama ||
+      (selectedMasterDokumen.mdk_satuan ? String(selectedMasterDokumen.mdk_satuan) : '');
+    const defaultUraianText =
+      selectedMasterDokumen.mdk_pekerjaan || selectedMasterDokumen.mdk_uraian_belanja || '';
+
+    if (items.length > 0) {
+      const rowsFromItems = createRowsFromItemBarang(items, selectedMdkId, defaultSatuan);
+      setRencanaAnggaranBiayaRows(rowsFromItems);
+      showToast('success', `Berhasil memuat ${rowsFromItems.length} item rincian belanja master dokumen!`);
+    } else {
+      setRencanaAnggaranBiayaRows([
+        createEmptyRow(defaultUraianText, selectedMasterDokumen.mdk_volume || '', defaultSatuan),
+      ]);
+      showToast('error', 'Item barang master dokumen kosong. Memuat uraian default dari pekerjaan.');
+    }
+  };
+
   // Handle Dynamic Rows
   const handleAddRow = () => {
-    const defaultUraianText = selectedMasterDokumen?.mdk_pekerjaan || selectedMasterDokumen?.mdk_uraian_belanja || '';
-    const defaultSatuan = selectedMasterDokumen?.st_nama || (selectedMasterDokumen?.mdk_satuan ? String(selectedMasterDokumen.mdk_satuan) : '');
+    const defaultSatuan =
+      selectedMasterDokumen?.st_nama ||
+      (selectedMasterDokumen?.mdk_satuan ? String(selectedMasterDokumen.mdk_satuan) : '');
     setRencanaAnggaranBiayaRows((prev) => [
       ...prev,
-      createEmptyRow(defaultUraianText, selectedMasterDokumen?.mdk_volume || '', defaultSatuan),
+      createEmptyRow('', '1', defaultSatuan),
     ]);
   };
 
@@ -207,7 +340,18 @@ export const RencanaAnggaranBiayaContainer: React.FC<RencanaAnggaranBiayaContain
 
     if (success) {
       showToast('success', 'Berhasil menyimpan data Rencana Anggaran Biaya!');
-      loadRencanaAnggaranBiayaForMdk(selectedMdkId);
+      const defaultUraianText =
+        selectedMasterDokumen?.mdk_pekerjaan || selectedMasterDokumen?.mdk_uraian_belanja || '';
+      const defaultSatuan =
+        selectedMasterDokumen?.st_nama ||
+        (selectedMasterDokumen?.mdk_satuan ? String(selectedMasterDokumen.mdk_satuan) : '');
+      loadRencanaAnggaranBiayaForMdk(
+        selectedMdkId,
+        defaultUraianText,
+        selectedMasterDokumen?.mdk_volume || '',
+        defaultSatuan,
+        selectedMasterDokumen?.mdk_item_barang
+      );
     } else {
       showToast('error', 'Gagal menyimpan data Rencana Anggaran Biaya.');
     }
@@ -295,23 +439,38 @@ export const RencanaAnggaranBiayaContainer: React.FC<RencanaAnggaranBiayaContain
           {selectedMasterDokumen ? (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="p-5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm space-y-5">
-                <div className="flex items-center justify-between pb-3 border-b border-gray-100 dark:border-gray-800">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pb-3 border-b border-gray-100 dark:border-gray-800">
                   <div>
                     <h2 className="text-base font-bold text-amber-900 dark:text-white">Rincian Item Rencana Anggaran Biaya</h2>
                     <p className="text-xs text-gray-500 dark:text-gray-400">
                       Tambahkan atau ubah daftar item uraian pekerjaan, volume, waktu, dan estimasi harga RAB
                     </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleAddRow}
-                    className="px-3.5 py-2 rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-400 font-semibold text-xs hover:bg-brand-100 transition-colors flex items-center gap-1.5 cursor-pointer"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-                    </svg>
-                    Tambah Baris
-                  </button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    {parseItemBarang(selectedMasterDokumen?.mdk_item_barang).length > 0 && (
+                      <button
+                        type="button"
+                        onClick={handleLoadFromItemBarang}
+                        className="px-3.5 py-2 rounded-xl bg-amber-50 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300 font-semibold text-xs hover:bg-amber-100 dark:hover:bg-amber-900/60 transition-colors flex items-center gap-1.5 cursor-pointer"
+                        title="Tarik ulang data rincian dari item belanja master dokumen"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        Tarik dari Item Barang ({parseItemBarang(selectedMasterDokumen?.mdk_item_barang).length})
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleAddRow}
+                      className="px-3.5 py-2 rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/40 dark:text-brand-400 font-semibold text-xs hover:bg-brand-100 transition-colors flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                      </svg>
+                      Tambah Baris
+                    </button>
+                  </div>
                 </div>
 
                 {loadingRencanaAnggaranBiaya ? (

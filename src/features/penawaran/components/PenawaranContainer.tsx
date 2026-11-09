@@ -9,7 +9,7 @@ import {
   savePenawaranBatchAction,
   deletePenawaranAction,
 } from '../actions';
-import { formatRupiah, terbilang } from '@/lib/terbilang';
+import { formatRupiah, isBelowPajakThreshold, terbilang } from '@/lib/terbilang';
 import { MasterDokumenSelectorCard } from '../../master-dokumen/components/MasterDokumenSelectorCard';
 import { RupiahInput } from '@/components/form/RupiahInput';
 import { Toast } from '@/components/ui/Toast';
@@ -258,7 +258,7 @@ export const PenawaranContainer: React.FC<PenawaranContainerProps> = ({
     (acc, curr) => acc + (Number(curr.pnw_harga_perkiraan_sendiri) || 0),
     0
   );
-  const ppnPenawaran = Math.round(totalHargaPenawaran * 0.11);
+  const ppnPenawaran = isBelowPajakThreshold(totalHargaPenawaran) ? Math.round(totalHargaPenawaran * 0.11) : 0;
   const totalKeseluruhanPenawaran = totalHargaPenawaran + ppnPenawaran;
   const paguNominal = Number(selectedMasterDokumen?.mdk_pagu_anggaran) || 0;
   const isLocked = selectedMasterDokumen?.mdk_is_lock === 1;

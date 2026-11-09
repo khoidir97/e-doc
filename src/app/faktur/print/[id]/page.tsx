@@ -4,7 +4,7 @@ import React, { useEffect, useState, use } from 'react';
 import { getFakturWithDetailsAction } from '@/features/faktur/actions';
 import { FakturHeader, Faktur } from '@/features/faktur/types';
 import { MasterDokumen } from '@/features/master-dokumen/types';
-import { formatRupiah } from '@/lib/terbilang';
+import { formatRupiah, isBelowPajakThreshold } from '@/lib/terbilang';
 
 function formatDateID(val?: string | Date | null): string {
   if (!val) return '-';
@@ -64,7 +64,7 @@ export default function FakturPrintPage({ params }: { params: Promise<{ id: stri
   }
 
   const totalHarga = details.reduce((acc, curr) => acc + (Number(curr.fkt_total) || 0), 0);
-  const countPPN = totalHarga * (11 / 100);
+  const countPPN = isBelowPajakThreshold(totalHarga) ? totalHarga * (11 / 100) : 0;
   const nomorFaktur = header?.fak_nomor_faktur || '/SEKRETARIS-027.1/VI/2026';
   const tanggalFaktur = header?.fak_tanggal_faktur ? formatDateID(header.fak_tanggal_faktur) : formatDateID(new Date());
 

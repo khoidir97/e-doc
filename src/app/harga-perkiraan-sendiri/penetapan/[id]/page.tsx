@@ -4,7 +4,7 @@ import React, { useEffect, useState, use } from 'react';
 import { getHargaPerkiraanSendiriWithDetailsAction } from '@/features/harga-perkiraan-sendiri/actions';
 import { HargaPerkiraanSendiri } from '@/features/harga-perkiraan-sendiri/types';
 import { MasterDokumen } from '@/features/master-dokumen/types';
-import { formatRupiah } from '@/lib/terbilang';
+import { formatRupiah, isBelowPajakThreshold } from '@/lib/terbilang';
 import { KopSuratBpkad } from '@/components/common/KopSuratBpkad';
 
 export default function PenetapanHpsPrintPage({ params }: { params: Promise<{ id: string }> }) {
@@ -72,7 +72,7 @@ export default function PenetapanHpsPrintPage({ params }: { params: Promise<{ id
 
   // Total HPS
   const totalBarang = items.reduce((sum, item) => sum + (Number(item.hps_harga_perkiraan_sendiri) || 0), 0);
-  const ppn = Math.round(totalBarang * 0.11);
+  const ppn = isBelowPajakThreshold(totalBarang) ? Math.round(totalBarang * 0.11) : 0;
   const totalHps = totalBarang + ppn;
 
   // Nama jabatan PPK / KPA

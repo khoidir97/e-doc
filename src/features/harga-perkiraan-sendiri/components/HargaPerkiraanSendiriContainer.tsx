@@ -8,7 +8,7 @@ import {
   getRencanaAnggaranBiayaByMasterDokumenAction,
   saveHargaPerkiraanSendiriBatchAction,
 } from '../actions';
-import { formatRupiah, terbilang } from '@/lib/terbilang';
+import { formatRupiah, isBelowPajakThreshold, terbilang } from '@/lib/terbilang';
 import { MasterDokumenSelectorCard } from '@/features/master-dokumen/components/MasterDokumenSelectorCard';
 import { RupiahInput } from '@/components/form/RupiahInput';
 import { Toast } from '@/components/ui/Toast';
@@ -268,7 +268,7 @@ export const HargaPerkiraanSendiriContainer: React.FC<HargaPerkiraanSendiriConta
     (acc, curr) => acc + (Number(curr.hps_harga_perkiraan_sendiri) || 0),
     0
   );
-  const ppnHps = Math.round(totalHargaHargaPerkiraanSendiri * 0.11);
+  const ppnHps = isBelowPajakThreshold(totalHargaHargaPerkiraanSendiri) ? Math.round(totalHargaHargaPerkiraanSendiri * 0.11) : 0;
   const totalKeseluruhanHps = totalHargaHargaPerkiraanSendiri + ppnHps;
   const paguNominal = Number(selectedMasterDokumen?.mdk_pagu_anggaran) || 0;
   const isLocked = selectedMasterDokumen?.mdk_is_lock === 1;

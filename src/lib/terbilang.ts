@@ -7,7 +7,7 @@ export function terbilang(n: number): string {
 
   const absolute = Math.abs(n);
   const nominal = Math.floor(absolute);
-  
+
   const decimalStr = String(absolute).split('.')[1];
   let decimalVal = 0;
   if (decimalStr) {
@@ -72,4 +72,11 @@ export function parseRupiahInput(value: string | number | null | undefined): num
   if (!value) return 0;
   const cleanNumber = String(value).replace(/\D/g, '');
   return cleanNumber ? parseInt(cleanNumber, 10) : 0;
+}
+
+export function isBelowPajakThreshold(value: number | string | null | undefined): boolean {
+  if (value === null || value === undefined || value === '') return false;
+  const num = typeof value === 'string' ? parseFloat(value) : value;
+  if (isNaN(num)) return false;
+  return num > 2000000;
 }

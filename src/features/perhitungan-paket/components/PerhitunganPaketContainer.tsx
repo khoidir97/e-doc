@@ -12,7 +12,7 @@ import {
   savePaketAction,
 } from '../actions';
 import { getNegoByMasterDokumenAction } from '@/features/nego/actions';
-import { formatRupiah } from '@/lib/terbilang';
+import { formatRupiah, isBelowPajakThreshold } from '@/lib/terbilang';
 import { formatDateYYYYMMDD } from '@/lib/date';
 import { MasterDokumenSelectorCard } from '@/features/master-dokumen/components/MasterDokumenSelectorCard';
 import { RupiahInput } from '@/components/form/RupiahInput';
@@ -44,17 +44,27 @@ const getPphRate = (jenisPph: '23' | '22' = '23') => {
   return jenisPph === '22' ? 0.015 : 0.02;
 };
 
-// Hitung otomatis turunan dari Nilai Invoice (invoice sudah termasuk PPN 11%)
+// Hitung otomatis turunan dari Nilai Invoice
+// Belanja <= 2 juta (isBelowPajakThreshold = false) tidak dikenakan PPN dan PPh
 const calcFromInvoice = (
   invoice: number,
   ppnOverride?: number,
   jenisPph: '23' | '22' = '23'
 ): Omit<PerhitunganPaketItemRow, 'pak_id' | 'pak_master_dokumen_id'> => {
   const nilai = Number(invoice) || 0;
-  const ppn = ppnOverride !== undefined ? ppnOverride : Math.round((nilai * 11) / 111);
+  const kenaPajak = isBelowPajakThreshold(nilai);
+
+  let ppn = 0;
+  if (ppnOverride !== undefined) {
+    ppn = ppnOverride;
+  } else if (kenaPajak) {
+    ppn = Math.round((nilai * 11) / 111);
+  }
+
   const dpp = nilai - ppn;
   const rate = getPphRate(jenisPph);
-  const pph = Math.round(dpp * rate);
+  const pph = kenaPajak ? Math.round(dpp * rate) : 0;
+
   return {
     pak_nilai_invoice: nilai,
     pak_ppn: ppn,
@@ -157,13 +167,14 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
       getNegoByMasterDokumenAction(mdkId),
     ]);
 
-    // Nilai Invoice = Total + PPN (11%) dari Harga Negosiasi
+    // Nilai Invoice = Total + PPN (11%) dari Harga Negosiasi (jika kena pajak > 2jt)
     let negoCalc: ReturnType<typeof calcFromInvoice> | null = null;
     if (negoRes.success && negoRes.data && negoRes.data.length > 0) {
       const totalNego = negoRes.data.reduce((acc, n) => acc + (Number(n.nego_negosiasi_jumlah_harga) || 0), 0);
       if (totalNego > 0) {
-        const ppnNego = Math.round(totalNego * 0.11);
-        negoCalc = calcFromInvoice(totalNego + ppnNego, ppnNego);
+        const kenaPajak = isBelowPajakThreshold(totalNego);
+        const ppnNego = kenaPajak ? Math.round(totalNego * 0.11) : 0;
+        negoCalc = calcFromInvoice(totalNego + ppnNego, ppnNego, pktJenisPph);
       }
     }
 
@@ -267,8 +278,9 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
           row = { ...row, ...calcFromInvoice(row.pak_nilai_invoice, row.pak_ppn, newJenis) };
         } else if (row.pak_dpp > 0) {
           const rate = getPphRate(newJenis);
-          row.pak_pph23 = Math.round(row.pak_dpp * rate);
-          row.pak_dibayar = row.pak_dpp - row.pak_pph23;
+          const pph = isBelowPajakThreshold(row.pak_dpp) ? Math.round(row.pak_dpp * rate) : 0;
+          row.pak_pph23 = pph;
+          row.pak_dibayar = row.pak_dpp - pph;
         }
       } else if (field === 'pak_nilai_invoice') {
         // Invoice berubah -> hitung ulang semua
@@ -281,8 +293,9 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
       } else if (field === 'pak_dpp') {
         const num = Number(value) || 0;
         const rate = getPphRate(currentJenisPph);
-        row.pak_pph23 = Math.round(num * rate);
-        row.pak_dibayar = num - row.pak_pph23;
+        const pph = isBelowPajakThreshold(num) ? Math.round(num * rate) : 0;
+        row.pak_pph23 = pph;
+        row.pak_dibayar = num - pph;
       } else if (field === 'pak_pph23') {
         const num = Number(value) || 0;
         row.pak_dibayar = (Number(row.pak_dpp) || 0) - num;
@@ -303,7 +316,7 @@ export const PerhitunganPaketContainer: React.FC<PerhitunganPaketContainerProps>
           return { ...row, ...calcFromInvoice(row.pak_nilai_invoice, row.pak_ppn, newJenis) };
         } else if (row.pak_dpp > 0) {
           const rate = getPphRate(newJenis);
-          const pph = Math.round(row.pak_dpp * rate);
+          const pph = isBelowPajakThreshold(row.pak_dpp) ? Math.round(row.pak_dpp * rate) : 0;
           return { ...row, pak_pph23: pph, pak_dibayar: row.pak_dpp - pph };
         }
         return row;

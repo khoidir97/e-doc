@@ -10,7 +10,7 @@ import {
 } from '../actions';
 import { getHargaPerkiraanSendiriByMasterDokumenAction } from '@/features/harga-perkiraan-sendiri/actions';
 import { getPenawaranByMasterDokumenAction } from '@/features/penawaran/actions';
-import { formatRupiah, terbilang } from '@/lib/terbilang';
+import { formatRupiah, isBelowPajakThreshold, terbilang } from '@/lib/terbilang';
 import { MasterDokumenSelectorCard } from '@/features/master-dokumen/components/MasterDokumenSelectorCard';
 import { RupiahInput } from '@/components/form/RupiahInput';
 import { Toast } from '@/components/ui/Toast';
@@ -96,55 +96,55 @@ export const NegoContainer: React.FC<NegoContainerProps> = ({
     const isSaved = Boolean(res.success && res.data && res.data.length > 0);
     setHasSavedData(isSaved);
 
-      if (isSaved && res.data) {
-        setNegoRows(
-          res.data.map((item, idx) => {
-            const pnwItem = pnwList[idx];
-            const pnwHargaSatuan = Number(item.nego_pnw_harga_satuan) || (pnwItem ? Number(pnwItem.pnw_harga_satuan) || 0 : 0);
-            const pnwJumlahHarga = Number(item.nego_pnw_jumlah_harga) || (pnwItem ? Number(pnwItem.pnw_harga_perkiraan_sendiri) || 0 : 0);
+    if (isSaved && res.data) {
+      setNegoRows(
+        res.data.map((item, idx) => {
+          const pnwItem = pnwList[idx];
+          const pnwHargaSatuan = Number(item.nego_pnw_harga_satuan) || (pnwItem ? Number(pnwItem.pnw_harga_satuan) || 0 : 0);
+          const pnwJumlahHarga = Number(item.nego_pnw_jumlah_harga) || (pnwItem ? Number(pnwItem.pnw_harga_perkiraan_sendiri) || 0 : 0);
 
+          return {
+            nego_id: item.nego_id,
+            nego_master_dokumen_id: item.nego_master_dokumen_id,
+            nego_uraian_kegiatan: item.nego_uraian_kegiatan || '',
+            nego_volume: item.nego_volume || '',
+            nego_waktu: item.nego_waktu || '',
+            nego_hps_harga_satuan: item.nego_hps_harga_satuan || 0,
+            nego_hps_jumlah_harga: item.nego_hps_jumlah_harga || 0,
+            nego_pnw_harga_satuan: pnwHargaSatuan,
+            nego_pnw_jumlah_harga: pnwJumlahHarga,
+            nego_negosiasi_harga_satuan: item.nego_negosiasi_harga_satuan || 0,
+            nego_negosiasi_jumlah_harga: item.nego_negosiasi_jumlah_harga || 0,
+          };
+        })
+      );
+    } else {
+      // Auto-fill from HPS and Penawaran if available
+      if (hpsRes.success && hpsRes.data && hpsRes.data.length > 0) {
+        setNegoRows(
+          hpsRes.data.map((item, idx) => {
+            const pnwItem = pnwList[idx];
             return {
-              nego_id: item.nego_id,
-              nego_master_dokumen_id: item.nego_master_dokumen_id,
-              nego_uraian_kegiatan: item.nego_uraian_kegiatan || '',
-              nego_volume: item.nego_volume || '',
-              nego_waktu: item.nego_waktu || '',
-              nego_hps_harga_satuan: item.nego_hps_harga_satuan || 0,
-              nego_hps_jumlah_harga: item.nego_hps_jumlah_harga || 0,
-              nego_pnw_harga_satuan: pnwHargaSatuan,
-              nego_pnw_jumlah_harga: pnwJumlahHarga,
-              nego_negosiasi_harga_satuan: item.nego_negosiasi_harga_satuan || 0,
-              nego_negosiasi_jumlah_harga: item.nego_negosiasi_jumlah_harga || 0,
+              nego_master_dokumen_id: mdkId,
+              nego_uraian_kegiatan: item.hps_uraian_pekerjaan || '',
+              nego_volume: item.hps_volume || '',
+              nego_waktu: item.hps_waktu || '',
+              nego_hps_harga_satuan: Number(item.hps_harga_satuan) || 0,
+              nego_hps_jumlah_harga: Number(item.hps_harga_perkiraan_sendiri) || 0,
+              nego_pnw_harga_satuan: pnwItem ? Number(pnwItem.pnw_harga_satuan) || 0 : 0,
+              nego_pnw_jumlah_harga: pnwItem ? Number(pnwItem.pnw_harga_perkiraan_sendiri) || 0 : 0,
+              nego_negosiasi_harga_satuan: 0,
+              nego_negosiasi_jumlah_harga: 0,
             };
           })
         );
+        showToast('success', 'Form Negosiasi otomatis terisi dari data HPS dan Penawaran.');
       } else {
-        // Auto-fill from HPS and Penawaran if available
-        if (hpsRes.success && hpsRes.data && hpsRes.data.length > 0) {
-          setNegoRows(
-            hpsRes.data.map((item, idx) => {
-              const pnwItem = pnwList[idx];
-              return {
-                nego_master_dokumen_id: mdkId,
-                nego_uraian_kegiatan: item.hps_uraian_pekerjaan || '',
-                nego_volume: item.hps_volume || '',
-                nego_waktu: item.hps_waktu || '',
-                nego_hps_harga_satuan: Number(item.hps_harga_satuan) || 0,
-                nego_hps_jumlah_harga: Number(item.hps_harga_perkiraan_sendiri) || 0,
-                nego_pnw_harga_satuan: pnwItem ? Number(pnwItem.pnw_harga_satuan) || 0 : 0,
-                nego_pnw_jumlah_harga: pnwItem ? Number(pnwItem.pnw_harga_perkiraan_sendiri) || 0 : 0,
-                nego_negosiasi_harga_satuan: 0,
-                nego_negosiasi_jumlah_harga: 0,
-              };
-            })
-          );
-          showToast('success', 'Form Negosiasi otomatis terisi dari data HPS dan Penawaran.');
-        } else {
-          setNegoRows([createEmptyRow()]);
-        }
+        setNegoRows([createEmptyRow()]);
       }
-      setLoadingNego(false);
-    }, []);
+    }
+    setLoadingNego(false);
+  }, []);
 
   const handleCopyFromHPS = async () => {
     if (!selectedMdkId || typeof selectedMdkId !== 'number') {
@@ -328,7 +328,7 @@ export const NegoContainer: React.FC<NegoContainerProps> = ({
     (acc, curr) => acc + (Number(curr.nego_negosiasi_jumlah_harga) || 0),
     0
   );
-  const ppnNego = Math.round(totalHargaNego * 0.11);
+  const ppnNego = isBelowPajakThreshold(totalHargaNego) ? Math.round(totalHargaNego * 0.11) : 0;
   const totalKeseluruhanNego = totalHargaNego + ppnNego;
   const paguNominal = Number(selectedMasterDokumen?.mdk_pagu_anggaran) || 0;
   const isLocked = selectedMasterDokumen?.mdk_is_lock === 1;
@@ -339,7 +339,7 @@ export const NegoContainer: React.FC<NegoContainerProps> = ({
   // Ringkasan untuk ketiga kolom (HPS/OE, Penawaran, Negosiasi)
   const buildSummary = (key: 'nego_hps_jumlah_harga' | 'nego_pnw_jumlah_harga' | 'nego_negosiasi_jumlah_harga') => {
     const total = NegoRows.reduce((acc, curr) => acc + (Number(curr[key]) || 0), 0);
-    const ppn = Math.round(total * 0.11);
+    const ppn = isBelowPajakThreshold(total) ? Math.round(total * 0.11) : 0;
     const totalPpn = total + ppn;
     return { total, ppn, totalPpn, selisih: paguNominal - totalPpn };
   };

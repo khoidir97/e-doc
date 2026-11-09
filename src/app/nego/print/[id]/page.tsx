@@ -4,7 +4,7 @@ import React, { useEffect, useState, use } from 'react';
 import { getNegoWithDetailsAction } from '@/features/nego/actions';
 import { Nego } from '@/features/nego/types';
 import { MasterDokumen } from '@/features/master-dokumen/types';
-import { formatRupiah, terbilang } from '@/lib/terbilang';
+import { formatRupiah, isBelowPajakThreshold, terbilang } from '@/lib/terbilang';
 import { formatDateIndonesian } from '@/lib/date';
 
 function formatTanggalIndonesian(dateStr?: string | null): string {
@@ -76,9 +76,9 @@ export default function NegoPrintPage({ params }: { params: Promise<{ id: string
   const totalPnw = items.reduce((s, i) => s + (Number(i.nego_pnw_jumlah_harga) || 0), 0);
   const totalNego = items.reduce((s, i) => s + (Number(i.nego_negosiasi_jumlah_harga) || 0), 0);
 
-  const ppnHps = Math.round(totalHps * 0.11);
-  const ppnPnw = Math.round(totalPnw * 0.11);
-  const ppnNego = Math.round(totalNego * 0.11);
+  const ppnHps = isBelowPajakThreshold(totalHps) ? Math.round(totalHps * 0.11) : 0;
+  const ppnPnw = isBelowPajakThreshold(totalPnw) ? Math.round(totalPnw * 0.11) : 0;
+  const ppnNego = isBelowPajakThreshold(totalNego) ? Math.round(totalNego * 0.11) : 0;
 
   const jumlahHps = totalHps + ppnHps;
   const jumlahPnw = totalPnw + ppnPnw;

@@ -4,7 +4,7 @@ import React, { useEffect, useState, use } from 'react';
 import { getHargaPerkiraanSendiriWithDetailsAction } from '@/features/harga-perkiraan-sendiri/actions';
 import { HargaPerkiraanSendiri } from '@/features/harga-perkiraan-sendiri/types';
 import { MasterDokumen } from '@/features/master-dokumen/types';
-import { formatRupiah, terbilang } from '@/lib/terbilang';
+import { formatRupiah, isBelowPajakThreshold, terbilang } from '@/lib/terbilang';
 import { KopSuratBpkad } from '@/components/common/KopSuratBpkad';
 
 export default function HargaPerkiraanSendiriPrintPage({ params }: { params: Promise<{ id: string }> }) {
@@ -64,7 +64,7 @@ export default function HargaPerkiraanSendiriPrintPage({ params }: { params: Pro
 
   // Calculation Metrics
   const jumlahHps = items.reduce((sum, item) => sum + (Number(item.hps_harga_perkiraan_sendiri) || 0), 0);
-  const ppnHps = Math.round(jumlahHps * 0.11);
+  const ppnHps = isBelowPajakThreshold(jumlahHps) ? Math.round(jumlahHps * 0.11) : 0;
   const totalKeseluruhanHps = jumlahHps + ppnHps;
   const pembulatanHps = totalKeseluruhanHps;
   const terbilangText = terbilang(pembulatanHps);

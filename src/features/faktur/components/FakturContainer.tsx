@@ -8,7 +8,7 @@ import {
   getRencanaAnggaranBiayaByMasterDokumenAction,
   saveFakturBatchAction,
 } from '../actions';
-import { formatRupiah } from '@/lib/terbilang';
+import { formatRupiah, isBelowPajakThreshold } from '@/lib/terbilang';
 import { MasterDokumenSelectorCard } from '@/features/master-dokumen/components/MasterDokumenSelectorCard';
 import { RupiahInput } from '@/components/form/RupiahInput';
 import { Toast } from '@/components/ui/Toast';
@@ -340,7 +340,7 @@ export const FakturContainer: React.FC<FakturContainerProps> = ({
   const paguNominal = Number(selectedMasterDokumen?.mdk_pagu_anggaran) || 0;
   const isLocked = selectedMasterDokumen?.mdk_is_lock === 1;
   const selisihNominal = paguNominal - totalHargaFaktur;
-  const countPPN = totalHargaFaktur * (11 / 100);
+  const countPPN = isBelowPajakThreshold(totalHargaFaktur) ? totalHargaFaktur * (11 / 100) : 0;
   const totalAkhir = totalHargaFaktur + countPPN;
   const isSaved = hasSavedData || FakturRows.some((r) => Boolean(r.fkt_id));
 

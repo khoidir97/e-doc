@@ -4,7 +4,7 @@ import React, { useEffect, useState, use } from 'react';
 import { getPerhitunganPaketWithDetailsAction } from '@/features/perhitungan-paket/actions';
 import { Paket, PerhitunganPaket } from '@/features/perhitungan-paket/types';
 import { MasterDokumen } from '@/features/master-dokumen/types';
-import { formatRupiah } from '@/lib/terbilang';
+import { formatRupiah, isBelowPajakThreshold } from '@/lib/terbilang';
 
 function formatDateID(val?: string | Date | null): string {
   if (!val) return '-';
@@ -66,8 +66,8 @@ export default function PerhitunganPaketPrintPage({ params }: { params: Promise<
   // Aggregated totals
   const totalNilaiInvoice = items.reduce((s, i) => s + (Number(i.pak_nilai_invoice) || 0), 0);
   const totalDpp = items.reduce((s, i) => s + (Number(i.pak_dpp) || 0), 0);
-  const totalPpn = items.reduce((s, i) => s + (Number(i.pak_ppn) || 0), 0);
-  const totalPph23 = items.reduce((s, i) => s + (Number(i.pak_pph23) || 0), 0);
+  const totalPpn = isBelowPajakThreshold(totalNilaiInvoice) ? items.reduce((s, i) => s + (Number(i.pak_ppn) || 0), 0) : 0;
+  const totalPph23 = isBelowPajakThreshold(totalNilaiInvoice) ? items.reduce((s, i) => s + (Number(i.pak_pph23) || 0), 0) : 0;
   const totalDibayar = items.reduce((s, i) => s + (Number(i.pak_dibayar) || 0), 0);
 
   const spkKwitansi = paket?.pkt_spk_kwitansi !== null && paket?.pkt_spk_kwitansi !== undefined
@@ -196,19 +196,15 @@ export default function PerhitunganPaketPrintPage({ params }: { params: Promise<
               items.map((item, idx) => (
                 <tr key={idx} className="text-center border-b border-dashed border-gray-300">
                   <td className="border border-black px-2 py-1.5 font-mono text-right">
-                    <span className="text-[8px] mr-1">Rp</span>
                     <span className="font-semibold">{formatRupiah(item.pak_nilai_invoice)}</span>
                   </td>
                   <td className="border border-black px-2 py-1.5 font-mono text-right">
-                    <span className="text-[8px] mr-1">Rp</span>
                     {formatRupiah(item.pak_dpp)}
                   </td>
                   <td className="border border-black px-2 py-1.5 font-mono text-right">
-                    <span className="text-[8px] mr-1">Rp</span>
                     {item.pak_ppn > 0 ? formatRupiah(item.pak_ppn) : '-'}
                   </td>
                   <td className="border border-black px-2 py-1.5 font-mono text-right">
-                    <span className="text-[8px] mr-1">Rp</span>
                     {item.pak_pph23 > 0 ? formatRupiah(item.pak_pph23) : '-'}
                   </td>
                   <td className="border border-black px-2 py-1.5 font-mono font-extrabold text-right bg-blue-50">
@@ -218,7 +214,7 @@ export default function PerhitunganPaketPrintPage({ params }: { params: Promise<
               ))
             )}
 
-            {/* Total row */}
+            {/* Total row
             {items.length > 0 && (
               <tr className="font-extrabold border-t-2 border-black bg-gray-50 text-right">
                 <td className="border border-black px-2 py-1.5 font-mono">{formatRupiah(totalNilaiInvoice)}</td>
@@ -227,7 +223,7 @@ export default function PerhitunganPaketPrintPage({ params }: { params: Promise<
                 <td className="border border-black px-2 py-1.5 font-mono">{totalPph23 > 0 ? formatRupiah(totalPph23) : '-'}</td>
                 <td className="border border-black px-2 py-1.5 font-mono text-blue-700 bg-blue-100">{formatRupiah(totalDibayar)}</td>
               </tr>
-            )}
+            )} */}
           </tbody>
         </table>
       </div>
