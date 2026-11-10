@@ -43,6 +43,17 @@ export class KerangkaAcuanKerjaRepository {
     return rows as DetailKakSpesifikasiTeknis[];
   }
 
+  static async getManualKakList(): Promise<KerangkaAcuanKerja[]> {
+    await initDatabase();
+    const [rows] = await pool.query<any[]>(
+      `SELECT * FROM kerangka_acuan_kerja 
+       WHERE (kak_master_dokumen_id IS NULL OR kak_master_dokumen_id = 0) 
+         AND kak_deleted_at IS NULL 
+       ORDER BY kak_id DESC`
+    );
+    return rows as KerangkaAcuanKerja[];
+  }
+
   static async saveAll(payload: SaveKakPayload, userId?: number | null): Promise<number> {
     await initDatabase();
     const connection = await pool.getConnection();
@@ -50,18 +61,32 @@ export class KerangkaAcuanKerjaRepository {
     try {
       await connection.beginTransaction();
 
-      // Check existing KAK for this master dokumen
-      const [existingRows]: any = await connection.query(
-        `SELECT kak_id FROM kerangka_acuan_kerja WHERE kak_master_dokumen_id = ? AND kak_deleted_at IS NULL LIMIT 1`,
-        [payload.kak_master_dokumen_id]
-      );
+      let kakId: number | null = payload.kak_id ? Number(payload.kak_id) : null;
 
-      let kakId: number;
+      // If kakId not specified, check if existing record for this master dokumen
+      if (!kakId && payload.kak_master_dokumen_id) {
+        const [existingRows]: any = await connection.query(
+          `SELECT kak_id FROM kerangka_acuan_kerja WHERE kak_master_dokumen_id = ? AND kak_deleted_at IS NULL LIMIT 1`,
+          [payload.kak_master_dokumen_id]
+        );
+        if (existingRows.length > 0) {
+          kakId = existingRows[0].kak_id;
+        }
+      }
 
-      if (existingRows.length > 0) {
-        kakId = existingRows[0].kak_id;
+      if (kakId) {
         await connection.query(
           `UPDATE kerangka_acuan_kerja SET
+            kak_master_dokumen_id = ?,
+            kak_program = ?,
+            kak_kode_program = ?,
+            kak_kegiatan = ?,
+            kak_kode_kegiatan = ?,
+            kak_sub_kegiatan = ?,
+            kak_rekening = ?,
+            kak_kode_rekening = ?,
+            kak_pekerjaan = ?,
+            kak_tahun_anggaran = ?,
             kak_latar_belakang = ?,
             kak_maksud_dan_tujuan = ?,
             kak_referensi_hukum = ?,
@@ -79,6 +104,16 @@ export class KerangkaAcuanKerjaRepository {
             kak_updated_at = NOW()
           WHERE kak_id = ?`,
           [
+            payload.kak_master_dokumen_id || null,
+            payload.kak_program || null,
+            payload.kak_kode_program || null,
+            payload.kak_kegiatan || null,
+            payload.kak_kode_kegiatan || null,
+            payload.kak_sub_kegiatan || null,
+            payload.kak_rekening || null,
+            payload.kak_kode_rekening || null,
+            payload.kak_pekerjaan || null,
+            payload.kak_tahun_anggaran || null,
             payload.kak_latar_belakang || null,
             payload.kak_maksud_dan_tujuan || null,
             payload.kak_referensi_hukum || null,
@@ -99,14 +134,25 @@ export class KerangkaAcuanKerjaRepository {
       } else {
         const [insertResult]: any = await connection.query(
           `INSERT INTO kerangka_acuan_kerja
-            (kak_master_dokumen_id, kak_latar_belakang, kak_maksud_dan_tujuan, kak_referensi_hukum,
+            (kak_master_dokumen_id, kak_program, kak_kode_program, kak_kegiatan, kak_kode_kegiatan,
+             kak_sub_kegiatan, kak_rekening, kak_kode_rekening, kak_pekerjaan, kak_tahun_anggaran,
+             kak_latar_belakang, kak_maksud_dan_tujuan, kak_referensi_hukum,
              kak_target_sasaran, kak_nama_organisasi_dan_pengadaan, kak_sumber_dana_perkiraan_biaya,
              kak_perkiraan_biaya_id, kak_ruang_lingkup_lokasi_pekerjaan, kak_jangka_waktu_pelaksanaan,
              kak_metode_pemilihan, kak_spesifikasi_teknis_id, kak_persyaratan_kualifikasi_penyedia,
-             kak_penutup, kak_created_by)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+             kak_penutup, kak_created_by, kak_created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
           [
-            payload.kak_master_dokumen_id,
+            payload.kak_master_dokumen_id || null,
+            payload.kak_program || null,
+            payload.kak_kode_program || null,
+            payload.kak_kegiatan || null,
+            payload.kak_kode_kegiatan || null,
+            payload.kak_sub_kegiatan || null,
+            payload.kak_rekening || null,
+            payload.kak_kode_rekening || null,
+            payload.kak_pekerjaan || null,
+            payload.kak_tahun_anggaran || null,
             payload.kak_latar_belakang || null,
             payload.kak_maksud_dan_tujuan || null,
             payload.kak_referensi_hukum || null,
@@ -123,7 +169,11 @@ export class KerangkaAcuanKerjaRepository {
             userId ?? null,
           ]
         );
-        kakId = insertResult.insertId;
+        kakId = Number(insertResult.insertId);
+      }
+
+      if (!kakId) {
+        throw new Error('Gagal mendapatkan ID Kerangka Acuan Kerja yang disimpan.');
       }
 
       // 1. Sync detail_kak_perkiraan_biaya

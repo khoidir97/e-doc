@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useEffect, useState, use } from 'react';
-import { getKerangkaAcuanKerjaByMasterDokumenAction } from '@/features/kerangka-acuan-kerja/actions';
+import {
+  getKerangkaAcuanKerjaByMasterDokumenAction,
+  getKerangkaAcuanKerjaByIdAction,
+} from '@/features/kerangka-acuan-kerja/actions';
 import {
   DetailKakPerkiraanBiaya,
   DetailKakSpesifikasiTeknis,
@@ -13,7 +16,7 @@ import { KopSuratBpkad } from '@/components/common/KopSuratBpkad';
 
 export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
-  const mdkId = Number(resolvedParams.id);
+  const rawId = resolvedParams.id;
 
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState<{
@@ -31,21 +34,49 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
 
   useEffect(() => {
     async function loadData() {
-      if (!mdkId) return;
+      if (!rawId) return;
       setLoading(true);
-      const res = await getKerangkaAcuanKerjaByMasterDokumenAction(mdkId);
-      if (res.success && res.data) {
-        setData({
-          kak: res.data.kakDetails.kak,
-          perkiraanBiayaList: res.data.kakDetails.perkiraanBiayaList,
-          spesifikasiTeknisList: res.data.kakDetails.spesifikasiTeknisList,
-          masterDokumen: res.data.masterDokumen,
-        });
+
+      if (rawId.startsWith('kak-')) {
+        const kakId = Number(rawId.replace('kak-', ''));
+        const res = await getKerangkaAcuanKerjaByIdAction(kakId);
+        if (res.success && res.data) {
+          setData({
+            kak: res.data.kakDetails.kak,
+            perkiraanBiayaList: res.data.kakDetails.perkiraanBiayaList,
+            spesifikasiTeknisList: res.data.kakDetails.spesifikasiTeknisList,
+            masterDokumen: res.data.masterDokumen,
+          });
+        }
+      } else {
+        const numId = Number(rawId);
+        // Try by master dokumen first
+        const res = await getKerangkaAcuanKerjaByMasterDokumenAction(numId);
+        if (res.success && res.data && res.data.kakDetails.kak) {
+          setData({
+            kak: res.data.kakDetails.kak,
+            perkiraanBiayaList: res.data.kakDetails.perkiraanBiayaList,
+            spesifikasiTeknisList: res.data.kakDetails.spesifikasiTeknisList,
+            masterDokumen: res.data.masterDokumen,
+          });
+        } else {
+          // Fallback: try by kakId
+          const resKak = await getKerangkaAcuanKerjaByIdAction(numId);
+          if (resKak.success && resKak.data) {
+            setData({
+              kak: resKak.data.kakDetails.kak,
+              perkiraanBiayaList: resKak.data.kakDetails.perkiraanBiayaList,
+              spesifikasiTeknisList: resKak.data.kakDetails.spesifikasiTeknisList,
+              masterDokumen: resKak.data.masterDokumen,
+            });
+          }
+        }
       }
+
       setLoading(false);
     }
     loadData();
-  }, [mdkId]);
+  }, [rawId]);
 
   if (loading) {
     return (
@@ -58,7 +89,7 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
     );
   }
 
-  if (!data || !data.masterDokumen) {
+  if (!data || (!data.kak && !data.masterDokumen)) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
         <div className="text-center text-red-500 font-semibold">
@@ -70,15 +101,21 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
 
   const { kak, perkiraanBiayaList, spesifikasiTeknisList, masterDokumen } = data;
 
-  const namaPekerjaan = masterDokumen.mdk_pekerjaan || masterDokumen.mdk_uraian_belanja || 'Pengadaan Barang / Jasa';
-  const tahunAnggaran = masterDokumen.mdk_apbd?.match(/\b(20\d\d)\b/)?.[1] || new Date().getFullYear().toString();
+  const namaPekerjaan = kak?.kak_pekerjaan || masterDokumen?.mdk_pekerjaan || masterDokumen?.mdk_uraian_belanja || 'Pengadaan Barang / Jasa';
+  const program = kak?.kak_program || masterDokumen?.mdk_program || '-';
+  const kegiatan = kak?.kak_kegiatan || masterDokumen?.mdk_kegiatan || '-';
+  const subKegiatan = kak?.kak_sub_kegiatan || masterDokumen?.mdk_sub_kegiatan || '-';
+  const kodeRekening = kak?.kak_kode_rekening || masterDokumen?.mdk_rekening_belanja || '-';
+  const tahunAnggaran = kak?.kak_tahun_anggaran || masterDokumen?.mdk_apbd?.match(/\b(20\d\d)\b/)?.[1] || new Date().getFullYear().toString();
 
   // Metrics
   const totalBiaya = perkiraanBiayaList.reduce((acc, curr) => acc + (Number(curr.kpb_jumlah) || 0), 0);
   const terbilangText = terbilang(totalBiaya);
 
-  const isPA = masterDokumen.mdk_jabatan_pejabat?.trim().toUpperCase() === 'PA';
+  const isPA = masterDokumen?.mdk_jabatan_pejabat?.trim().toUpperCase() === 'PA';
   const labelKpaPpk = isPA ? 'Pengguna Anggaran (PA)' : 'Kuasa Pengguna Anggaran (KPA)';
+  const namaPejabat = masterDokumen?.mdk_nama_pejabat || 'DANIEL PERDANA, SE';
+  const nipPejabat = masterDokumen?.mdk_nip_pejabat || '197507242001121006';
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-6 print:py-0 print:bg-white text-black font-serif">
@@ -185,17 +222,17 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
                 <tr>
                   <td className="py-2 align-top font-bold">Program</td>
                   <td className="py-2 align-top text-center font-bold">:</td>
-                  <td className="py-2 align-top font-bold">{masterDokumen.mdk_program || '-'}</td>
+                  <td className="py-2 align-top font-bold">{program}</td>
                 </tr>
                 <tr>
                   <td className="py-2 align-top font-bold">Kegiatan</td>
                   <td className="py-2 align-top text-center font-bold">:</td>
-                  <td className="py-2 align-top font-bold">{masterDokumen.mdk_kegiatan || '-'}</td>
+                  <td className="py-2 align-top font-bold">{kegiatan}</td>
                 </tr>
                 <tr>
                   <td className="py-2 align-top font-bold">Sub Kegiatan</td>
                   <td className="py-2 align-top text-center font-bold">:</td>
-                  <td className="py-2 align-top font-bold">{masterDokumen.mdk_sub_kegiatan || '-'}</td>
+                  <td className="py-2 align-top font-bold">{subKegiatan}</td>
                 </tr>
                 <tr>
                   <td className="py-2 align-top font-bold">Pekerjaan</td>
@@ -206,7 +243,7 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
                   <td className="py-2 align-top font-bold">Kode Rekening</td>
                   <td className="py-2 align-top text-center font-bold">:</td>
                   <td className="py-2 align-top font-mono font-bold">
-                    {masterDokumen.mdk_rekening_belanja || '-'}
+                    {kodeRekening}
                   </td>
                 </tr>
                 <tr>
@@ -460,10 +497,10 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
             </div>
             <div className="pt-20">
               <p className="font-bold underline uppercase text-sm">
-                {masterDokumen.mdk_nama_pejabat || 'DANIEL PERDANA, SE'}
+                {namaPejabat}
               </p>
               <p className="text-[11px] font-mono mt-0.5">
-                NIP. {masterDokumen.mdk_nip_pejabat || '197507242001121006'}
+                NIP. {nipPejabat}
               </p>
             </div>
           </div>

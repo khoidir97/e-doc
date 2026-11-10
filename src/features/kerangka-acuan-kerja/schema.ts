@@ -15,8 +15,17 @@ export const detailKakSpesifikasiTeknisSchema = z.object({
 });
 
 export const saveKakSchema = z.object({
-  kak_id: z.coerce.number().optional(),
-  kak_master_dokumen_id: z.coerce.number().positive('Master Dokumen harus dipilih'),
+  kak_id: z.coerce.number().nullable().optional(),
+  kak_master_dokumen_id: z.coerce.number().nullable().optional(),
+  kak_program: z.string().nullable().optional(),
+  kak_kode_program: z.string().nullable().optional(),
+  kak_kegiatan: z.string().nullable().optional(),
+  kak_kode_kegiatan: z.string().nullable().optional(),
+  kak_sub_kegiatan: z.string().nullable().optional(),
+  kak_rekening: z.string().nullable().optional(),
+  kak_kode_rekening: z.string().nullable().optional(),
+  kak_pekerjaan: z.string().nullable().optional(),
+  kak_tahun_anggaran: z.string().nullable().optional(),
   kak_latar_belakang: z.string().nullable().optional(),
   kak_maksud_dan_tujuan: z.string().nullable().optional(),
   kak_referensi_hukum: z.string().nullable().optional(),

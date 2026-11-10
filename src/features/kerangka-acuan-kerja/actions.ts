@@ -11,6 +11,7 @@ import { HargaPerkiraanSendiriService } from '../harga-perkiraan-sendiri/service
 import { saveKakSchema } from './schema';
 import {
   ActionResponse,
+  KerangkaAcuanKerja,
   KerangkaAcuanKerjaWithDetails,
   SaveKakPayload,
 } from './types';
@@ -90,6 +91,23 @@ export async function getKerangkaAcuanKerjaByIdAction(
   }
 }
 
+export async function getManualKakListAction(): Promise<ActionResponse<KerangkaAcuanKerja[]>> {
+  try {
+    const list = await KerangkaAcuanKerjaService.getManualKakList();
+    return {
+      success: true,
+      message: 'Berhasil memuat daftar KAK Manual',
+      data: list,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || 'Gagal memuat daftar KAK Manual',
+      data: [],
+    };
+  }
+}
+
 export async function saveKerangkaAcuanKerjaAction(
   payload: SaveKakPayload
 ): Promise<ActionResponse<{ kakId: number }>> {
@@ -107,7 +125,10 @@ export async function saveKerangkaAcuanKerjaAction(
     const kakId = await KerangkaAcuanKerjaService.saveAll(validation.data as SaveKakPayload, userId);
 
     revalidatePath('/kerangka-acuan-kerja');
-    revalidatePath(`/kerangka-acuan-kerja/print/${payload.kak_master_dokumen_id}`);
+    if (payload.kak_master_dokumen_id) {
+      revalidatePath(`/kerangka-acuan-kerja/print/${payload.kak_master_dokumen_id}`);
+    }
+    revalidatePath(`/kerangka-acuan-kerja/print/kak-${kakId}`);
 
     return {
       success: true,

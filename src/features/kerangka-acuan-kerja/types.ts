@@ -1,6 +1,15 @@
 export interface KerangkaAcuanKerja {
   kak_id: number;
-  kak_master_dokumen_id: number;
+  kak_master_dokumen_id: number | null;
+  kak_program: string | null;
+  kak_kode_program: string | null;
+  kak_kegiatan: string | null;
+  kak_kode_kegiatan: string | null;
+  kak_sub_kegiatan: string | null;
+  kak_rekening: string | null;
+  kak_kode_rekening: string | null;
+  kak_pekerjaan: string | null;
+  kak_tahun_anggaran: string | null;
   kak_latar_belakang: string | null;
   kak_maksud_dan_tujuan: string | null;
   kak_referensi_hukum: string | null;
@@ -14,7 +23,7 @@ export interface KerangkaAcuanKerja {
   kak_spesifikasi_teknis_id: number | null;
   kak_persyaratan_kualifikasi_penyedia: string | null;
   kak_penutup: string | null;
-  kak_created_at: string | Date;
+  kak_created_at: string | Date | null;
   kak_created_by: number | null;
   kak_updated_at: string | Date | null;
   kak_updated_by: number | null;
@@ -57,7 +66,17 @@ export interface KerangkaAcuanKerjaWithDetails {
 }
 
 export interface SaveKakPayload {
-  kak_master_dokumen_id: number;
+  kak_id?: number | null;
+  kak_master_dokumen_id?: number | null;
+  kak_program?: string | null;
+  kak_kode_program?: string | null;
+  kak_kegiatan?: string | null;
+  kak_kode_kegiatan?: string | null;
+  kak_sub_kegiatan?: string | null;
+  kak_rekening?: string | null;
+  kak_kode_rekening?: string | null;
+  kak_pekerjaan?: string | null;
+  kak_tahun_anggaran?: string | null;
   kak_latar_belakang?: string | null;
   kak_maksud_dan_tujuan?: string | null;
   kak_referensi_hukum?: string | null;
