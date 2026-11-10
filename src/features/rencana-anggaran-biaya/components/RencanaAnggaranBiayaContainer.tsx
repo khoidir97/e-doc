@@ -18,18 +18,33 @@ interface RencanaAnggaranBiayaItemRow {
   rab_master_dokumen_id?: number;
   rab_uraian_pekerjaan: string;
   rab_volume: string;
+  rab_max_volume?: number;
   rab_waktu: string;
   rab_harga_satuan: number;
   rab_harga_perkiraan_sendiri: number;
 }
 
-const createEmptyRow = (defaultUraian = '', defaultVolume = '', defaultWaktu = ''): RencanaAnggaranBiayaItemRow => ({
-  rab_uraian_pekerjaan: defaultUraian,
-  rab_volume: defaultVolume,
-  rab_waktu: defaultWaktu,
-  rab_harga_satuan: 0,
-  rab_harga_perkiraan_sendiri: 0,
-});
+const parseVolumeNumber = (val: string | number | null | undefined): { str: string; num?: number } => {
+  if (val === null || val === undefined || val === '') return { str: '', num: undefined };
+  if (typeof val === 'number') return { str: isNaN(val) ? '' : String(val), num: isNaN(val) ? undefined : val };
+  const match = String(val).match(/[\d,.]+/);
+  if (!match) return { str: '', num: undefined };
+  const parsed = parseFloat(match[0].replace(/\./g, '').replace(',', '.'));
+  if (isNaN(parsed) || parsed <= 0) return { str: '', num: undefined };
+  return { str: String(parsed), num: parsed };
+};
+
+const createEmptyRow = (defaultUraian = '', defaultVolume = '', defaultWaktu = '', maxVolume?: number): RencanaAnggaranBiayaItemRow => {
+  const parsed = parseVolumeNumber(defaultVolume);
+  return {
+    rab_uraian_pekerjaan: defaultUraian,
+    rab_volume: parsed.str || defaultVolume,
+    rab_max_volume: maxVolume !== undefined ? maxVolume : parsed.num,
+    rab_waktu: defaultWaktu,
+    rab_harga_satuan: 0,
+    rab_harga_perkiraan_sendiri: 0,
+  };
+};
 
 const parseItemBarang = (raw: any): any[] => {
   if (!raw) return [];
@@ -97,7 +112,8 @@ const createRowsFromItemBarang = (
     return {
       rab_master_dokumen_id: mdkId,
       rab_uraian_pekerjaan: uraian,
-      rab_volume: koefisien,
+      rab_volume: String(volNum),
+      rab_max_volume: volNum,
       rab_waktu: satuan,
       rab_harga_satuan: hargaSatuan,
       rab_harga_perkiraan_sendiri: hps,
@@ -171,25 +187,44 @@ export const RencanaAnggaranBiayaContainer: React.FC<RencanaAnggaranBiayaContain
       setHasSavedData(isSaved);
 
       if (isSaved && res.data) {
+        const items = parseItemBarang(itemBarangRaw);
+        const mdkVolParsed = parseVolumeNumber(defaultVolume);
+
         setRencanaAnggaranBiayaRows(
-          res.data.map((item) => ({
-            rab_id: item.rab_id,
-            rab_master_dokumen_id: item.rab_master_dokumen_id,
-            rab_uraian_pekerjaan:
-              item.rab_uraian_pekerjaan && item.rab_uraian_pekerjaan.trim() !== ''
-                ? item.rab_uraian_pekerjaan
-                : defaultUraianText,
-            rab_volume:
-              item.rab_volume && item.rab_volume.trim() !== ''
-                ? item.rab_volume
-                : defaultVolume,
-            rab_waktu:
-              item.rab_waktu && item.rab_waktu.trim() !== ''
-                ? item.rab_waktu
-                : defaultWaktu,
-            rab_harga_satuan: item.rab_harga_satuan || 0,
-            rab_harga_perkiraan_sendiri: item.rab_harga_perkiraan_sendiri || 0,
-          }))
+          res.data.map((item, idx) => {
+            let itemMaxVol: number | undefined = undefined;
+            if (items.length > idx) {
+              const koef = String(items[idx].KOOFISIEN ?? items[idx].koofisien ?? items[idx].KOEFISIEN ?? items[idx].koefisien ?? '').trim();
+              const p = parseVolumeNumber(koef);
+              if (p.num) itemMaxVol = p.num;
+            }
+            if (itemMaxVol === undefined && mdkVolParsed.num) {
+              itemMaxVol = mdkVolParsed.num;
+            }
+            const savedVolParsed = parseVolumeNumber(item.rab_volume);
+            if (itemMaxVol === undefined && savedVolParsed.num) {
+              itemMaxVol = savedVolParsed.num;
+            }
+
+            const cleanVol = savedVolParsed.str || (item.rab_volume && item.rab_volume.trim() !== '' ? item.rab_volume : mdkVolParsed.str || defaultVolume);
+
+            return {
+              rab_id: item.rab_id,
+              rab_master_dokumen_id: item.rab_master_dokumen_id,
+              rab_uraian_pekerjaan:
+                item.rab_uraian_pekerjaan && item.rab_uraian_pekerjaan.trim() !== ''
+                  ? item.rab_uraian_pekerjaan
+                  : defaultUraianText,
+              rab_volume: cleanVol,
+              rab_max_volume: itemMaxVol,
+              rab_waktu:
+                item.rab_waktu && item.rab_waktu.trim() !== ''
+                  ? item.rab_waktu
+                  : defaultWaktu,
+              rab_harga_satuan: item.rab_harga_satuan || 0,
+              rab_harga_perkiraan_sendiri: item.rab_harga_perkiraan_sendiri || 0,
+            };
+          })
         );
       } else {
         // Jika data RAB belum disimpan di database:
@@ -257,9 +292,10 @@ export const RencanaAnggaranBiayaContainer: React.FC<RencanaAnggaranBiayaContain
     const defaultSatuan =
       selectedMasterDokumen?.st_nama ||
       (selectedMasterDokumen?.mdk_satuan ? String(selectedMasterDokumen.mdk_satuan) : '');
+    const mdkVolParsed = parseVolumeNumber(selectedMasterDokumen?.mdk_volume);
     setRencanaAnggaranBiayaRows((prev) => [
       ...prev,
-      createEmptyRow('', '1', defaultSatuan),
+      createEmptyRow('', '1', defaultSatuan, mdkVolParsed.num),
     ]);
   };
 
@@ -278,27 +314,44 @@ export const RencanaAnggaranBiayaContainer: React.FC<RencanaAnggaranBiayaContain
   const handleRowChange = (index: number, field: keyof RencanaAnggaranBiayaItemRow, value: any) => {
     setRencanaAnggaranBiayaRows((prev) => {
       const updated = [...prev];
-      const row = { ...updated[index], [field]: value };
+      const row = { ...updated[index] };
+
+      let finalValue = value;
+      if (field === 'rab_volume') {
+        const maxLimit = row.rab_max_volume;
+        if (value !== '' && maxLimit !== undefined) {
+          const numVal = parseFloat(String(value).replace(',', '.'));
+          if (!isNaN(numVal) && numVal > maxLimit) {
+            finalValue = maxLimit.toString();
+          }
+        }
+      }
+
+      row[field] = finalValue as never;
 
       // Helper to parse first number from volume/waktu string
       const parseNum = (str: string) => {
         if (!str) return 1;
-        const match = str.match(/[\d,.]+/);
+        const match = String(str).match(/[\d,.]+/);
         if (!match) return 1;
         const parsed = parseFloat(match[0].replace(/\./g, '').replace(',', '.'));
         return isNaN(parsed) || parsed <= 0 ? 1 : parsed;
       };
 
       if (field === 'rab_harga_satuan' || field === 'rab_volume' || field === 'rab_waktu') {
-        const vol = parseNum(field === 'rab_volume' ? value : row.rab_volume);
-        const waktu = parseNum(field === 'rab_waktu' ? value : row.rab_waktu);
-        const hargaSatuan = Number(field === 'rab_harga_satuan' ? value : row.rab_harga_satuan) || 0;
+        const vol = parseNum(field === 'rab_volume' ? finalValue : row.rab_volume);
+        const waktu = parseNum(field === 'rab_waktu' ? finalValue : row.rab_waktu);
+        const hargaSatuan = Number(field === 'rab_harga_satuan' ? finalValue : row.rab_harga_satuan) || 0;
         row.rab_harga_perkiraan_sendiri = Math.round(vol * waktu * hargaSatuan);
       }
 
       updated[index] = row;
       return updated;
     });
+  };
+
+  const handleVolumeChange = (index: number, val: string) => {
+    handleRowChange(index, 'rab_volume', val);
   };
 
   // Save Batch Data
@@ -516,12 +569,30 @@ export const RencanaAnggaranBiayaContainer: React.FC<RencanaAnggaranBiayaContain
                           <div className="md:col-span-2">
                             <label className="block text-[11px] font-medium text-gray-500 dark:text-gray-400 mb-1 md:hidden">Volume</label>
                             <input
-                              type="text"
-                              placeholder="ex: 1 Paket"
+                              type="number"
+                              min={0}
+                              max={row.rab_max_volume}
+                              step="any"
+                              inputMode="decimal"
+                              placeholder="0"
                               value={row.rab_volume}
-                              onChange={(e) => handleRowChange(index, 'rab_volume', e.target.value)}
-                              className="w-full px-3 py-2 text-xs rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 focus:outline-none transition-all"
+                              onChange={(e) => handleVolumeChange(index, e.target.value)}
+                              onKeyDown={(e) => {
+                                if (['e', 'E', '+', '-'].includes(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                              onWheel={(e) => (e.target as HTMLInputElement).blur()}
+                              className={`w-full px-3 py-2 text-xs rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:outline-none transition-all ${row.rab_max_volume !== undefined && Number(row.rab_volume) > row.rab_max_volume
+                                ? 'border-red-500 text-red-600 focus:ring-red-500/20'
+                                : 'border-gray-300 dark:border-gray-700 focus:ring-brand-500/20 focus:border-brand-500'
+                                }`}
                             />
+                            {row.rab_max_volume !== undefined && (
+                              <span className="text-[10px] text-gray-400 dark:text-gray-500 block mt-0.5">
+                                Maks: {row.rab_max_volume}
+                              </span>
+                            )}
                           </div>
 
                           {/* Waktu */}

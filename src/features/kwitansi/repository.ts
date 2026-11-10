@@ -1,6 +1,7 @@
 import pool, { initDatabase } from '@/lib/db';
 import { Kwitansi } from './types';
 import { formatDateYYYYMMDD } from '@/lib/date';
+import { isBelowPajakThreshold } from '@/lib/terbilang';
 
 export class KwitansiRepository {
   static async findByMasterDokumenId(mdk_id: number): Promise<Kwitansi | null> {
@@ -53,7 +54,7 @@ export class KwitansiRepository {
       );
       if (negoRows && negoRows.length > 0) {
         const totalNego = negoRows.reduce((s, i) => s + (Number(i.nego_negosiasi_jumlah_harga) || 0), 0);
-        const ppnNego = Math.round(totalNego * 0.11);
+        const ppnNego = isBelowPajakThreshold(totalNego) ? Math.round(totalNego * 0.11) : 0;
         const jumlahNego = totalNego + ppnNego;
         if (jumlahNego > 0) {
           nego_jumlah = jumlahNego;
@@ -65,14 +66,13 @@ export class KwitansiRepository {
 
     try {
       const [pakRows] = await pool.query<any[]>(
-        `SELECT pak_dibayar 
+        `SELECT SUM(pak_dibayar) as total_dibayar, COUNT(*) as count 
          FROM detail_perhitungan_paket 
-         WHERE pak_master_dokumen_id = ? AND pak_deleted_at IS NULL 
-         ORDER BY pak_id DESC LIMIT 1`,
+         WHERE pak_master_dokumen_id = ? AND pak_deleted_at IS NULL`,
         [mdk_id]
       );
-      if (pakRows && pakRows.length > 0) {
-        const val = Number(pakRows[0].pak_dibayar);
+      if (pakRows && pakRows.length > 0 && pakRows[0].count > 0 && pakRows[0].total_dibayar !== null) {
+        const val = Number(pakRows[0].total_dibayar);
         pak_dibayar = isNaN(val) ? null : val;
       }
     } catch (err) {
