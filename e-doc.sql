@@ -1,17 +1,17 @@
 /*
- Navicat Premium Data Transfer
+ Navicat Premium Dump SQL
 
- Source Server         : db_local_mysql
+ Source Server         : localhost
  Source Server Type    : MySQL
- Source Server Version : 80030
+ Source Server Version : 80030 (8.0.30)
  Source Host           : localhost:3306
  Source Schema         : e-doc
 
  Target Server Type    : MySQL
- Target Server Version : 80030
+ Target Server Version : 80030 (8.0.30)
  File Encoding         : 65001
 
- Date: 09/11/2026 16:38:49
+ Date: 10/11/2026 23:39:02
 */
 
 SET NAMES utf8mb4;
@@ -40,7 +40,7 @@ CREATE TABLE `berita_acara`  (
   `bac_deleted_at` timestamp NULL DEFAULT NULL,
   `bac_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`bac_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of berita_acara
@@ -62,7 +62,7 @@ CREATE TABLE `bidang`  (
   `bdg_deleted_at` timestamp NULL DEFAULT NULL,
   `bdg_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`bdg_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of bidang
@@ -93,7 +93,7 @@ CREATE TABLE `detail_berita_acara`  (
   `dba_deleted_at` timestamp NULL DEFAULT NULL,
   `dba_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`dba_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of detail_berita_acara
@@ -125,7 +125,7 @@ CREATE TABLE `detail_faktur`  (
   `fkt_deleted_at` timestamp NULL DEFAULT NULL,
   `fkt_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`fkt_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 13 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of detail_faktur
@@ -155,7 +155,7 @@ CREATE TABLE `detail_harga_perkiraan_sendiri`  (
   `hps_deleted_at` timestamp NULL DEFAULT NULL,
   `hps_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`hps_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of detail_harga_perkiraan_sendiri
@@ -189,7 +189,7 @@ CREATE TABLE `detail_kak_perkiraan_biaya`  (
   `kpb_deleted_at` timestamp NULL DEFAULT NULL,
   `kpb_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`kpb_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of detail_kak_perkiraan_biaya
@@ -204,6 +204,7 @@ INSERT INTO `detail_kak_perkiraan_biaya` VALUES (7, 1, 'Routerboard CCR2004-16G-
 INSERT INTO `detail_kak_perkiraan_biaya` VALUES (8, 1, 'Routerboard CCR2004-16G-2S+ Spesifikasi : Product code: RB450Gx4, Architecture: ARM 32bit, CPU: IPQ-4019, CPU core Count: 4, CPU nominal frequency: 716 MHz, RouterOS license: 5, Operating System: RouterOS, Size of RAM: 1 GB, Storage size: 512 MB.', 1, 2252000, 2252000, NULL, 1, NULL, NULL, NULL, NULL);
 INSERT INTO `detail_kak_perkiraan_biaya` VALUES (9, 1, 'Routerboard CCR2116-12G-4S+ Spesifikasi : Product code CCR2116-12G-4S+,Architecture ARM 64bit, CPU AL73400, CPU core count 16, CPU nominal frequency 2000 MHz, RouterOS license 6, Operating System RouterOS (v7 only), Size of RAM 16 GB, torage size 128 MB.', 1, 18900000, 18900000, NULL, 1, NULL, NULL, NULL, NULL);
 INSERT INTO `detail_kak_perkiraan_biaya` VALUES (10, 2, 'Wireless Access Point\nSpesifikasi : Next-generation performance with Wi-Fi 7, delivering\nextra-high wireless speeds, Superior streaming with Wi-Fi 7\'s\nexclusive MLO feature, Compact design and easy installation,\nEnhanced data transmission with 4K-QAM', 6, 5800000, 34800000, NULL, 1, NULL, NULL, NULL, NULL);
+INSERT INTO `detail_kak_perkiraan_biaya` VALUES (11, 3, 'Wireless Bluetooth Barcode Scanner\nSpesifikasi : Spesifikasi :\n• Distance Bluetooth/2,4G/Wired: 50m/100m/1,8m\n• Memory: 100.000 barcodes\n• Battery: 5V-2000mAh\n• Working Time: 3 to 10 days\n• Resolution: 4mil\n• Drop test: 2mil', 2, 1000000, 2000000, NULL, 1, NULL, NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for detail_kak_spesifikasi_teknis
@@ -221,7 +222,7 @@ CREATE TABLE `detail_kak_spesifikasi_teknis`  (
   `kst_deleted_at` timestamp NULL DEFAULT NULL,
   `kst_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`kst_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of detail_kak_spesifikasi_teknis
@@ -236,6 +237,7 @@ INSERT INTO `detail_kak_spesifikasi_teknis` VALUES (7, 1, 'Routerboard CCR2004-1
 INSERT INTO `detail_kak_spesifikasi_teknis` VALUES (8, 1, 'Routerboard CCR2004-16G-2S+ Spesifikasi : Product code: RB450Gx4, Architecture: ARM 32bit, CPU: IPQ-4019, CPU core Count: 4, CPU nominal frequency: 716 MHz, RouterOS license: 5, Operating System: RouterOS, Size of RAM: 1 GB, Storage size: 512 MB.', '', NULL, 1, NULL, NULL, NULL, NULL);
 INSERT INTO `detail_kak_spesifikasi_teknis` VALUES (9, 1, 'Routerboard CCR2116-12G-4S+ Spesifikasi : Product code CCR2116-12G-4S+,Architecture ARM 64bit, CPU AL73400, CPU core count 16, CPU nominal frequency 2000 MHz, RouterOS license 6, Operating System RouterOS (v7 only), Size of RAM 16 GB, torage size 128 MB.', '', NULL, 1, NULL, NULL, NULL, NULL);
 INSERT INTO `detail_kak_spesifikasi_teknis` VALUES (10, 2, 'Wireless Access Point\nSpesifikasi : Next-generation performance with Wi-Fi 7, delivering\nextra-high wireless speeds, Superior streaming with Wi-Fi 7\'s\nexclusive MLO feature, Compact design and easy installation,\nEnhanced data transmission with 4K-QAM', '', NULL, 1, NULL, NULL, NULL, NULL);
+INSERT INTO `detail_kak_spesifikasi_teknis` VALUES (11, 3, 'Wireless Bluetooth Barcode Scanner\nSpesifikasi : Spesifikasi :\n• Distance Bluetooth/2,4G/Wired: 50m/100m/1,8m\n• Memory: 100.000 barcodes\n• Battery: 5V-2000mAh\n• Working Time: 3 to 10 days\n• Resolution: 4mil\n• Drop test: 2mil', '', NULL, 1, NULL, NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for detail_nota_pencairan_dana
@@ -265,7 +267,7 @@ CREATE TABLE `detail_nota_pencairan_dana`  (
   `dpd_deleted_at` timestamp NULL DEFAULT NULL,
   `dpd_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`dpd_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of detail_nota_pencairan_dana
@@ -292,7 +294,7 @@ CREATE TABLE `detail_perhitungan_paket`  (
   `pak_deleted_by` int NULL DEFAULT NULL,
   `pak_jenis_pph` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '23',
   PRIMARY KEY (`pak_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of detail_perhitungan_paket
@@ -322,7 +324,7 @@ CREATE TABLE `detail_rencana_anggaran_biaya`  (
   `rab_deleted_at` timestamp NULL DEFAULT NULL,
   `rab_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`rab_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of detail_rencana_anggaran_biaya
@@ -350,7 +352,7 @@ CREATE TABLE `detail_survey`  (
   `dsrv_deleted_at` timestamp NULL DEFAULT NULL,
   `dsrv_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`dsrv_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of detail_survey
@@ -372,7 +374,7 @@ CREATE TABLE `faktur`  (
   `fak_deleted_at` timestamp NULL DEFAULT NULL,
   `fak_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`fak_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of faktur
@@ -388,6 +390,15 @@ DROP TABLE IF EXISTS `kerangka_acuan_kerja`;
 CREATE TABLE `kerangka_acuan_kerja`  (
   `kak_id` int NOT NULL AUTO_INCREMENT,
   `kak_master_dokumen_id` int NULL DEFAULT NULL,
+  `kak_program` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `kak_kode_program` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `kak_kegiatan` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `kak_kode_kegiatan` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `kak_sub_kegiatan` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `kak_rekening` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `kak_kode_rekening` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `kak_pekerjaan` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `kak_tahun_anggaran` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `kak_latar_belakang` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
   `kak_maksud_dan_tujuan` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
   `kak_referensi_hukum` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
@@ -408,13 +419,14 @@ CREATE TABLE `kerangka_acuan_kerja`  (
   `kak_deleted_at` timestamp NULL DEFAULT NULL,
   `kak_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`kak_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of kerangka_acuan_kerja
 -- ----------------------------
-INSERT INTO `kerangka_acuan_kerja` VALUES (1, 1, '<p style=\"text-align: justify;\">Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru merupakan perangkat daerah yang mempunyai tugas melaksanakan sebagian urusan pemerintahan daerah di bidang pengelolaan keuangan daerah dan pengelolaan aset daerah. Dalam pelaksanaan tugas dan fungsinya, BPKAD Kota Pekanbaru melaksanakan antara lain pengelolaan anggaran, perbendaharaan, aset daerah, akuntansi, serta fasilitasi penyusunan, penetapan, perubahan dan pertanggungjawaban pelaksanaan Anggaran Pendapatan dan Belanja Daerah (APBD).</p><p style=\"text-align: justify;\">Sejalan dengan meningkatnya kebutuhan akses sistem informasi, aplikasi berbasis Cloud, dan pertukaran data di lingkungan BPKAD Kota Pekanbaru, diperlukan infrastruktur dan sarana prasarana yang andal dan aman guna mendukung percepatan kinerja dan pelayanan.</p><p style=\"text-align: justify;\">Untuk memenuhi kebutuhan tersebut, pada Tahun Anggaran 2026 BPKAD Kota Pekanbaru melaksanakan kegiatan Pengadaan Router Board sebagai bagian dari upaya pemenuhan sarana dan prasarana kerja guna menunjang pelaksanaan tugas dan fungsi organisasi.</p>', '<p><strong>a. Maksud</strong></p><p>Melakukan Pengadaan Router Board di lingkungan Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru.</p><p><strong>b. Tujuan</strong></p><ul><li>Mengoptimalkan sarana dan prasarana kerja aparatur dalam menunjang pelaksanaan tugas secara efisien dan akuntabel.</li><li>Meningkatkan keandalan operasional sistem informasi dan pertukaran data internal SKPD.</li><li>Memastikan ketersediaan sarana pendukung yang terstandarisasi dan bergaransi resmi.</li></ul>', '<ul><li>Undang-Undang Nomor 23 Tahun 2014 tentang Pemerintahan Daerah sebagaimana telah diubah beberapa kali terakhir dengan Undang-Undang Nomor 11 tahun 2020 tentang Cipta Kerja;</li><li>Peraturan Pemerintah Nomor 27 Tahun 2014 tentang Pengelolaan Barang Milik Negara/Daerah sebagaimana telah diubah dengan Peraturan Pemerintah Nomor 28 Tahun 2020;</li><li>Peraturan Pemerintah Nomor 12 Tahun 2019 tentang Pengelolaan Keuangan Daerah;</li><li>Peraturan Presiden Nomor 16 Tahun 2018 tentang Pengadaan Barang/Jasa Pemerintah sebagaimana telah diubah dengan Peraturan Presiden Nomor 12 Tahun 2021;</li><li>Peraturan Menteri Dalam Negeri Nomor 77 Tahun 2020 tentang Pedoman Teknis Pengelolaan Keuangan Daerah;</li><li>Peraturan Daerah Kota Pekanbaru Nomor 01 Tahun 2023 tentang Pengelolaan Keuangan Daerah;</li><li>Peraturan Wali Kota Pekanbaru Nomor 7 Tahun 2022 tentang Sistem dan Prosedur Pengelolaan Keuangan Daerah.</li></ul>', '<p>Terpasangnya dan beroperasinya Pengadaan Router Board yang memenuhi standar spesifikasi teknis yang dipersyaratkan guna mendukung kelancaran operasional di Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru.</p>', '<p>Nama organisasi yang menyelenggarakan/melaksanakan pengadaan barang/jasa:</p><p>a. K/L/PD : Pemerintah Kota Pekanbaru</p><p>b. PD : Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru</p><p>c. PPK : DANIEL PERDANA, S.E</p>', '<p><strong>a. Sumber Dana :</strong><br>Anggaran Pendapatan dan Belanja Daerah (APBD) Tahun Anggaran 2026 Pemerintah Kota Pekanbaru Badan Pengelola Keuangan dan Aset Daerah (No. DPA SKPD : DPPA/A.1/5.02.0.00.0.00.00.00/001/2026)</p><p><strong>b. Total perkiraan biaya yang diperlukan :</strong></p>', NULL, '<p>a) Penyediaan Pengadaan Router Board;<br>b) Penyediaan garansi dan layanan purna jual sesuai ketentuan;<br>c) Serah terima barang setelah seluruh persyaratan jumlah, spesifikasi, kualitas dan fungsi terpenuhi;<br>d) Lokasi pekerjaan : Pekanbaru / BPKAD Kota Pekanbaru.</p>', '<p>14 (empat belas) Hari Kalender</p>', 'Penunjukan Langsung', NULL, '<ol><li>Memiliki SIUP / NIB yang masih berlaku sesuai bidang pekerjaan;</li><li>Memiliki Nomor Pokok Wajib Pajak (NPWP) dan telah memenuhi kewajiban perpajakan tahun terakhir (SPT Tahunan);</li><li>Memperoleh paling sedikit 1 (satu) pekerjaan sejenis dalam kurun waktu 1 (satu) sampai 3 (tiga) tahun terakhir;</li><li>Tidak dalam pengawasan pengadilan, tidak pailit, kegiatan usahanya tidak sedang dihentikan dan/atau direksi yang bertindak untuk dan atas nama perusahaan tidak sedang dalam menjalani sanksi pidana;</li><li>Memiliki kemampuan untuk menyediakan fasilitas/peralatan/perlengkapan yang dipersyaratkan.</li></ol>', '<p>1. Apabila terdapat hal yang bertentangan dengan ketentuan, peraturan, pedoman dan kebijakan pemerintah yang berlaku maka segala sesuatu yang termaksud di dalam Kerangka Acuan Kerja (KAK) ini akan diteliti dan ditinjau kembali;<br>2. Hal-hal yang belum diatur dalam KAK ini akan ditetapkan lebih lanjut.</p><p><br></p><p>Demikian Kerangka Acuan Kerja ini dibuat. Untuk dapat digunakan dengan sebaik-baiknya.</p>', NULL, 1, '2026-11-09 13:28:03', 1, NULL, NULL);
-INSERT INTO `kerangka_acuan_kerja` VALUES (2, 2, '<p>Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru merupakan perangkat daerah yang mempunyai tugas melaksanakan sebagian urusan pemerintahan daerah di bidang pengelolaan keuangan daerah dan pengelolaan aset daerah. Dalam pelaksanaan tugas dan fungsinya, BPKAD Kota Pekanbaru melaksanakan antara lain pengelolaan anggaran, perbendaharaan, aset daerah, akuntansi, serta fasilitasi penyusunan, penetapan, perubahan dan pertanggungjawaban pelaksanaan Anggaran Pendapatan dan Belanja Daerah (APBD).</p><p>Sejalan dengan meningkatnya kebutuhan akses sistem informasi, aplikasi berbasis Cloud, dan pertukaran data di lingkungan BPKAD Kota Pekanbaru, diperlukan infrastruktur dan sarana prasarana yang andal dan aman guna mendukung percepatan kinerja dan pelayanan.</p><p>Untuk memenuhi kebutuhan tersebut, pada Tahun Anggaran 2026 BPKAD Kota Pekanbaru melaksanakan kegiatan Pengadaan Wireless Access Point sebagai bagian dari upaya pemenuhan sarana dan prasarana kerja guna menunjang pelaksanaan tugas dan fungsi organisasi.</p>', '<p><strong>a. Maksud</strong></p><p>Melakukan Pengadaan Wireless Access Point di lingkungan Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru.</p><p><strong>b. Tujuan</strong></p><ul><li>Mengoptimalkan sarana dan prasarana kerja aparatur dalam menunjang pelaksanaan tugas secara efisien dan akuntabel.</li><li>Meningkatkan keandalan operasional sistem informasi dan pertukaran data internal SKPD.</li><li>Memastikan ketersediaan sarana pendukung yang terstandarisasi dan bergaransi resmi.</li></ul>', '<ul><li>Undang-Undang Nomor 23 Tahun 2014 tentang Pemerintahan Daerah sebagaimana telah diubah beberapa kali terakhir dengan Undang-Undang Nomor 11 tahun 2020 tentang Cipta Kerja;</li><li>Peraturan Pemerintah Nomor 27 Tahun 2014 tentang Pengelolaan Barang Milik Negara/Daerah sebagaimana telah diubah dengan Peraturan Pemerintah Nomor 28 Tahun 2020;</li><li>Peraturan Pemerintah Nomor 12 Tahun 2019 tentang Pengelolaan Keuangan Daerah;</li><li>Peraturan Presiden Nomor 16 Tahun 2018 tentang Pengadaan Barang/Jasa Pemerintah sebagaimana telah diubah dengan Peraturan Presiden Nomor 12 Tahun 2021;</li><li>Peraturan Menteri Dalam Negeri Nomor 77 Tahun 2020 tentang Pedoman Teknis Pengelolaan Keuangan Daerah;</li><li>Peraturan Daerah Kota Pekanbaru Nomor 01 Tahun 2023 tentang Pengelolaan Keuangan Daerah;</li><li>Peraturan Wali Kota Pekanbaru Nomor 7 Tahun 2022 tentang Sistem dan Prosedur Pengelolaan Keuangan Daerah.</li></ul>', '<p>Terpasangnya dan beroperasinya Pengadaan Wireless Access Point yang memenuhi standar spesifikasi teknis yang dipersyaratkan guna mendukung kelancaran operasional di Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru.</p>', '<p>Nama organisasi yang menyelenggarakan/melaksanakan pengadaan barang/jasa:</p><p>a. K/L/PD : Pemerintah Kota Pekanbaru</p><p>b. PD : Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru</p><p>c. PPK : DANIEL PERDANA, S.E</p>', '<p><strong>a. Sumber Dana :</strong><br>Anggaran Pendapatan dan Belanja Daerah (APBD) Tahun Anggaran 2026 Pemerintah Kota Pekanbaru Badan Pengelola Keuangan dan Aset Daerah (No. DPA SKPD : DPPA/A.1/5.02.0.00.0.00.00.00/001/2026)</p><p><strong>b. Total perkiraan biaya yang diperlukan :</strong></p>', NULL, '<p>a) Penyediaan Pengadaan Wireless Access Point;<br>b) Penyediaan garansi dan layanan purna jual sesuai ketentuan;<br>c) Serah terima barang setelah seluruh persyaratan jumlah, spesifikasi, kualitas dan fungsi terpenuhi;<br>d) Lokasi pekerjaan : Pekanbaru / BPKAD Kota Pekanbaru.</p>', '<p>14 (empat belas) Hari Kalender</p>', 'e-Purchasing', NULL, '<ol><li>Memiliki SIUP / NIB yang masih berlaku sesuai bidang pekerjaan;</li><li>Memiliki Nomor Pokok Wajib Pajak (NPWP) dan telah memenuhi kewajiban perpajakan tahun terakhir (SPT Tahunan);</li><li>Memperoleh paling sedikit 1 (satu) pekerjaan sejenis dalam kurun waktu 1 (satu) sampai 3 (tiga) tahun terakhir;</li><li>Tidak dalam pengawasan pengadilan, tidak pailit, kegiatan usahanya tidak sedang dihentikan dan/atau direksi yang bertindak untuk dan atas nama perusahaan tidak sedang dalam menjalani sanksi pidana;</li><li>Memiliki kemampuan untuk menyediakan fasilitas/peralatan/perlengkapan yang dipersyaratkan.</li></ol>', '<p>1. Apabila terdapat hal yang bertentangan dengan ketentuan, peraturan, pedoman dan kebijakan pemerintah yang berlaku maka segala sesuatu yang termaksud di dalam Kerangka Acuan Kerja (KAK) ini akan diteliti dan ditinjau kembali;<br>2. Hal-hal yang belum diatur dalam KAK ini akan ditetapkan lebih lanjut.</p><p><br></p><p>Demikian Kerangka Acuan Kerja ini dibuat. Untuk dapat digunakan dengan sebaik-baiknya.</p>', NULL, 1, NULL, NULL, NULL, NULL);
+INSERT INTO `kerangka_acuan_kerja` VALUES (1, 1, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '<p style=\"text-align: justify;\">Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru merupakan perangkat daerah yang mempunyai tugas melaksanakan sebagian urusan pemerintahan daerah di bidang pengelolaan keuangan daerah dan pengelolaan aset daerah. Dalam pelaksanaan tugas dan fungsinya, BPKAD Kota Pekanbaru melaksanakan antara lain pengelolaan anggaran, perbendaharaan, aset daerah, akuntansi, serta fasilitasi penyusunan, penetapan, perubahan dan pertanggungjawaban pelaksanaan Anggaran Pendapatan dan Belanja Daerah (APBD).</p><p style=\"text-align: justify;\">Sejalan dengan meningkatnya kebutuhan akses sistem informasi, aplikasi berbasis Cloud, dan pertukaran data di lingkungan BPKAD Kota Pekanbaru, diperlukan infrastruktur dan sarana prasarana yang andal dan aman guna mendukung percepatan kinerja dan pelayanan.</p><p style=\"text-align: justify;\">Untuk memenuhi kebutuhan tersebut, pada Tahun Anggaran 2026 BPKAD Kota Pekanbaru melaksanakan kegiatan Pengadaan Router Board sebagai bagian dari upaya pemenuhan sarana dan prasarana kerja guna menunjang pelaksanaan tugas dan fungsi organisasi.</p>', '<p><strong>a. Maksud</strong></p><p>Melakukan Pengadaan Router Board di lingkungan Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru.</p><p><strong>b. Tujuan</strong></p><ul><li>Mengoptimalkan sarana dan prasarana kerja aparatur dalam menunjang pelaksanaan tugas secara efisien dan akuntabel.</li><li>Meningkatkan keandalan operasional sistem informasi dan pertukaran data internal SKPD.</li><li>Memastikan ketersediaan sarana pendukung yang terstandarisasi dan bergaransi resmi.</li></ul>', '<ul><li>Undang-Undang Nomor 23 Tahun 2014 tentang Pemerintahan Daerah sebagaimana telah diubah beberapa kali terakhir dengan Undang-Undang Nomor 11 tahun 2020 tentang Cipta Kerja;</li><li>Peraturan Pemerintah Nomor 27 Tahun 2014 tentang Pengelolaan Barang Milik Negara/Daerah sebagaimana telah diubah dengan Peraturan Pemerintah Nomor 28 Tahun 2020;</li><li>Peraturan Pemerintah Nomor 12 Tahun 2019 tentang Pengelolaan Keuangan Daerah;</li><li>Peraturan Presiden Nomor 16 Tahun 2018 tentang Pengadaan Barang/Jasa Pemerintah sebagaimana telah diubah dengan Peraturan Presiden Nomor 12 Tahun 2021;</li><li>Peraturan Menteri Dalam Negeri Nomor 77 Tahun 2020 tentang Pedoman Teknis Pengelolaan Keuangan Daerah;</li><li>Peraturan Daerah Kota Pekanbaru Nomor 01 Tahun 2023 tentang Pengelolaan Keuangan Daerah;</li><li>Peraturan Wali Kota Pekanbaru Nomor 7 Tahun 2022 tentang Sistem dan Prosedur Pengelolaan Keuangan Daerah.</li></ul>', '<p>Terpasangnya dan beroperasinya Pengadaan Router Board yang memenuhi standar spesifikasi teknis yang dipersyaratkan guna mendukung kelancaran operasional di Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru.</p>', '<p>Nama organisasi yang menyelenggarakan/melaksanakan pengadaan barang/jasa:</p><p>a. K/L/PD : Pemerintah Kota Pekanbaru</p><p>b. PD : Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru</p><p>c. PPK : DANIEL PERDANA, S.E</p>', '<p><strong>a. Sumber Dana :</strong><br>Anggaran Pendapatan dan Belanja Daerah (APBD) Tahun Anggaran 2026 Pemerintah Kota Pekanbaru Badan Pengelola Keuangan dan Aset Daerah (No. DPA SKPD : DPPA/A.1/5.02.0.00.0.00.00.00/001/2026)</p><p><strong>b. Total perkiraan biaya yang diperlukan :</strong></p>', NULL, '<p>a) Penyediaan Pengadaan Router Board;<br>b) Penyediaan garansi dan layanan purna jual sesuai ketentuan;<br>c) Serah terima barang setelah seluruh persyaratan jumlah, spesifikasi, kualitas dan fungsi terpenuhi;<br>d) Lokasi pekerjaan : Pekanbaru / BPKAD Kota Pekanbaru.</p>', '<p>14 (empat belas) Hari Kalender</p>', 'Penunjukan Langsung', NULL, '<ol><li>Memiliki SIUP / NIB yang masih berlaku sesuai bidang pekerjaan;</li><li>Memiliki Nomor Pokok Wajib Pajak (NPWP) dan telah memenuhi kewajiban perpajakan tahun terakhir (SPT Tahunan);</li><li>Memperoleh paling sedikit 1 (satu) pekerjaan sejenis dalam kurun waktu 1 (satu) sampai 3 (tiga) tahun terakhir;</li><li>Tidak dalam pengawasan pengadilan, tidak pailit, kegiatan usahanya tidak sedang dihentikan dan/atau direksi yang bertindak untuk dan atas nama perusahaan tidak sedang dalam menjalani sanksi pidana;</li><li>Memiliki kemampuan untuk menyediakan fasilitas/peralatan/perlengkapan yang dipersyaratkan.</li></ol>', '<p>1. Apabila terdapat hal yang bertentangan dengan ketentuan, peraturan, pedoman dan kebijakan pemerintah yang berlaku maka segala sesuatu yang termaksud di dalam Kerangka Acuan Kerja (KAK) ini akan diteliti dan ditinjau kembali;<br>2. Hal-hal yang belum diatur dalam KAK ini akan ditetapkan lebih lanjut.</p><p><br></p><p>Demikian Kerangka Acuan Kerja ini dibuat. Untuk dapat digunakan dengan sebaik-baiknya.</p>', NULL, 1, '2026-11-09 13:28:03', 1, NULL, NULL);
+INSERT INTO `kerangka_acuan_kerja` VALUES (2, 2, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '<p>Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru merupakan perangkat daerah yang mempunyai tugas melaksanakan sebagian urusan pemerintahan daerah di bidang pengelolaan keuangan daerah dan pengelolaan aset daerah. Dalam pelaksanaan tugas dan fungsinya, BPKAD Kota Pekanbaru melaksanakan antara lain pengelolaan anggaran, perbendaharaan, aset daerah, akuntansi, serta fasilitasi penyusunan, penetapan, perubahan dan pertanggungjawaban pelaksanaan Anggaran Pendapatan dan Belanja Daerah (APBD).</p><p>Sejalan dengan meningkatnya kebutuhan akses sistem informasi, aplikasi berbasis Cloud, dan pertukaran data di lingkungan BPKAD Kota Pekanbaru, diperlukan infrastruktur dan sarana prasarana yang andal dan aman guna mendukung percepatan kinerja dan pelayanan.</p><p>Untuk memenuhi kebutuhan tersebut, pada Tahun Anggaran 2026 BPKAD Kota Pekanbaru melaksanakan kegiatan Pengadaan Wireless Access Point sebagai bagian dari upaya pemenuhan sarana dan prasarana kerja guna menunjang pelaksanaan tugas dan fungsi organisasi.</p>', '<p><strong>a. Maksud</strong></p><p>Melakukan Pengadaan Wireless Access Point di lingkungan Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru.</p><p><strong>b. Tujuan</strong></p><ul><li>Mengoptimalkan sarana dan prasarana kerja aparatur dalam menunjang pelaksanaan tugas secara efisien dan akuntabel.</li><li>Meningkatkan keandalan operasional sistem informasi dan pertukaran data internal SKPD.</li><li>Memastikan ketersediaan sarana pendukung yang terstandarisasi dan bergaransi resmi.</li></ul>', '<ul><li>Undang-Undang Nomor 23 Tahun 2014 tentang Pemerintahan Daerah sebagaimana telah diubah beberapa kali terakhir dengan Undang-Undang Nomor 11 tahun 2020 tentang Cipta Kerja;</li><li>Peraturan Pemerintah Nomor 27 Tahun 2014 tentang Pengelolaan Barang Milik Negara/Daerah sebagaimana telah diubah dengan Peraturan Pemerintah Nomor 28 Tahun 2020;</li><li>Peraturan Pemerintah Nomor 12 Tahun 2019 tentang Pengelolaan Keuangan Daerah;</li><li>Peraturan Presiden Nomor 16 Tahun 2018 tentang Pengadaan Barang/Jasa Pemerintah sebagaimana telah diubah dengan Peraturan Presiden Nomor 12 Tahun 2021;</li><li>Peraturan Menteri Dalam Negeri Nomor 77 Tahun 2020 tentang Pedoman Teknis Pengelolaan Keuangan Daerah;</li><li>Peraturan Daerah Kota Pekanbaru Nomor 01 Tahun 2023 tentang Pengelolaan Keuangan Daerah;</li><li>Peraturan Wali Kota Pekanbaru Nomor 7 Tahun 2022 tentang Sistem dan Prosedur Pengelolaan Keuangan Daerah.</li></ul>', '<p>Terpasangnya dan beroperasinya Pengadaan Wireless Access Point yang memenuhi standar spesifikasi teknis yang dipersyaratkan guna mendukung kelancaran operasional di Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru.</p>', '<p>Nama organisasi yang menyelenggarakan/melaksanakan pengadaan barang/jasa:</p><p>a. K/L/PD : Pemerintah Kota Pekanbaru</p><p>b. PD : Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru</p><p>c. PPK : DANIEL PERDANA, S.E</p>', '<p><strong>a. Sumber Dana :</strong><br>Anggaran Pendapatan dan Belanja Daerah (APBD) Tahun Anggaran 2026 Pemerintah Kota Pekanbaru Badan Pengelola Keuangan dan Aset Daerah (No. DPA SKPD : DPPA/A.1/5.02.0.00.0.00.00.00/001/2026)</p><p><strong>b. Total perkiraan biaya yang diperlukan :</strong></p>', NULL, '<p>a) Penyediaan Pengadaan Wireless Access Point;<br>b) Penyediaan garansi dan layanan purna jual sesuai ketentuan;<br>c) Serah terima barang setelah seluruh persyaratan jumlah, spesifikasi, kualitas dan fungsi terpenuhi;<br>d) Lokasi pekerjaan : Pekanbaru / BPKAD Kota Pekanbaru.</p>', '<p>14 (empat belas) Hari Kalender</p>', 'e-Purchasing', NULL, '<ol><li>Memiliki SIUP / NIB yang masih berlaku sesuai bidang pekerjaan;</li><li>Memiliki Nomor Pokok Wajib Pajak (NPWP) dan telah memenuhi kewajiban perpajakan tahun terakhir (SPT Tahunan);</li><li>Memperoleh paling sedikit 1 (satu) pekerjaan sejenis dalam kurun waktu 1 (satu) sampai 3 (tiga) tahun terakhir;</li><li>Tidak dalam pengawasan pengadilan, tidak pailit, kegiatan usahanya tidak sedang dihentikan dan/atau direksi yang bertindak untuk dan atas nama perusahaan tidak sedang dalam menjalani sanksi pidana;</li><li>Memiliki kemampuan untuk menyediakan fasilitas/peralatan/perlengkapan yang dipersyaratkan.</li></ol>', '<p>1. Apabila terdapat hal yang bertentangan dengan ketentuan, peraturan, pedoman dan kebijakan pemerintah yang berlaku maka segala sesuatu yang termaksud di dalam Kerangka Acuan Kerja (KAK) ini akan diteliti dan ditinjau kembali;<br>2. Hal-hal yang belum diatur dalam KAK ini akan ditetapkan lebih lanjut.</p><p><br></p><p>Demikian Kerangka Acuan Kerja ini dibuat. Untuk dapat digunakan dengan sebaik-baiknya.</p>', NULL, 1, NULL, NULL, NULL, NULL);
+INSERT INTO `kerangka_acuan_kerja` VALUES (3, 3, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, '<p>Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru merupakan perangkat daerah yang mempunyai tugas melaksanakan sebagian urusan pemerintahan daerah di bidang pengelolaan keuangan daerah dan pengelolaan aset daerah. Dalam pelaksanaan tugas dan fungsinya, BPKAD Kota Pekanbaru melaksanakan antara lain pengelolaan anggaran, perbendaharaan, aset daerah, akuntansi, serta fasilitasi penyusunan, penetapan, perubahan dan pertanggungjawaban pelaksanaan Anggaran Pendapatan dan Belanja Daerah (APBD).</p><p>Sejalan dengan meningkatnya kebutuhan akses sistem informasi, aplikasi berbasis Cloud, dan pertukaran data di lingkungan BPKAD Kota Pekanbaru, diperlukan infrastruktur dan sarana prasarana yang andal dan aman guna mendukung percepatan kinerja dan pelayanan.</p><p>Untuk memenuhi kebutuhan tersebut, pada Tahun Anggaran 2026 BPKAD Kota Pekanbaru melaksanakan kegiatan Pengadaan Barcode Scaner sebagai bagian dari upaya pemenuhan sarana dan prasarana kerja guna menunjang pelaksanaan tugas dan fungsi organisasi.</p>', '<p><strong>a. Maksud</strong></p><p>Melakukan Pengadaan Barcode Scaner di lingkungan Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru.</p><p><strong>b. Tujuan</strong></p><ul><li>Mengoptimalkan sarana dan prasarana kerja aparatur dalam menunjang pelaksanaan tugas secara efisien dan akuntabel.</li><li>Meningkatkan keandalan operasional sistem informasi dan pertukaran data internal SKPD.</li><li>Memastikan ketersediaan sarana pendukung yang terstandarisasi dan bergaransi resmi.</li></ul>', '<ul><li>Undang-Undang Nomor 23 Tahun 2014 tentang Pemerintahan Daerah sebagaimana telah diubah beberapa kali terakhir dengan Undang-Undang Nomor 11 tahun 2020 tentang Cipta Kerja;</li><li>Peraturan Pemerintah Nomor 27 Tahun 2014 tentang Pengelolaan Barang Milik Negara/Daerah sebagaimana telah diubah dengan Peraturan Pemerintah Nomor 28 Tahun 2020;</li><li>Peraturan Pemerintah Nomor 12 Tahun 2019 tentang Pengelolaan Keuangan Daerah;</li><li>Peraturan Presiden Nomor 16 Tahun 2018 tentang Pengadaan Barang/Jasa Pemerintah sebagaimana telah diubah dengan Peraturan Presiden Nomor 12 Tahun 2021;</li><li>Peraturan Menteri Dalam Negeri Nomor 77 Tahun 2020 tentang Pedoman Teknis Pengelolaan Keuangan Daerah;</li><li>Peraturan Daerah Kota Pekanbaru Nomor 01 Tahun 2023 tentang Pengelolaan Keuangan Daerah;</li><li>Peraturan Wali Kota Pekanbaru Nomor 7 Tahun 2022 tentang Sistem dan Prosedur Pengelolaan Keuangan Daerah.</li></ul>', '<p>Terpasangnya dan beroperasinya Pengadaan Barcode Scaner yang memenuhi standar spesifikasi teknis yang dipersyaratkan guna mendukung kelancaran operasional di Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru.</p>', '<p>Nama organisasi yang menyelenggarakan/melaksanakan pengadaan barang/jasa:</p><p>a. K/L/PD : Pemerintah Kota Pekanbaru</p><p>b. PD : Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru</p><p>c. PPK : DANIEL PERDANA, S.E</p>', '<p><strong>a. Sumber Dana :</strong><br>Anggaran Pendapatan dan Belanja Daerah (APBD) Tahun Anggaran 2026 Pemerintah Kota Pekanbaru Badan Pengelola Keuangan dan Aset Daerah (No. DPA SKPD : DPPA/A.1/5.02.0.00.0.00.00.00/001/2026)</p><p><strong>b. Total perkiraan biaya yang diperlukan :</strong></p>', NULL, '<p>a) Penyediaan Pengadaan Barcode Scaner;<br>b) Penyediaan garansi dan layanan purna jual sesuai ketentuan;<br>c) Serah terima barang setelah seluruh persyaratan jumlah, spesifikasi, kualitas dan fungsi terpenuhi;<br>d) Lokasi pekerjaan : Pekanbaru / BPKAD Kota Pekanbaru.</p>', '<p>14 (empat belas) Hari Kalender</p>', 'e-Purchasing', NULL, '<ol><li>Memiliki SIUP / NIB yang masih berlaku sesuai bidang pekerjaan;</li><li>Memiliki Nomor Pokok Wajib Pajak (NPWP) dan telah memenuhi kewajiban perpajakan tahun terakhir (SPT Tahunan);</li><li>Memperoleh paling sedikit 1 (satu) pekerjaan sejenis dalam kurun waktu 1 (satu) sampai 3 (tiga) tahun terakhir;</li><li>Tidak dalam pengawasan pengadilan, tidak pailit, kegiatan usahanya tidak sedang dihentikan dan/atau direksi yang bertindak untuk dan atas nama perusahaan tidak sedang dalam menjalani sanksi pidana;</li><li>Memiliki kemampuan untuk menyediakan fasilitas/peralatan/perlengkapan yang dipersyaratkan.</li></ol>', '<p>1. Apabila terdapat hal yang bertentangan dengan ketentuan, peraturan, pedoman dan kebijakan pemerintah yang berlaku maka segala sesuatu yang termaksud di dalam Kerangka Acuan Kerja (KAK) ini akan diteliti dan ditinjau kembali;<br>2. Hal-hal yang belum diatur dalam KAK ini akan ditetapkan lebih lanjut.</p><p><br></p><p>Demikian Kerangka Acuan Kerja ini dibuat. Untuk dapat digunakan dengan sebaik-baiknya.</p>', NULL, 1, NULL, NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for kwitansi
@@ -439,7 +451,7 @@ CREATE TABLE `kwitansi`  (
   `kwt_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`kwt_id`) USING BTREE,
   INDEX `idx_kwt_deleted`(`kwt_deleted_at` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of kwitansi
@@ -462,7 +474,7 @@ CREATE TABLE `master_ba_bukti_perikatan`  (
   `mbk_deleted_at` timestamp NULL DEFAULT NULL,
   `mbk_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`mbk_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of master_ba_bukti_perikatan
@@ -525,7 +537,7 @@ CREATE TABLE `master_dokumen`  (
   INDEX `idx_mdk_pegawai_id`(`mdk_nama_pejabat_id` ASC) USING BTREE,
   INDEX `idx_mdk_deleted_bdg`(`mdk_deleted_at` ASC, `mdk_bidang_id` ASC, `mdk_pagu_anggaran` ASC) USING BTREE,
   INDEX `idx_mdk_created_deleted`(`mdk_deleted_at` ASC, `mdk_created_at` ASC, `mdk_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of master_dokumen
@@ -549,7 +561,7 @@ CREATE TABLE `master_jenis_berita_acara`  (
   `mba_deleted_at` timestamp NULL DEFAULT NULL,
   `mba_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`mba_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of master_jenis_berita_acara
@@ -580,7 +592,7 @@ CREATE TABLE `nego`  (
   `nego_deleted_at` timestamp NULL DEFAULT NULL,
   `nego_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`nego_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of nego
@@ -622,7 +634,7 @@ CREATE TABLE `nota_pencairan_dana`  (
   PRIMARY KEY (`dpd_id`) USING BTREE,
   INDEX `idx_dpd_mdk_deleted`(`dpd_master_dokumen_id` ASC, `dpd_deleted_at` ASC) USING BTREE,
   INDEX `idx_dpd_deleted_pembayaran`(`dpd_deleted_at` ASC, `dpd_saatini_pembayaran` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of nota_pencairan_dana
@@ -648,7 +660,7 @@ CREATE TABLE `pegawai`  (
   `pgw_deleted_at` timestamp NULL DEFAULT NULL,
   `pgw_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`pgw_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of pegawai
@@ -682,7 +694,7 @@ CREATE TABLE `penawaran`  (
   `pnw_deleted_at` timestamp NULL DEFAULT NULL,
   `pnw_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`pnw_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 7 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of penawaran
@@ -720,7 +732,7 @@ CREATE TABLE `perhitungan_paket`  (
   `pkt_deleted_by` int NULL DEFAULT NULL,
   `pkt_jenis_pph` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '23',
   PRIMARY KEY (`pkt_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of perhitungan_paket
@@ -735,7 +747,7 @@ INSERT INTO `perhitungan_paket` VALUES (4, 3, NULL, NULL, '2026-11-09', NULL, NU
 DROP TABLE IF EXISTS `permohonan`;
 CREATE TABLE `permohonan`  (
   `pmh_id` int NOT NULL AUTO_INCREMENT,
-  `pmh_master_dokumen_id` int NULL DEFAULT NULL,
+  `pmh_kak_id` int NULL DEFAULT NULL,
   `pmh_tanggal` date NULL DEFAULT NULL,
   `pmh_nomor` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `pmh_sifat` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
@@ -743,6 +755,9 @@ CREATE TABLE `permohonan`  (
   `pmh_hal` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `pmh_paragraf1` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
   `pmh_kode_rup` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `pmh_nama_paket` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `pmh_pagu_anggaran` bigint NULL DEFAULT NULL,
+  `pmh_hps` bigint NULL DEFAULT NULL,
   `pmh_metode_pemilihan` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `pmh_sumber_dana` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
   `pmh_paragraf2` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
@@ -753,11 +768,13 @@ CREATE TABLE `permohonan`  (
   `pmh_deleted_at` timestamp NULL DEFAULT NULL,
   `pmh_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`pmh_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of permohonan
 -- ----------------------------
+INSERT INTO `permohonan` VALUES (2, 1, '2026-11-10', 'S.000.3.1/ BPKAD-ND/      / 2026', 'Segera', '3 (tiga)', 'Permintaan Proses Pengadaan Barang/Jasa', 'Memperhatikan DPA Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru Tahun Anggaran 2026, bersama ini Pejabat Pengadaan Barang/Jasa pada Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru diminta untuk melaksanakan paket Pengadaan melalui e-purchasing pada Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru dengan rincian sebagai berikut :', NULL, 'Pengadaan Router Board', 81000000, 29260000, 'Penunjukan Langsung', 'APBD Pemerintah Kota Pekanbaru Tahun Anggaran 2026', 'Berkaitan dengan hal tersebut di atas, bersama ini kami lampirkan Dokumen Persiapan Pengadaan (DPP), antara lain:\n1. KAK\n2. Spesifikasi Teknis\n\nDemikian disampaikan untuk diproses lebih lanjut sesuai dengan ketentuan dan peraturan perundang-undangan yang berlaku.', '2026-11-10 21:23:47', 1, NULL, NULL, NULL, NULL);
+INSERT INTO `permohonan` VALUES (3, 3, '2026-11-08', 'S.000.3.1/ BPKAD-ND/      / 2026', 'Segera', '3 (tiga)', 'Permintaan Proses Pengadaan Barang/Jasa', 'Memperhatikan DPA<b> Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru </b>Tahun Anggaran 2026, bersama ini Pejabat Pengadaan Barang/Jasa pada Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru diminta untuk melaksanakan paket Pengadaan melalui e-purchasing pada Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru dengan rincian sebagai berikut :', NULL, 'Pengadaan Barcode Scaner', 2000000, 2000000, 'e-Purchasing', 'APBD Pemerintah Kota Pekanbaru Tahun Anggaran 2026', '<p>Berkaitan dengan hal tersebut di atas, bersama ini kami lampirkan Dokumen Persiapan Pengadaan (DPP), antara lain:</p><ol><li>KAK</li><li>Spesifikasi Teknis</li></ol><p>Demikian disampaikan untuk diproses lebih lanjut sesuai dengan ketentuan dan peraturan perundang-undangan yang berlaku.</p>', '2026-11-10 21:44:07', 1, '2026-11-10 21:52:15', 1, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for perusahaan
@@ -780,7 +797,7 @@ CREATE TABLE `perusahaan`  (
   `psh_deleted_at` timestamp NULL DEFAULT NULL,
   `psh_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`psh_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of perusahaan
@@ -805,7 +822,7 @@ CREATE TABLE `satuan`  (
   `st_deleted_at` timestamp NULL DEFAULT NULL,
   `st_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`st_id`) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of satuan
@@ -835,7 +852,7 @@ CREATE TABLE `survey`  (
   `srv_deleted_by` int NULL DEFAULT NULL,
   `srv_master_dokumen_id` int NOT NULL DEFAULT 0,
   PRIMARY KEY (`srv_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of survey
@@ -858,7 +875,7 @@ CREATE TABLE `user`  (
   `usr_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`usr_id`) USING BTREE,
   UNIQUE INDEX `usr_name`(`usr_name` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 2 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of user
