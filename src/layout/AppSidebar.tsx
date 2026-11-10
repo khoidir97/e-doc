@@ -50,6 +50,11 @@ const navItems: NavItem[] = [
     path: "/kerangka-acuan-kerja",
   },
   {
+    icon: <PageIcon />,
+    name: "Permohonan",
+    path: "/permohonan",
+  },
+  {
     name: "Dokumen",
     icon: <ListIcon />,
     subItems: [
