@@ -104,6 +104,22 @@ export interface SaveKakPayload {
   }[];
 }
 
+export interface KakOptionItem {
+  kak_id: number;
+  kak_master_dokumen_id: number | null;
+  kak_pekerjaan: string;
+  kak_program: string;
+  kak_kode_program: string;
+  kak_kegiatan: string;
+  kak_kode_kegiatan: string;
+  kak_sub_kegiatan: string;
+  kak_kode_sub_kegiatan: string;
+  kak_rekening: string;
+  kak_kode_rekening: string;
+  kak_tahun_anggaran: string;
+  kak_pagu_total: number;
+}
+
 export interface ActionResponse<T = any> {
   success: boolean;
   message: string;

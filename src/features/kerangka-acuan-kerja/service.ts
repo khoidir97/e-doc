@@ -1,9 +1,13 @@
 import { KerangkaAcuanKerjaRepository } from './repository';
-import { KerangkaAcuanKerja, KerangkaAcuanKerjaWithDetails, SaveKakPayload } from './types';
+import { KerangkaAcuanKerja, KerangkaAcuanKerjaWithDetails, SaveKakPayload, KakOptionItem } from './types';
 
 export class KerangkaAcuanKerjaService {
   static async getManualKakList(): Promise<KerangkaAcuanKerja[]> {
     return await KerangkaAcuanKerjaRepository.getManualKakList();
+  }
+
+  static async getAllKakForSelection(): Promise<KakOptionItem[]> {
+    return await KerangkaAcuanKerjaRepository.getAllKakForSelection();
   }
 
   static async getByMasterDokumenId(mdkId: number): Promise<KerangkaAcuanKerjaWithDetails> {

@@ -14,6 +14,7 @@ import {
   KerangkaAcuanKerja,
   KerangkaAcuanKerjaWithDetails,
   SaveKakPayload,
+  KakOptionItem,
 } from './types';
 
 async function getActiveUserId(): Promise<number | null> {
@@ -103,6 +104,23 @@ export async function getManualKakListAction(): Promise<ActionResponse<KerangkaA
     return {
       success: false,
       message: error.message || 'Gagal memuat daftar KAK Manual',
+      data: [],
+    };
+  }
+}
+
+export async function getAllKakOptionsAction(): Promise<ActionResponse<KakOptionItem[]>> {
+  try {
+    const list = await KerangkaAcuanKerjaService.getAllKakForSelection();
+    return {
+      success: true,
+      message: 'Berhasil memuat daftar Kerangka Acuan Kerja (KAK)',
+      data: list,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || 'Gagal memuat daftar Kerangka Acuan Kerja',
       data: [],
     };
   }

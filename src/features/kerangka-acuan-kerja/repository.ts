@@ -4,6 +4,7 @@ import {
   DetailKakPerkiraanBiaya,
   DetailKakSpesifikasiTeknis,
   SaveKakPayload,
+  KakOptionItem,
 } from './types';
 
 export class KerangkaAcuanKerjaRepository {
@@ -52,6 +53,49 @@ export class KerangkaAcuanKerjaRepository {
        ORDER BY kak_id DESC`
     );
     return rows as KerangkaAcuanKerja[];
+  }
+
+  static async getAllKakForSelection(): Promise<KakOptionItem[]> {
+    await initDatabase();
+    const [rows] = await pool.query<any[]>(
+      `SELECT 
+         k.kak_id,
+         k.kak_master_dokumen_id,
+         COALESCE(NULLIF(TRIM(k.kak_pekerjaan), ''), m.mdk_pekerjaan, CONCAT('KAK #', k.kak_id)) as kak_pekerjaan,
+         COALESCE(NULLIF(TRIM(k.kak_program), ''), m.mdk_program, '') as kak_program,
+         COALESCE(NULLIF(TRIM(k.kak_kode_program), ''), m.mdk_kode_program, '') as kak_kode_program,
+         COALESCE(NULLIF(TRIM(k.kak_kegiatan), ''), m.mdk_kegiatan, '') as kak_kegiatan,
+         COALESCE(NULLIF(TRIM(k.kak_kode_kegiatan), ''), m.mdk_kode_kegiatan, '') as kak_kode_kegiatan,
+         COALESCE(NULLIF(TRIM(k.kak_sub_kegiatan), ''), m.mdk_sub_kegiatan, '') as kak_sub_kegiatan,
+         COALESCE(m.mdk_kode_sub_kegiatan, '') as kak_kode_sub_kegiatan,
+         COALESCE(NULLIF(TRIM(k.kak_rekening), ''), m.mdk_uraian_belanja, m.mdk_rekening_belanja, '') as kak_rekening,
+         COALESCE(NULLIF(TRIM(k.kak_kode_rekening), ''), m.mdk_rekening_belanja, '') as kak_kode_rekening,
+         COALESCE(NULLIF(TRIM(k.kak_tahun_anggaran), ''), m.mdk_apbd, '2026') as kak_tahun_anggaran,
+         COALESCE(
+           (SELECT SUM(kpb_jumlah) FROM detail_kak_perkiraan_biaya WHERE kpb_kak_id = k.kak_id AND kpb_deleted_at IS NULL),
+           m.mdk_pagu_anggaran,
+           0
+         ) as kak_pagu_total
+       FROM kerangka_acuan_kerja k
+       LEFT JOIN master_dokumen m ON k.kak_master_dokumen_id = m.mdk_id
+       WHERE k.kak_deleted_at IS NULL
+       ORDER BY k.kak_id DESC`
+    );
+    return rows.map((r) => ({
+      kak_id: Number(r.kak_id),
+      kak_master_dokumen_id: r.kak_master_dokumen_id ? Number(r.kak_master_dokumen_id) : null,
+      kak_pekerjaan: r.kak_pekerjaan || '',
+      kak_program: r.kak_program || '',
+      kak_kode_program: r.kak_kode_program || '',
+      kak_kegiatan: r.kak_kegiatan || '',
+      kak_kode_kegiatan: r.kak_kode_kegiatan || '',
+      kak_sub_kegiatan: r.kak_sub_kegiatan || '',
+      kak_kode_sub_kegiatan: r.kak_kode_sub_kegiatan || '',
+      kak_rekening: r.kak_rekening || '',
+      kak_kode_rekening: r.kak_kode_rekening || '',
+      kak_tahun_anggaran: r.kak_tahun_anggaran || '',
+      kak_pagu_total: Number(r.kak_pagu_total) || 0,
+    }));
   }
 
   static async saveAll(payload: SaveKakPayload, userId?: number | null): Promise<number> {

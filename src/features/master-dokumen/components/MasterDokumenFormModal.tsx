@@ -14,6 +14,8 @@ import { Bidang } from '@/features/bidang/types';
 import { RupiahInput } from '@/components/form/RupiahInput';
 import { SearchableSelect } from '@/components/form/SearchableSelect';
 import { BpkadApiService, Program, Kegiatan, SubKegiatan, RekeningBelanja, RincianObjek } from '@/services/bpkadApiService';
+import { getAllKakOptionsAction, getKerangkaAcuanKerjaByIdAction } from '@/features/kerangka-acuan-kerja/actions';
+import { KakOptionItem } from '@/features/kerangka-acuan-kerja/types';
 
 interface MasterDokumenFormModalProps {
   isOpen: boolean;
@@ -58,6 +60,14 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
   const [expandedSpecs, setExpandedSpecs] = useState<Record<string, boolean>>({});
   const [searchRincianKeyword, setSearchRincianKeyword] = useState('');
   const [appliedNotice, setAppliedNotice] = useState<string | null>(null);
+
+  // KAK (Kerangka Acuan Kerja) Options & Mode State
+  const [inputMode, setInputMode] = useState<'manual' | 'kak'>('manual');
+  const [kakOptions, setKakOptions] = useState<KakOptionItem[]>([]);
+  const [selectedKakId, setSelectedKakId] = useState<number | ''>('');
+  const [loadingKakOptions, setLoadingKakOptions] = useState(false);
+  const [loadingKakDetail, setLoadingKakDetail] = useState(false);
+  const [selectedKakDetail, setSelectedKakDetail] = useState<KakOptionItem | null>(null);
 
   // Form states matching all 24 mdk_* fields
   const [mdkNamaPejabatId, setMdkNamaPejabatId] = useState<number | string>(0);
@@ -205,6 +215,9 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
       setSavedItemObjects([]);
       setSearchRincianKeyword('');
       setAppliedNotice(null);
+      setSelectedKakId('');
+      setSelectedKakDetail(null);
+      setInputMode('manual');
     }
     setActiveTab(1);
     setError('');
@@ -256,8 +269,24 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
       }
     };
 
+    // ── Fetch Daftar KAK untuk pilihan otomatisasi ──────────────────────────
+    const fetchKakOptions = async () => {
+      setLoadingKakOptions(true);
+      try {
+        const res = await getAllKakOptionsAction();
+        if (res.success && res.data) {
+          setKakOptions(res.data);
+        }
+      } catch (err) {
+        console.error('Gagal mengambil daftar KAK:', err);
+      } finally {
+        setLoadingKakOptions(false);
+      }
+    };
+
     fetchInternalOptions();
     fetchProgram();
+    fetchKakOptions();
   }, [isOpen]);
 
   // ── Fetch Kegiatan saat mdkKodeProgram terisi/berubah ────────────────────
@@ -402,10 +431,203 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
     };
   }, [isOpen, mdkKodeSubKegiatan, mdkRekeningBelanja, initialData]);
 
+  const handleSelectKak = async (kakId: number) => {
+    setSelectedKakId(kakId);
+    if (!kakId) {
+      setSelectedKakDetail(null);
+      return;
+    }
+
+    const kakItem = kakOptions.find((k) => k.kak_id === kakId);
+    if (kakItem) {
+      setSelectedKakDetail(kakItem);
+    }
+
+    setLoadingKakDetail(true);
+    try {
+      const res = await getKerangkaAcuanKerjaByIdAction(kakId);
+      if (res.success && res.data) {
+        const { kakDetails, masterDokumen: mdkFromKak } = res.data;
+        const kak = kakDetails?.kak;
+
+        // Ambil data program, kegiatan, sub kegiatan, rekening belanja
+        const kodeProg = kak?.kak_kode_program || mdkFromKak?.mdk_kode_program || kakItem?.kak_kode_program || '';
+        const namaProg = kak?.kak_program || mdkFromKak?.mdk_program || kakItem?.kak_program || '';
+        const kodeKeg = kak?.kak_kode_kegiatan || mdkFromKak?.mdk_kode_kegiatan || kakItem?.kak_kode_kegiatan || '';
+        const namaKeg = kak?.kak_kegiatan || mdkFromKak?.mdk_kegiatan || kakItem?.kak_kegiatan || '';
+        const kodeSubKeg = mdkFromKak?.mdk_kode_sub_kegiatan || kakItem?.kak_kode_sub_kegiatan || '';
+        const namaSubKeg = kak?.kak_sub_kegiatan || mdkFromKak?.mdk_sub_kegiatan || kakItem?.kak_sub_kegiatan || '';
+        const kodeRek = kak?.kak_kode_rekening || mdkFromKak?.mdk_rekening_belanja || kakItem?.kak_kode_rekening || '';
+        const namaRek = kak?.kak_rekening || mdkFromKak?.mdk_uraian_belanja || kakItem?.kak_rekening || '';
+        const namaPekerjaan = kak?.kak_pekerjaan || mdkFromKak?.mdk_pekerjaan || kakItem?.kak_pekerjaan || '';
+        const tahunAnggaran = kak?.kak_tahun_anggaran || mdkFromKak?.mdk_apbd || kakItem?.kak_tahun_anggaran || '';
+
+        // Terapkan ke form states
+        if (kodeProg) setMdkKodeProgram(kodeProg);
+        if (namaProg) setMdkProgram(namaProg);
+        if (kodeKeg) setMdkKodeKegiatan(kodeKeg);
+        if (namaKeg) setMdkKegiatan(namaKeg);
+        if (kodeSubKeg) setMdkKodeSubKegiatan(kodeSubKeg);
+        if (namaSubKeg) setMdkSubKegiatan(namaSubKeg);
+        if (kodeRek) setMdkRekeningBelanja(kodeRek);
+        if (namaRek) setMdkUraianBelanja(namaRek);
+        if (namaPekerjaan && !mdkPekerjaan) setMdkPekerjaan(namaPekerjaan);
+        if (tahunAnggaran) {
+          setMdkApbd(
+            tahunAnggaran.startsWith('APBD')
+              ? tahunAnggaran
+              : `APBD Kota Pekanbaru Tahun ${tahunAnggaran}`
+          );
+        }
+
+        // Terapkan Level 1-5 jika ada dari master dokumen sumber
+        if (mdkFromKak) {
+          if (mdkFromKak.mdk_kode_level1) setMdkKodeLevel1(mdkFromKak.mdk_kode_level1);
+          if (mdkFromKak.mdk_nama_level1) setMdkNamaLevel1(mdkFromKak.mdk_nama_level1);
+          if (mdkFromKak.mdk_kode_level2) setMdkKodeLevel2(mdkFromKak.mdk_kode_level2);
+          if (mdkFromKak.mdk_nama_level2) setMdkNamaLevel2(mdkFromKak.mdk_nama_level2);
+          if (mdkFromKak.mdk_kode_level3) setMdkKodeLevel3(mdkFromKak.mdk_kode_level3);
+          if (mdkFromKak.mdk_nama_level3) setMdkNamaLevel3(mdkFromKak.mdk_nama_level3);
+          if (mdkFromKak.mdk_kode_level4) setMdkKodeLevel4(mdkFromKak.mdk_kode_level4);
+          if (mdkFromKak.mdk_nama_level4) setMdkNamaLevel4(mdkFromKak.mdk_nama_level4);
+          if (mdkFromKak.mdk_kode_level5) setMdkKodeLevel5(mdkFromKak.mdk_kode_level5);
+          if (mdkFromKak.mdk_nama_level5) setMdkNamaLevel5(mdkFromKak.mdk_nama_level5);
+        }
+
+        // Item Barang & Pagu Anggaran
+        let itemObjectsToSet: any[] = [];
+        let totalPagu = 0;
+
+        // Cek jika master dokumen dari KAK memiliki mdk_item_barang
+        if (mdkFromKak?.mdk_item_barang) {
+          try {
+            const parsed = typeof mdkFromKak.mdk_item_barang === 'string'
+              ? JSON.parse(mdkFromKak.mdk_item_barang)
+              : mdkFromKak.mdk_item_barang;
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              itemObjectsToSet = parsed;
+              totalPagu = parsed.reduce((sum: number, it: any) => sum + (Number(it.PAGU_TOTAL) || 0), 0);
+            }
+          } catch (e) {
+            console.error('Error parsing mdk_item_barang from KAK:', e);
+          }
+        }
+
+        // Jika tidak ada dari mdk_item_barang tapi ada perkiraanBiayaList di KAK
+        if (itemObjectsToSet.length === 0 && kakDetails?.perkiraanBiayaList && kakDetails.perkiraanBiayaList.length > 0) {
+          itemObjectsToSet = kakDetails.perkiraanBiayaList.map((biaya, idx) => {
+            const lines = (biaya.kpb_uraian || '').split('\n');
+            const namaItem = lines[0] || `Item KAK #${idx + 1}`;
+            const spesifikasi = biaya.kpb_uraian.includes('Spesifikasi :')
+              ? biaya.kpb_uraian.split('Spesifikasi :')[1]?.trim() || ''
+              : lines.slice(1).join(' ').trim();
+
+            return {
+              KODE_STANDAR_HARGA: `KAK-${biaya.kpb_id || idx + 1}`,
+              NAMA_STANDAR_HARGA: namaItem,
+              SPESIFIKASI: spesifikasi,
+              KOOFISIEN: String(biaya.kpb_volume || 1),
+              SATUAN: 'Unit',
+              HARGA_SATUAN: Number(biaya.kpb_harga || 0),
+              PAGU_TOTAL: Number(biaya.kpb_jumlah || 0),
+            };
+          });
+          totalPagu = itemObjectsToSet.reduce((sum, it) => sum + (Number(it.PAGU_TOTAL) || 0), 0);
+        }
+
+        if (itemObjectsToSet.length > 0) {
+          setSavedItemObjects(itemObjectsToSet);
+          setSelectedKodeStandarHarga(itemObjectsToSet.map((it: any) => it.KODE_STANDAR_HARGA));
+          if (totalPagu > 0) {
+            setMdkPaguAnggaran(totalPagu);
+          }
+        } else if (kakItem?.kak_pagu_total) {
+          setMdkPaguAnggaran(kakItem.kak_pagu_total);
+        }
+
+        setAppliedNotice(
+          `✓ Berhasil menarik data dari KAK #${kakId} (${namaPekerjaan || namaProg}) ke Program, Kegiatan, Rekening Belanja & Pagu Anggaran.`
+        );
+        setTimeout(() => setAppliedNotice(null), 5000);
+      }
+    } catch (err) {
+      console.error('Gagal mengambil detail KAK:', err);
+    } finally {
+      setLoadingKakDetail(false);
+    }
+  };
+
+  // Memoized options for SearchableSelect to ensure selected values are always displayed cleanly
+  const programOptions = React.useMemo(() => {
+    const opts = programList.map((p) => ({
+      value: p.KODE_PROGRAM,
+      label: p.NAMA_PROGRAM,
+      sublabel: p.KODE_PROGRAM,
+    }));
+    if (mdkKodeProgram && !opts.some((o) => o.value === mdkKodeProgram)) {
+      opts.unshift({
+        value: mdkKodeProgram,
+        label: mdkProgram || mdkKodeProgram,
+        sublabel: mdkKodeProgram,
+      });
+    }
+    return opts;
+  }, [programList, mdkKodeProgram, mdkProgram]);
+
+  const kegiatanOptions = React.useMemo(() => {
+    const opts = kegiatanList.map((k) => ({
+      value: k.KODE_KEGIATAN,
+      label: k.NAMA_KEGIATAN,
+      sublabel: `${k.KODE_KEGIATAN}${k.PAGU ? ` · Pagu: Rp ${Number(k.PAGU).toLocaleString('id-ID')}` : ''}`,
+    }));
+    if (mdkKodeKegiatan && !opts.some((o) => o.value === mdkKodeKegiatan)) {
+      opts.unshift({
+        value: mdkKodeKegiatan,
+        label: mdkKegiatan || mdkKodeKegiatan,
+        sublabel: mdkKodeKegiatan,
+      });
+    }
+    return opts;
+  }, [kegiatanList, mdkKodeKegiatan, mdkKegiatan]);
+
+  const subKegiatanOptions = React.useMemo(() => {
+    const opts = subKegiatanList.map((sk) => ({
+      value: sk.KODE_SUB_KEGIATAN,
+      label: sk.NAMA_SUB_KEGIATAN,
+      sublabel: `${sk.KODE_SUB_KEGIATAN}${sk.PAGU ? ` · Pagu: Rp ${Number(sk.PAGU).toLocaleString('id-ID')}` : ''}`,
+    }));
+    if (mdkKodeSubKegiatan && !opts.some((o) => o.value === mdkKodeSubKegiatan)) {
+      opts.unshift({
+        value: mdkKodeSubKegiatan,
+        label: mdkSubKegiatan || mdkKodeSubKegiatan,
+        sublabel: mdkKodeSubKegiatan,
+      });
+    }
+    return opts;
+  }, [subKegiatanList, mdkKodeSubKegiatan, mdkSubKegiatan]);
+
+  const rekeningBelanjaOptions = React.useMemo(() => {
+    const opts = rekeningBelanjaList.map((r) => ({
+      value: r.KODE_REKENING,
+      label: r.NAMA_REKENING,
+      sublabel: `${r.KODE_REKENING} · Pagu: Rp ${Number(r.PAGU).toLocaleString('id-ID')}`,
+    }));
+    if (mdkRekeningBelanja && !opts.some((o) => o.value === mdkRekeningBelanja)) {
+      opts.unshift({
+        value: mdkRekeningBelanja,
+        label: mdkUraianBelanja || mdkRekeningBelanja,
+        sublabel: mdkRekeningBelanja,
+      });
+    }
+    return opts;
+  }, [rekeningBelanjaList, mdkRekeningBelanja, mdkUraianBelanja]);
+
+  const effectiveRincianList = rincianObjekList.length > 0 ? rincianObjekList : savedItemObjects;
+
   const toggleSelectItem = (kode: string) => {
     setSelectedKodeStandarHarga((prev) => {
       const next = prev.includes(kode) ? prev.filter((k) => k !== kode) : [...prev, kode];
-      const sumPagu = rincianObjekList
+      const sumPagu = effectiveRincianList
         .filter((item) => next.includes(item.KODE_STANDAR_HARGA))
         .reduce((sum, item) => sum + (Number(item.PAGU_TOTAL) || 0), 0);
       setMdkPaguAnggaran(sumPagu);
@@ -414,13 +636,13 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
   };
 
   const toggleSelectAll = () => {
-    if (selectedKodeStandarHarga.length === rincianObjekList.length) {
+    if (selectedKodeStandarHarga.length === effectiveRincianList.length) {
       setSelectedKodeStandarHarga([]);
       setMdkPaguAnggaran(0);
     } else {
-      const allCodes = rincianObjekList.map((item) => item.KODE_STANDAR_HARGA);
+      const allCodes = effectiveRincianList.map((item) => item.KODE_STANDAR_HARGA);
       setSelectedKodeStandarHarga(allCodes);
-      const sumPagu = rincianObjekList.reduce((sum, item) => sum + (Number(item.PAGU_TOTAL) || 0), 0);
+      const sumPagu = effectiveRincianList.reduce((sum, item) => sum + (Number(item.PAGU_TOTAL) || 0), 0);
       setMdkPaguAnggaran(sumPagu);
     }
   };
@@ -429,7 +651,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
     setExpandedSpecs((prev) => ({ ...prev, [kode]: !prev[kode] }));
   };
 
-  const selectedRincianItems = rincianObjekList.filter((item) =>
+  const selectedRincianItems = effectiveRincianList.filter((item) =>
     selectedKodeStandarHarga.includes(item.KODE_STANDAR_HARGA)
   );
 
@@ -438,7 +660,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
     0
   );
 
-  const filteredRincianList = rincianObjekList.filter((item) => {
+  const filteredRincianList = effectiveRincianList.filter((item) => {
     if (!searchRincianKeyword.trim()) return true;
     const term = searchRincianKeyword.toLowerCase();
     return (
@@ -738,6 +960,143 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                 )}
               </div>
 
+              {/* Mode Switcher: Manual / SIPD BPKAD vs Berdasarkan KAK */}
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3.5 bg-gray-50/90 dark:bg-gray-800/60 rounded-2xl border border-gray-200 dark:border-gray-700">
+                <div>
+                  <span className="text-xs font-bold text-gray-900 dark:text-white block">
+                    Metode Pengisian Data Program &amp; Kegiatan
+                  </span>
+                  <span className="text-[11px] text-gray-500 dark:text-gray-400">
+                    Pilih apakah ingin mengisi mandiri via SIPD BPKAD atau menarik data langsung dari Kerangka Acuan Kerja (KAK)
+                  </span>
+                </div>
+
+                <div className="inline-flex p-1 bg-gray-200/80 dark:bg-gray-900 rounded-xl shrink-0 self-start sm:self-auto">
+                  <button
+                    type="button"
+                    onClick={() => setInputMode('manual')}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                      inputMode === 'manual'
+                        ? 'bg-white dark:bg-gray-800 text-brand-600 dark:text-brand-400 shadow-xs'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <span>✏️</span>
+                    <span>Isi Manual / SIPD BPKAD</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setInputMode('kak')}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
+                      inputMode === 'kak'
+                        ? 'bg-white dark:bg-gray-800 text-brand-600 dark:text-brand-400 shadow-xs'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <span>📋</span>
+                    <span>Pilih Berdasarkan KAK</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Card Seleksi KAK saat mode Berdasarkan KAK dipilih */}
+              {inputMode === 'kak' && (
+                <div className="p-4 rounded-2xl bg-brand-50/50 dark:bg-brand-950/25 border border-brand-200/80 dark:border-brand-800/70 space-y-3 animate-in fade-in duration-200">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div className="flex items-center gap-2">
+                      <span className="p-1.5 rounded-lg bg-brand-600 text-white text-xs">📋</span>
+                      <div>
+                        <h4 className="text-xs font-bold text-gray-900 dark:text-white">
+                          Pilih Kerangka Acuan Kerja (KAK)
+                        </h4>
+                        <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                          Data program, kegiatan, sub kegiatan, rekening belanja, pekerjaan, dan pagu akan diisi otomatis dari KAK terpilih.
+                        </p>
+                      </div>
+                    </div>
+                    {loadingKakOptions && (
+                      <span className="text-xs text-brand-600 dark:text-brand-400 flex items-center gap-1.5 self-start sm:self-auto">
+                        <svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                        </svg>
+                        Memuat KAK...
+                      </span>
+                    )}
+                  </div>
+
+                  <SearchableSelect
+                    placeholder={loadingKakOptions ? 'Memuat daftar KAK...' : 'Pilih Dokumen KAK...'}
+                    searchPlaceholder="Cari pekerjaan, program, atau rekening KAK..."
+                    disabled={loadingKakOptions || loadingKakDetail}
+                    value={selectedKakId ? String(selectedKakId) : ''}
+                    options={kakOptions.map((k) => ({
+                      value: String(k.kak_id),
+                      label: k.kak_pekerjaan || `KAK #${k.kak_id}`,
+                      sublabel: `KAK #${k.kak_id} · Rek: ${k.kak_kode_rekening || k.kak_rekening || '-'} · Pagu: Rp ${Number(k.kak_pagu_total || 0).toLocaleString('id-ID')}`,
+                    }))}
+                    onChange={(val: string) => {
+                      if (val) handleSelectKak(Number(val));
+                    }}
+                  />
+
+                  {loadingKakDetail && (
+                    <div className="flex items-center gap-2 text-xs text-brand-600 dark:text-brand-400 py-1">
+                      <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+                      </svg>
+                      Sedang menarik detail dan rincian perkiraan biaya dari KAK...
+                    </div>
+                  )}
+
+                  {selectedKakDetail && !loadingKakDetail && (
+                    <div className="p-3.5 rounded-xl bg-white dark:bg-gray-900 border border-brand-200 dark:border-brand-800/80 shadow-xs space-y-2 text-xs animate-in fade-in">
+                      <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-gray-100 dark:border-gray-800">
+                        <span className="font-bold text-gray-900 dark:text-white flex items-center gap-1.5">
+                          <span className="text-emerald-600">✓</span>
+                          Data KAK Terhubung: <span className="text-brand-600 dark:text-brand-400 font-mono">#{selectedKakDetail.kak_id}</span>
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded text-[11px] border border-emerald-200/60">
+                            Pagu KAK: Rp {Number(selectedKakDetail.kak_pagu_total || 0).toLocaleString('id-ID')}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedKakId('');
+                              setSelectedKakDetail(null);
+                            }}
+                            className="text-xs text-gray-400 hover:text-red-600 dark:hover:text-red-400 font-medium cursor-pointer"
+                          >
+                            Ganti KAK
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-gray-600 dark:text-gray-300">
+                        <div>
+                          <span className="text-gray-400 block text-[10px] uppercase font-semibold">Pekerjaan</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{selectedKakDetail.kak_pekerjaan || '-'}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block text-[10px] uppercase font-semibold">Rekening Belanja</span>
+                          <span className="font-medium text-gray-900 dark:text-white font-mono">{selectedKakDetail.kak_kode_rekening || selectedKakDetail.kak_rekening || '-'}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block text-[10px] uppercase font-semibold">Program</span>
+                          <span>{selectedKakDetail.kak_kode_program ? `${selectedKakDetail.kak_kode_program} - ` : ''}{selectedKakDetail.kak_program || '-'}</span>
+                        </div>
+                        <div>
+                          <span className="text-gray-400 block text-[10px] uppercase font-semibold">Kegiatan</span>
+                          <span>{selectedKakDetail.kak_kode_kegiatan ? `${selectedKakDetail.kak_kode_kegiatan} - ` : ''}{selectedKakDetail.kak_kegiatan || '-'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
               {/* Grid 2 Kolom untuk Form Select agar rapi dan tidak terlalu panjang ke samping */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* 1. Program (Kolom Kiri) */}
@@ -759,11 +1118,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                     searchPlaceholder="Cari kode atau nama program..."
                     disabled={loadingProgram}
                     value={mdkKodeProgram}
-                    options={programList.map((p) => ({
-                      value: p.KODE_PROGRAM,
-                      label: p.NAMA_PROGRAM,
-                      sublabel: p.KODE_PROGRAM,
-                    }))}
+                    options={programOptions}
                     onChange={(val: string) => {
                       const found = programList.find((p) => p.KODE_PROGRAM === val);
                       setMdkKodeProgram(val);
@@ -817,11 +1172,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                     searchPlaceholder="Cari kode atau nama kegiatan..."
                     disabled={loadingKegiatan || !mdkKodeProgram}
                     value={mdkKodeKegiatan}
-                    options={kegiatanList.map((k) => ({
-                      value: k.KODE_KEGIATAN,
-                      label: k.NAMA_KEGIATAN,
-                      sublabel: `${k.KODE_KEGIATAN}${k.PAGU ? ` · Pagu: Rp ${Number(k.PAGU).toLocaleString('id-ID')}` : ''}`,
-                    }))}
+                    options={kegiatanOptions}
                     onChange={(val: string) => {
                       const found = kegiatanList.find((k) => k.KODE_KEGIATAN === val);
                       setMdkKodeKegiatan(val);
@@ -873,11 +1224,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                     searchPlaceholder="Cari kode atau nama sub kegiatan..."
                     disabled={loadingSubKegiatan || !mdkKodeKegiatan}
                     value={mdkKodeSubKegiatan}
-                    options={subKegiatanList.map((sk) => ({
-                      value: sk.KODE_SUB_KEGIATAN,
-                      label: sk.NAMA_SUB_KEGIATAN,
-                      sublabel: `${sk.KODE_SUB_KEGIATAN}${sk.PAGU ? ` · Pagu: Rp ${Number(sk.PAGU).toLocaleString('id-ID')}` : ''}`,
-                    }))}
+                    options={subKegiatanOptions}
                     onChange={(val: string) => {
                       const found = subKegiatanList.find((sk) => sk.KODE_SUB_KEGIATAN === val);
                       setMdkKodeSubKegiatan(val);
@@ -927,11 +1274,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                     searchPlaceholder="Cari kode atau nama rekening..."
                     disabled={!mdkKodeSubKegiatan || loadingRekBel}
                     value={mdkRekeningBelanja}
-                    options={rekeningBelanjaList.map((r) => ({
-                      value: r.KODE_REKENING,
-                      label: r.NAMA_REKENING,
-                      sublabel: `${r.KODE_REKENING} · Pagu: Rp ${Number(r.PAGU).toLocaleString('id-ID')}`,
-                    }))}
+                    options={rekeningBelanjaOptions}
                     onChange={(val: string) => {
                       const found = rekeningBelanjaList.find((r) => r.KODE_REKENING === val);
                       setMdkRekeningBelanja(val);
@@ -1000,15 +1343,15 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
 
                     <div className="flex items-center gap-2.5 self-start sm:self-auto">
                       <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                        {rincianObjekList.length} Item
+                        {effectiveRincianList.length} Item
                       </span>
-                      {rincianObjekList.length > 0 && (
+                      {effectiveRincianList.length > 0 && (
                         <button
                           type="button"
                           onClick={toggleSelectAll}
                           className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-700 hover:underline cursor-pointer"
                         >
-                          {selectedKodeStandarHarga.length === rincianObjekList.length ? 'Batalkan Semua' : 'Pilih Semua'}
+                          {selectedKodeStandarHarga.length === effectiveRincianList.length ? 'Batalkan Semua' : 'Pilih Semua'}
                         </button>
                       )}
                     </div>
@@ -1041,14 +1384,14 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                         Mengambil data rincian belanja (Api-RO) dari server BPKAD...
                       </p>
                     </div>
-                  ) : rincianObjekList.length === 0 ? (
+                  ) : effectiveRincianList.length === 0 ? (
                     <div className="py-6 text-center text-xs text-gray-400 dark:text-gray-500 bg-white/60 dark:bg-gray-900/40 rounded-xl border border-dashed border-gray-200 dark:border-gray-700">
                       Tidak ditemukan item rincian objek belanja untuk rekening ini.
                     </div>
                   ) : (
                     <>
                       {/* Search bar when items > 2 */}
-                      {rincianObjekList.length > 2 && (
+                      {effectiveRincianList.length > 2 && (
                         <div className="relative">
                           <input
                             type="text"
@@ -1077,7 +1420,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                             </span>
                             <div>
                               <span className="text-xs font-bold text-gray-900 dark:text-white block">
-                                {selectedKodeStandarHarga.length} dari {rincianObjekList.length} item dipilih
+                                {selectedKodeStandarHarga.length} dari {effectiveRincianList.length} item dipilih
                               </span>
                               <span className="text-xs font-semibold text-emerald-600 dark:text-emerald-400">
                                 Total Pagu Terpilih: Rp {totalSelectedPagu.toLocaleString('id-ID')}

@@ -826,11 +826,10 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
             <button
               type="button"
               onClick={() => setSelectedMode('master')}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
-                selectedMode === 'master'
-                  ? 'bg-white dark:bg-gray-900 text-brand-600 dark:text-brand-400 shadow-xs'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-              }`}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${selectedMode === 'master'
+                ? 'bg-white dark:bg-gray-900 text-brand-600 dark:text-brand-400 shadow-xs'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
             >
               <span>📋</span>
               Pilih Master Dokumen
@@ -843,11 +842,10 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                   handleCreateNewManualKak();
                 }
               }}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
-                selectedMode === 'manual'
-                  ? 'bg-white dark:bg-gray-900 text-brand-600 dark:text-brand-400 shadow-xs'
-                  : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-              }`}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${selectedMode === 'manual'
+                ? 'bg-white dark:bg-gray-900 text-brand-600 dark:text-brand-400 shadow-xs'
+                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                }`}
             >
               <span>⚡</span>
               Isi Manual (Tarik API BPKAD)
@@ -1104,8 +1102,8 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                       !kakKodeProgram
                         ? 'Pilih Program terlebih dahulu...'
                         : loadingKegiatan
-                        ? 'Memuat kegiatan...'
-                        : 'Pilih Kegiatan...'
+                          ? 'Memuat kegiatan...'
+                          : 'Pilih Kegiatan...'
                     }
                     searchPlaceholder="Cari kode atau nama kegiatan..."
                     disabled={loadingKegiatan || !kakKodeProgram}
@@ -1162,8 +1160,8 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                       !kakKodeKegiatan
                         ? 'Pilih Kegiatan terlebih dahulu...'
                         : loadingSubKegiatan
-                        ? 'Memuat sub kegiatan...'
-                        : 'Pilih Sub Kegiatan...'
+                          ? 'Memuat sub kegiatan...'
+                          : 'Pilih Sub Kegiatan...'
                     }
                     searchPlaceholder="Cari kode atau nama sub kegiatan..."
                     disabled={loadingSubKegiatan || !kakKodeKegiatan}
@@ -1217,8 +1215,8 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                       !kakKodeSubKegiatan
                         ? 'Pilih Sub Kegiatan terlebih dahulu...'
                         : loadingRekBel
-                        ? 'Memuat data rekening...'
-                        : 'Pilih Rekening Belanja...'
+                          ? 'Memuat data rekening...'
+                          : 'Pilih Rekening Belanja...'
                     }
                     searchPlaceholder="Cari kode atau nama rekening..."
                     disabled={!kakKodeSubKegiatan || loadingRekBel}
@@ -1256,7 +1254,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                 {/* 5. Pekerjaan */}
                 <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Nama Pekerjaan / Pengadaan (kak_pekerjaan)
+                    Nama Pekerjaan / Pengadaan
                   </label>
                   <input
                     type="text"
@@ -1270,7 +1268,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                 {/* 6. Tahun Anggaran */}
                 <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    Tahun Anggaran (kak_tahun_anggaran)
+                    Tahun Anggaran
                   </label>
                   <input
                     type="text"
@@ -1360,9 +1358,8 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                           return (
                             <label
                               key={item.KODE_STANDAR_HARGA}
-                              className={`flex items-start gap-2.5 p-2.5 text-xs cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${
-                                isChecked ? 'bg-brand-50/40 dark:bg-brand-950/20' : ''
-                              }`}
+                              className={`flex items-start gap-2.5 p-2.5 text-xs cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors ${isChecked ? 'bg-brand-50/40 dark:bg-brand-950/20' : ''
+                                }`}
                             >
                               <input
                                 type="checkbox"
@@ -1837,11 +1834,10 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                   key={m}
                   type="button"
                   onClick={() => setMetodePemilihan(m)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                    metodePemilihan === m
-                      ? 'bg-brand-600 text-white shadow-sm'
-                      : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
-                  }`}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${metodePemilihan === m
+                    ? 'bg-brand-600 text-white shadow-sm'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                    }`}
                 >
                   {m}
                 </button>

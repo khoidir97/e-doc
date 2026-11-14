@@ -365,7 +365,7 @@ export const PermohonanContainer: React.FC<PermohonanContainerProps> = ({
             options={kakOptions.map((k) => ({
               value: k.kak_id,
               label: k.kak_pekerjaan || `Dokumen KAK #${k.kak_id}`,
-              sublabel: `Program: ${k.kak_program || '-'} · [${k.has_permohonan ? '✓ Permohonan Ada' : 'Belum Ada Permohonan'}]`,
+              sublabel: `Metode: ${k.kak_metode_pemilihan || '-'} · [${k.has_permohonan ? '✓ Permohonan Ada' : 'Belum Ada Permohonan'}]`,
             }))}
             value={selectedKakId}
             onChange={(val) => handleSelectKak(val)}

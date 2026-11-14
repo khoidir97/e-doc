@@ -1233,6 +1233,55 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
               <strong>Info:</strong> Pada Halaman 5 dokumen cetak, 7 poin pertimbangan (Spesifikasi Mutu, TKDN &amp; PDN, Usaha Kecil/Koperasi, Spesifikasi Jumlah, Waktu, Pelayanan, dan Lokasi) beserta Tanda Tangan PPK akan otomatis dicetak secara resmi.
             </div>
           </div>
+
+          {/* BOTTOM ACTION BAR */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 p-5 rounded-2xl bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-sm mt-6">
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              {hasSavedData ? (
+                <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block"></span>
+                  Data Spesifikasi Teknis sudah tersimpan. Klik &quot;Perbarui Data&quot; jika melakukan perubahan.
+                </span>
+              ) : (
+                <span>Pastikan data spesifikasi teknis dan rincian penyedia telah diisi dengan benar.</span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3 flex-wrap">
+              {hasSavedData && (
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={saving}
+                  className="px-3 py-2 rounded-xl border border-red-200 text-red-600 hover:bg-red-50 dark:border-red-900/50 dark:hover:bg-red-950/30 text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
+                  title="Hapus Dokumen Spesifikasi Teknis"
+                >
+                  Hapus
+                </button>
+              )}
+
+              <button
+                type="button"
+                onClick={handlePrintPdf}
+                disabled={saving}
+                className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+                </svg>
+                Cetak (PDF)
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleSave()}
+                disabled={saving}
+                className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {saving ? 'Menyimpan...' : hasSavedData ? 'Perbarui Data' : 'Simpan Dokumen'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
