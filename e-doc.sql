@@ -1,17 +1,17 @@
 /*
- Navicat Premium Dump SQL
+ Navicat Premium Data Transfer
 
- Source Server         : localhost
+ Source Server         : db_local_mysql
  Source Server Type    : MySQL
- Source Server Version : 80030 (8.0.30)
+ Source Server Version : 80030
  Source Host           : localhost:3306
  Source Schema         : e-doc
 
  Target Server Type    : MySQL
- Target Server Version : 80030 (8.0.30)
+ Target Server Version : 80030
  File Encoding         : 65001
 
- Date: 10/11/2026 23:39:02
+ Date: 14/11/2026 12:01:06
 */
 
 SET NAMES utf8mb4;
@@ -106,6 +106,32 @@ INSERT INTO `detail_berita_acara` VALUES (5, 1, 1, 'Routerboard CCR2004-16G-2S+ 
 INSERT INTO `detail_berita_acara` VALUES (6, 1, 1, 'Routerboard CCR2116-12G-4S+ Spesifikasi : Product code CCR2116-12G-4S+,Architecture ARM 64bit, CPU AL73400, CPU core count 16, CPU nominal frequency 2000 MHz, RouterOS license 6, Operating System RouterOS (v7 only), Size of RAM 16 GB, torage size 128 MB.', '1', 'Unit', '100% Selesai', NULL, 1, NULL, NULL, NULL, NULL);
 
 -- ----------------------------
+-- Table structure for detail_daftar_pelaku_usaha
+-- ----------------------------
+DROP TABLE IF EXISTS `detail_daftar_pelaku_usaha`;
+CREATE TABLE `detail_daftar_pelaku_usaha`  (
+  `dpu_id` int NOT NULL AUTO_INCREMENT,
+  `dpu_spt_id` int NULL DEFAULT NULL,
+  `dpu_item` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `dpu_nama_pelaku_usaha_potensial` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `dpu_link_katalog` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `dpu_harga` bigint NULL DEFAULT NULL,
+  `dpu_evaluasi_berdasarkan_parameter` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `dpu_created_at` timestamp NULL DEFAULT NULL,
+  `dpu_created_by` int NULL DEFAULT NULL,
+  `dpu_updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `dpu_updated_by` int NULL DEFAULT NULL,
+  `dpu_deleted_at` timestamp NULL DEFAULT NULL,
+  `dpu_deleted_by` int NULL DEFAULT NULL,
+  PRIMARY KEY (`dpu_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of detail_daftar_pelaku_usaha
+-- ----------------------------
+INSERT INTO `detail_daftar_pelaku_usaha` VALUES (1, 1, 'Routerboard CCR2004-16G-2S+ Spesifikasi : Product code CCR2004-16G-2S+, Architecture ARM 64bit, CPU AL32400, CPU core count 4, CPU nominal frequency 1700 MHz, Switch chip model 88E6191X, Dimensions 443 x 210 x 44 mm, RouterOS license 6, Operating System', 'SAMRTHA', 'HTTPS:///SDFSDFD', 200000, 'Lulus/Gugur\nSeluruh parameter Spesifikasi terpenuhi\nLokasi : Pekanbaru', '2026-11-14 11:49:20', 1, NULL, NULL, NULL, NULL);
+
+-- ----------------------------
 -- Table structure for detail_faktur
 -- ----------------------------
 DROP TABLE IF EXISTS `detail_faktur`;
@@ -155,7 +181,7 @@ CREATE TABLE `detail_harga_perkiraan_sendiri`  (
   `hps_deleted_at` timestamp NULL DEFAULT NULL,
   `hps_deleted_by` int NULL DEFAULT NULL,
   PRIMARY KEY (`hps_id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
+) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = DYNAMIC;
 
 -- ----------------------------
 -- Records of detail_harga_perkiraan_sendiri
@@ -169,7 +195,8 @@ INSERT INTO `detail_harga_perkiraan_sendiri` VALUES (6, 1, 'Routerboard CCR2116-
 INSERT INTO `detail_harga_perkiraan_sendiri` VALUES (7, 2, 'Wireless Access Point\nSpesifikasi : Next-generation performance with Wi-Fi 7, delivering\nextra-high wireless speeds, Superior streaming with Wi-Fi 7\'s\nexclusive MLO feature, Compact design and easy installation,\nEnhanced data transmission with 4K-QAM', '6', 'Unit', 5800000, 34800000, NULL, 1, '2026-11-09 15:04:39', NULL, '2026-11-09 15:04:39', 1);
 INSERT INTO `detail_harga_perkiraan_sendiri` VALUES (8, 2, 'Wireless Access Point\nSpesifikasi : Next-generation performance with Wi-Fi 7, delivering\nextra-high wireless speeds, Superior streaming with Wi-Fi 7\'s\nexclusive MLO feature, Compact design and easy installation,\nEnhanced data transmission with 4K-QAM', '6', 'Unit', 5800000, 34800000, NULL, 1, NULL, NULL, NULL, NULL);
 INSERT INTO `detail_harga_perkiraan_sendiri` VALUES (9, 3, 'Wireless Bluetooth Barcode Scanner\nSpesifikasi : Spesifikasi :\n• Distance Bluetooth/2,4G/Wired: 50m/100m/1,8m\n• Memory: 100.000 barcodes\n• Battery: 5V-2000mAh\n• Working Time: 3 to 10 days\n• Resolution: 4mil\n• Drop test: 2mil', '2', 'Unit', 1000000, 2000000, NULL, 1, '2026-11-09 16:00:40', NULL, '2026-11-09 16:00:40', 1);
-INSERT INTO `detail_harga_perkiraan_sendiri` VALUES (10, 3, 'Wireless Bluetooth Barcode Scanner\nSpesifikasi : Spesifikasi :\n• Distance Bluetooth/2,4G/Wired: 50m/100m/1,8m\n• Memory: 100.000 barcodes\n• Battery: 5V-2000mAh\n• Working Time: 3 to 10 days\n• Resolution: 4mil\n• Drop test: 2mil', '2', 'Unit', 1000000, 2000000, NULL, 1, NULL, NULL, NULL, NULL);
+INSERT INTO `detail_harga_perkiraan_sendiri` VALUES (10, 3, 'Wireless Bluetooth Barcode Scanner\nSpesifikasi : Spesifikasi :\n• Distance Bluetooth/2,4G/Wired: 50m/100m/1,8m\n• Memory: 100.000 barcodes\n• Battery: 5V-2000mAh\n• Working Time: 3 to 10 days\n• Resolution: 4mil\n• Drop test: 2mil', '2', 'Unit', 1000000, 2000000, NULL, 1, '2026-11-14 11:11:45', NULL, '2026-11-14 11:11:45', 1);
+INSERT INTO `detail_harga_perkiraan_sendiri` VALUES (11, 3, 'Wireless Bluetooth Barcode Scanner\nSpesifikasi : Spesifikasi :\n• Distance Bluetooth/2,4G/Wired: 50m/100m/1,8m\n• Memory: 100.000 barcodes\n• Battery: 5V-2000mAh\n• Working Time: 3 to 10 days\n• Resolution: 4mil\n• Drop test: 2mil', '2', 'Unit', 1000000, 2000000, NULL, 1, NULL, NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for detail_kak_perkiraan_biaya
@@ -334,6 +361,57 @@ INSERT INTO `detail_rencana_anggaran_biaya` VALUES (2, 1, 'Routerboard CCR2004-1
 INSERT INTO `detail_rencana_anggaran_biaya` VALUES (3, 1, 'Routerboard CCR2116-12G-4S+ Spesifikasi : Product code CCR2116-12G-4S+,Architecture ARM 64bit, CPU AL73400, CPU core count 16, CPU nominal frequency 2000 MHz, RouterOS license 6, Operating System RouterOS (v7 only), Size of RAM 16 GB, torage size 128 MB.', '1', 'Unit', 21000000, 21000000, NULL, 1, NULL, NULL, NULL, NULL);
 INSERT INTO `detail_rencana_anggaran_biaya` VALUES (4, 2, 'Wireless Access Point\nSpesifikasi : Next-generation performance with Wi-Fi 7, delivering\nextra-high wireless speeds, Superior streaming with Wi-Fi 7\'s\nexclusive MLO feature, Compact design and easy installation,\nEnhanced data transmission with 4K-QAM', '6', 'Unit', 6500000, 39000000, NULL, 1, NULL, NULL, NULL, NULL);
 INSERT INTO `detail_rencana_anggaran_biaya` VALUES (5, 3, 'Wireless Bluetooth Barcode Scanner\nSpesifikasi : Spesifikasi :\n• Distance Bluetooth/2,4G/Wired: 50m/100m/1,8m\n• Memory: 100.000 barcodes\n• Battery: 5V-2000mAh\n• Working Time: 3 to 10 days\n• Resolution: 4mil\n• Drop test: 2mil', '2', 'Unit', 1000000, 2000000, NULL, 1, NULL, NULL, NULL, NULL);
+
+-- ----------------------------
+-- Table structure for detail_spesifikasi_jumlah
+-- ----------------------------
+DROP TABLE IF EXISTS `detail_spesifikasi_jumlah`;
+CREATE TABLE `detail_spesifikasi_jumlah`  (
+  `dspj_id` int NOT NULL AUTO_INCREMENT,
+  `dpsj_spt_id` int NULL DEFAULT NULL,
+  `dspj_item_barang_jasa` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `dspj_jumlah` int NULL DEFAULT NULL,
+  `dspj_satuan_id` int NULL DEFAULT NULL,
+  `dspj_created_at` timestamp NULL DEFAULT NULL,
+  `dspj_created_by` int NULL DEFAULT NULL,
+  `dspj_updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `dspj_updated_by` int NULL DEFAULT NULL,
+  `dspj_deleted_at` timestamp NULL DEFAULT NULL,
+  `dspj_deleted_by` int NULL DEFAULT NULL,
+  PRIMARY KEY (`dspj_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of detail_spesifikasi_jumlah
+-- ----------------------------
+INSERT INTO `detail_spesifikasi_jumlah` VALUES (1, 1, 'Routerboard CCR2004-16G-2S+ Spesifikasi : Product code CCR2004-16G-2S+, Architecture ARM 64bit, CPU AL32400, CPU core count 4, CPU nominal frequency 1700 MHz, Switch chip model 88E6191X, Dimensions 443 x 210 x 44 mm, RouterOS license 6, Operating System', 1, 1, '2026-11-14 11:49:20', 1, NULL, NULL, NULL, NULL);
+INSERT INTO `detail_spesifikasi_jumlah` VALUES (2, 1, 'Routerboard CCR2004-16G-2S+ Spesifikasi : Product code: RB450Gx4, Architecture: ARM 32bit, CPU: IPQ-4019, CPU core Count: 4, CPU nominal frequency: 716 MHz, RouterOS license: 5, Operating System: RouterOS, Size of RAM: 1 GB, Storage size: 512 MB.', 1, 1, '2026-11-14 11:49:20', 1, NULL, NULL, NULL, NULL);
+INSERT INTO `detail_spesifikasi_jumlah` VALUES (3, 1, 'Routerboard CCR2116-12G-4S+ Spesifikasi : Product code CCR2116-12G-4S+,Architecture ARM 64bit, CPU AL73400, CPU core count 16, CPU nominal frequency 2000 MHz, RouterOS license 6, Operating System RouterOS (v7 only), Size of RAM 16 GB, torage size 128 MB.', 1, 1, '2026-11-14 11:49:20', 1, NULL, NULL, NULL, NULL);
+
+-- ----------------------------
+-- Table structure for detail_spesifikasi_teknis
+-- ----------------------------
+DROP TABLE IF EXISTS `detail_spesifikasi_teknis`;
+CREATE TABLE `detail_spesifikasi_teknis`  (
+  `dpst_id` int NOT NULL AUTO_INCREMENT,
+  `dspt_spt_id` int NULL DEFAULT NULL,
+  `dspt_item_barang_jasa` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `dspt_spesifikasi` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `dpst_created_at` timestamp NULL DEFAULT NULL,
+  `dspt_created_by` int NULL DEFAULT NULL,
+  `dspt_updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `dspt_updated_by` int NULL DEFAULT NULL,
+  `dspt_deleted_at` timestamp NULL DEFAULT NULL,
+  `dspt_deleted_by` int NULL DEFAULT NULL,
+  PRIMARY KEY (`dpst_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of detail_spesifikasi_teknis
+-- ----------------------------
+INSERT INTO `detail_spesifikasi_teknis` VALUES (1, 1, 'Routerboard CCR2004-16G-2S+ Spesifikasi : Product code CCR2004-16G-2S+, Architecture ARM 64bit, CPU AL32400, CPU core count 4, CPU nominal frequency 1700 MHz, Switch chip model 88E6191X, Dimensions 443 x 210 x 44 mm, RouterOS license 6, Operating System', 'conbtoh spek', '2026-11-14 11:49:20', 1, NULL, NULL, NULL, NULL);
+INSERT INTO `detail_spesifikasi_teknis` VALUES (2, 1, 'Routerboard CCR2004-16G-2S+ Spesifikasi : Product code: RB450Gx4, Architecture: ARM 32bit, CPU: IPQ-4019, CPU core Count: 4, CPU nominal frequency: 716 MHz, RouterOS license: 5, Operating System: RouterOS, Size of RAM: 1 GB, Storage size: 512 MB.', '', '2026-11-14 11:49:20', 1, NULL, NULL, NULL, NULL);
+INSERT INTO `detail_spesifikasi_teknis` VALUES (3, 1, 'Routerboard CCR2116-12G-4S+ Spesifikasi : Product code CCR2116-12G-4S+,Architecture ARM 64bit, CPU AL73400, CPU core count 16, CPU nominal frequency 2000 MHz, RouterOS license 6, Operating System RouterOS (v7 only), Size of RAM 16 GB, torage size 128 MB.', '', '2026-11-14 11:49:20', 1, NULL, NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for detail_survey
@@ -829,6 +907,42 @@ CREATE TABLE `satuan`  (
 -- ----------------------------
 INSERT INTO `satuan` VALUES (1, 'Unit', NULL, NULL, NULL, NULL, NULL, NULL);
 INSERT INTO `satuan` VALUES (2, 'Buah', NULL, NULL, NULL, NULL, NULL, NULL);
+
+-- ----------------------------
+-- Table structure for spesifikasi_teknis
+-- ----------------------------
+DROP TABLE IF EXISTS `spesifikasi_teknis`;
+CREATE TABLE `spesifikasi_teknis`  (
+  `spt_id` int NOT NULL AUTO_INCREMENT,
+  `spt_kak_id` int NULL DEFAULT NULL,
+  `spt_paket_pengadaan` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `spt_satuan_kerja` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `spt_spt_ppk_pgw_id` int NULL DEFAULT NULL,
+  `spd_id_rup` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `spt_nama_barang_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `spt_identifikasi_tkdn` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `spt_prioritas_penggunaan` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `spt_spesifikasi_jumlah` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `spt_spesifikasi_waktu_pelaksanaan` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `spt_spesifikasi_waktu_lokasi_kedatangan` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `spt_spesifikasi_pelayanan` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `spt_spesifikasi_lokasi` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `spt_rencana_poin_negosiasi_teknis` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `spt_nama_pelaku_usaha` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL,
+  `spt_link_katalog` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL,
+  `spt_created_at` timestamp NULL DEFAULT NULL,
+  `spt_created_by` int NULL DEFAULT NULL,
+  `spt_updated_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `spt_updated_by` int NULL DEFAULT NULL,
+  `spt_deleted_at` timestamp NULL DEFAULT NULL,
+  `spt_deleted_by` int NULL DEFAULT NULL,
+  PRIMARY KEY (`spt_id`) USING BTREE
+) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of spesifikasi_teknis
+-- ----------------------------
+INSERT INTO `spesifikasi_teknis` VALUES (1, 1, 'Pengadaan Router Board', 'Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru', 4, '9874e893', 'Pengadaan Router Board', 'TKDN,PDN', 'Usaha Kecil', 'Harga perolehan atas masing-masing uraian barang di atas harus sudah memperhitungkan komponen harga perolehan di bawah ini :\n- Ongkos Kirim dan pajak', '<p>14 (empat belas) Hari Kalender</p>', 'Kantor Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru', 'Tingkat pelayanan barang/jasa :\n1. Pengiriman : Vendor bertanggung jawab atas pengiriman ke lokasi dan harus memastikan bahwa barang sampai dalam kondisi baik.\n2. Jadwal: Vendor harus menyediakan jadwal pengadaan yang jelas,termasuk tenggat waktu untuk pengiriman.', 'Berdasarkan lokasi pengiriman terdekat dari lokasi tujuan pengiriman.', '1. Sebagaimana tersebut pada spesifikasi mutu\n2. Sebagaimana tersebut pada spesifikasi waktu\n3. Sebagaimana tersebut pada spesifikasi pelayanan\n4. Sebagaimana tersebut pada spesifikasi lokasi', 'PT. SAMARTHA NUSA UTAMA', 'LINK KATALOG\nHTTPS', '2026-11-14 11:49:20', 1, NULL, NULL, NULL, NULL);
 
 -- ----------------------------
 -- Table structure for survey
