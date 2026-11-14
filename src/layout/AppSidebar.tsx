@@ -55,6 +55,11 @@ const navItems: NavItem[] = [
     path: "/permohonan",
   },
   {
+    icon: <BoxCubeIcon />,
+    name: "Spesifikasi Teknis",
+    path: "/spesifikasi-teknis",
+  },
+  {
     name: "Dokumen",
     icon: <ListIcon />,
     subItems: [
