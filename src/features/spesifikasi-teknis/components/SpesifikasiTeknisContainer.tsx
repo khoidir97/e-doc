@@ -481,22 +481,20 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
             <button
               type="button"
               onClick={() => setActiveTab('form')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                activeTab === 'form'
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${activeTab === 'form'
                   ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
                   : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
-              }`}
+                }`}
             >
               Form Input
             </button>
             <button
               type="button"
               onClick={() => setActiveTab('preview')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                activeTab === 'preview'
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${activeTab === 'preview'
                   ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
                   : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
-              }`}
+                }`}
             >
               Preview Cetak
             </button>
@@ -704,7 +702,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
 
               <div className="md:col-span-2">
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Nama Barang / Tipe (spt_nama_barang_type)
+                  Nama Barang / Tipe
                 </label>
                 <input
                   type="text"
@@ -788,10 +786,10 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gray-100 dark:border-gray-800 pb-2">
               <div>
                 <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
-                  2. Detail Spesifikasi Teknis (detail_spesifikasi_teknis)
+                  2. Detail Spesifikasi Teknis
                 </h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Daftar item barang/jasa beserta rincian spesifikasi teknisnya (Dynamic Form tetap menggunakan textarea)
+                  Daftar item barang/jasa beserta rincian spesifikasi teknisnya
                 </p>
               </div>
 
@@ -867,7 +865,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gray-100 dark:border-gray-800 pb-2">
               <div>
                 <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
-                  3. Detail Spesifikasi Jumlah / Kuantitas (detail_spesifikasi_jumlah)
+                  3. Detail Spesifikasi Jumlah / Kuantitas
                 </h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   Daftar kuantitas dan satuan masing-masing uraian barang/jasa
@@ -929,7 +927,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
 
                     <div>
                       <label className="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">
-                        Jumlah (dspj_jumlah)
+                        Jumlah
                       </label>
                       <input
                         type="number"
@@ -942,7 +940,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
 
                     <div>
                       <label className="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">
-                        Satuan (dspj_satuan_id)
+                        Satuan
                       </label>
                       <select
                         value={item.dspj_satuan_id || ''}
@@ -971,7 +969,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
             {/* Kalimat Komponen Harga Perolehan (spt_spesifikasi_jumlah - Rich Text Editor) */}
             <div className="pt-2">
               <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                Catatan Komponen Harga Perolehan (spt_spesifikasi_jumlah)
+                Catatan Komponen Harga Perolehan
               </label>
               <RichTextEditor
                 value={sptSpesifikasiJumlah}
@@ -991,7 +989,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Waktu Pelaksanaan (spt_spesifikasi_waktu_pelaksanaan)
+                  Waktu Pelaksanaan
                 </label>
                 <input
                   type="text"
@@ -1004,7 +1002,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Lokasi Kedatangan Barang (spt_spesifikasi_waktu_lokasi_kedatangan)
+                  Lokasi Kedatangan Barang
                 </label>
                 <input
                   type="text"
@@ -1019,7 +1017,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
             {/* Spesifikasi Pelayanan (Rich Text Editor) */}
             <div>
               <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                Spesifikasi Pelayanan (spt_spesifikasi_pelayanan)
+                Spesifikasi Pelayanan
               </label>
               <RichTextEditor
                 value={sptPelayanan}
@@ -1033,7 +1031,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
               {/* Spesifikasi Lokasi (Rich Text Editor) */}
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                  Spesifikasi Lokasi (spt_spesifikasi_lokasi)
+                  Spesifikasi Lokasi
                 </label>
                 <RichTextEditor
                   value={sptLokasi}
@@ -1046,7 +1044,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
               {/* Rencana Poin Negosiasi Teknis (Rich Text Editor) */}
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                  Rencana Poin Negosiasi Teknis (spt_rencana_poin_negosiasi_teknis)
+                  Rencana Poin Negosiasi Teknis
                 </label>
                 <RichTextEditor
                   value={sptPoinNegosiasi}
@@ -1063,7 +1061,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 border-b border-gray-100 dark:border-gray-800 pb-2">
               <div>
                 <h3 className="text-sm font-bold text-gray-900 dark:text-white uppercase tracking-wider">
-                  5. Daftar Pelaku Usaha Potensial (detail_daftar_pelaku_usaha)
+                  5. Daftar Pelaku Usaha Potensial
                 </h3>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
                   Daftar link katalog penyedia yang berpotensi relevan untuk Dokumen Penetapan Penyedia (Dynamic Form tetap menggunakan textarea)
@@ -1119,7 +1117,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div>
                       <label className="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">
-                        Item Barang / Jasa (dpu_item)
+                        Item Barang / Jasa
                       </label>
                       <input
                         type="text"
@@ -1132,7 +1130,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
 
                     <div>
                       <label className="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">
-                        Nama Pelaku Usaha Potensial (dpu_nama_pelaku_usaha_potensial)
+                        Nama Pelaku Usaha Potensial
                       </label>
                       <input
                         type="text"
@@ -1157,7 +1155,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
 
                     <div className="md:col-span-2">
                       <label className="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">
-                        Link Katalog (dpu_link_katalog)
+                        Link Katalog
                       </label>
                       <input
                         type="text"
@@ -1170,7 +1168,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
 
                     <div>
                       <label className="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">
-                        Evaluasi Berdasarkan Parameter (dpu_evaluasi_berdasarkan_parameter)
+                        Evaluasi Berdasarkan Parameter
                       </label>
                       <textarea
                         rows={2}
@@ -1206,7 +1204,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
             <div className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  Nama Pelaku Usaha yang Lulus (spt_nama_pelaku_usaha)
+                  Nama Pelaku Usaha yang Lulus
                 </label>
                 <input
                   type="text"
@@ -1220,7 +1218,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
               {/* Link Katalog (Rich Text Editor) */}
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
-                  Daftar Link Katalog Penyedia yang Lulus (spt_link_katalog)
+                  Daftar Link Katalog Penyedia yang Lulus
                 </label>
                 <RichTextEditor
                   value={sptLinkKatalog}
