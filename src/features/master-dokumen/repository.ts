@@ -137,8 +137,9 @@ export class MasterDokumenRepository {
         mdk_kode_level5, mdk_nama_level5,
         mdk_keterangan, mdk_apbd, mdk_no_dpa, mdk_volume, mdk_satuan, 
         mdk_item_barang,
+        mdk_kak_id,
         mdk_created_by
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         input.mdk_nama_pejabat_id ?? 0,
         input.mdk_bidang_id ?? 0,
@@ -175,10 +176,22 @@ export class MasterDokumenRepository {
         input.mdk_volume ?? '',
         input.mdk_satuan ?? 0,
         itemBarangJson,
+        input.mdk_kak_id ? Number(input.mdk_kak_id) : null,
         input.mdk_created_by ?? null,
       ]
     );
-    return result.insertId;
+
+    const newMdkId = result.insertId;
+    if (input.mdk_kak_id && newMdkId) {
+      await pool.query(
+        `UPDATE kerangka_acuan_kerja 
+         SET kak_master_dokumen_id = ? 
+         WHERE kak_id = ? AND (kak_master_dokumen_id IS NULL OR kak_master_dokumen_id = 0)`,
+        [newMdkId, Number(input.mdk_kak_id)]
+      );
+    }
+
+    return newMdkId;
   }
 
   static async update(input: UpdateMasterDokumenInput): Promise<boolean> {
@@ -202,6 +215,7 @@ export class MasterDokumenRepository {
            mdk_kode_level5 = ?, mdk_nama_level5 = ?,
            mdk_keterangan = ?, mdk_apbd = ?, mdk_no_dpa = ?, mdk_volume = ?, mdk_satuan = ?, 
            mdk_item_barang = ?,
+           mdk_kak_id = ?,
            mdk_updated_by = ?, mdk_updated_at = NOW() 
        WHERE mdk_id = ? AND mdk_deleted_at IS NULL`,
       [
@@ -240,10 +254,20 @@ export class MasterDokumenRepository {
         input.mdk_volume ?? '',
         input.mdk_satuan ?? 0,
         itemBarangJson,
+        input.mdk_kak_id ? Number(input.mdk_kak_id) : null,
         input.mdk_updated_by ?? null,
         input.mdk_id,
       ]
     );
+
+    if (input.mdk_kak_id && input.mdk_id) {
+      await pool.query(
+        `UPDATE kerangka_acuan_kerja 
+         SET kak_master_dokumen_id = ? 
+         WHERE kak_id = ? AND (kak_master_dokumen_id IS NULL OR kak_master_dokumen_id = 0)`,
+        [input.mdk_id, Number(input.mdk_kak_id)]
+      );
+    }
     return result.affectedRows > 0;
   }
 

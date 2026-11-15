@@ -152,6 +152,16 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
       setMdkVolume(initialData.mdk_volume || '');
       setMdkKeterangan(initialData.mdk_keterangan || '');
 
+      // Restore KAK selection if mdk_kak_id exists
+      if (initialData.mdk_kak_id) {
+        setSelectedKakId(initialData.mdk_kak_id);
+        setInputMode('kak');
+      } else {
+        setSelectedKakId('');
+        setSelectedKakDetail(null);
+        setInputMode('manual');
+      }
+
       // Parse and restore selected mdk_item_barang
       if (initialData.mdk_item_barang) {
         try {
@@ -288,6 +298,16 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
     fetchProgram();
     fetchKakOptions();
   }, [isOpen]);
+
+  // ── Sinkronisasi detail KAK jika selectedKakId terisi (misal saat edit dokumen) ──
+  useEffect(() => {
+    if (selectedKakId && kakOptions.length > 0) {
+      const found = kakOptions.find((k) => k.kak_id === Number(selectedKakId));
+      if (found) {
+        setSelectedKakDetail(found);
+      }
+    }
+  }, [selectedKakId, kakOptions]);
 
   // ── Fetch Kegiatan saat mdkKodeProgram terisi/berubah ────────────────────
   useEffect(() => {
@@ -771,6 +791,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
       mdk_volume: mdkVolume.trim(),
       mdk_satuan: Number(mdkSatuan) || 0,
       mdk_item_barang: finalItems.length > 0 ? finalItems : null,
+      mdk_kak_id: inputMode === 'kak' && selectedKakId ? Number(selectedKakId) : null,
     };
 
     try {
@@ -974,12 +995,15 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                 <div className="inline-flex p-1 bg-gray-200/80 dark:bg-gray-900 rounded-xl shrink-0 self-start sm:self-auto">
                   <button
                     type="button"
-                    onClick={() => setInputMode('manual')}
-                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
-                      inputMode === 'manual'
+                    onClick={() => {
+                      setInputMode('manual');
+                      setSelectedKakId('');
+                      setSelectedKakDetail(null);
+                    }}
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${inputMode === 'manual'
                         ? 'bg-white dark:bg-gray-800 text-brand-600 dark:text-brand-400 shadow-xs'
                         : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                    }`}
+                      }`}
                   >
                     <span>✏️</span>
                     <span>Isi Manual / SIPD BPKAD</span>
@@ -987,11 +1011,10 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                   <button
                     type="button"
                     onClick={() => setInputMode('kak')}
-                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${
-                      inputMode === 'kak'
+                    className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${inputMode === 'kak'
                         ? 'bg-white dark:bg-gray-800 text-brand-600 dark:text-brand-400 shadow-xs'
                         : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
-                    }`}
+                      }`}
                   >
                     <span>📋</span>
                     <span>Pilih Berdasarkan KAK</span>
@@ -1038,6 +1061,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                     onChange={(val: string) => {
                       if (val) handleSelectKak(Number(val));
                     }}
+
                   />
 
                   {loadingKakDetail && (
@@ -1453,11 +1477,10 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                             <div
                               key={item.KODE_STANDAR_HARGA}
                               onClick={() => toggleSelectItem(item.KODE_STANDAR_HARGA)}
-                              className={`p-3.5 rounded-xl border transition-all cursor-pointer select-none flex flex-col justify-between ${
-                                isChecked
+                              className={`p-3.5 rounded-xl border transition-all cursor-pointer select-none flex flex-col justify-between ${isChecked
                                   ? 'border-brand-500 bg-brand-50/40 dark:bg-brand-950/30 ring-1.5 ring-brand-500/20 shadow-xs'
                                   : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'
-                              }`}
+                                }`}
                             >
                               <div className="flex items-start gap-3">
                                 <div className="pt-0.5">
