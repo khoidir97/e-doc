@@ -144,6 +144,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
         kak,
         masterDokumen,
         ppkPegawai: ppk,
+        pmhKodeRup,
       } = res.data;
 
       setSelectedKak(kak);
@@ -166,12 +167,14 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
         masterDokumen?.mdk_nama_pejabat_id ||
         null;
 
+      const defaultIdRup = pmhKodeRup || '';
+
       if (spesifikasiTeknis) {
         setSptId(spesifikasiTeknis.spt_id);
         setSptPaketPengadaan(spesifikasiTeknis.spt_paket_pengadaan || defaultPaket);
         setSptSatuanKerja(spesifikasiTeknis.spt_satuan_kerja || 'Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru');
         setSptPpkPgwId(spesifikasiTeknis.spt_spt_ppk_pgw_id || defaultPpkId);
-        setSpdIdRup(spesifikasiTeknis.spd_id_rup || '');
+        setSpdIdRup(spesifikasiTeknis.spd_id_rup || defaultIdRup);
         setSptNamaBarangType(spesifikasiTeknis.spt_nama_barang_type || defaultNamaBarang);
 
         // Parse TKDN/PDN
@@ -202,7 +205,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
         setSptPaketPengadaan(defaultPaket);
         setSptSatuanKerja('Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru');
         setSptPpkPgwId(defaultPpkId);
-        setSpdIdRup('');
+        setSpdIdRup(defaultIdRup);
         setSptNamaBarangType(defaultNamaBarang);
 
         setIsTkdn(true);
@@ -308,11 +311,34 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
     showToast('success', `${synced.length} item berhasil disinkronkan ke Daftar Kuantitas.`);
   };
 
+  const applyEvaluationStatus = (
+    text: string,
+    status: 'Lulus' | 'Gugur' | 'Lulus/Gugur'
+  ): string => {
+    const raw = text || '';
+    if (/lulus\s*\/\s*gugur/i.test(raw)) {
+      return raw.replace(/lulus\s*\/\s*gugur/i, status);
+    }
+    if (/^(lulus|gugur)\b/i.test(raw.trimStart())) {
+      return raw.replace(/^\s*(lulus|gugur)\b/i, status);
+    }
+    return raw.trim() ? `${status}\n${raw}` : status;
+  };
+
+  const normalizedWinnerName = sptNamaPelakuUsaha.trim().toLowerCase();
+  const winnerIndex = normalizedWinnerName
+    ? detailPelakuUsaha.findIndex(
+        (v) => v.dpu_nama_pelaku_usaha_potensial.trim().toLowerCase() === normalizedWinnerName
+      )
+    : -1;
+  const hasWinner = winnerIndex !== -1;
+
   // -------------------------------------------------------------
   // DYNAMIC FORM 3: DETAIL PELAKU USAHA HANDLERS
   // -------------------------------------------------------------
   const handleAddDetailPelakuUsaha = (defaultItemName?: string) => {
     const itemToUse = defaultItemName || (detailTeknis[0]?.dspt_item_barang_jasa || '');
+    const defaultStatus = hasWinner ? 'Gugur' : 'Lulus/Gugur';
     setDetailPelakuUsaha((prev) => [
       ...prev,
       {
@@ -320,7 +346,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
         dpu_nama_pelaku_usaha_potensial: '',
         dpu_link_katalog: '',
         dpu_harga: 0,
-        dpu_evaluasi_berdasarkan_parameter: 'Lulus/Gugur\nSeluruh parameter Spesifikasi terpenuhi\nLokasi : Pekanbaru',
+        dpu_evaluasi_berdasarkan_parameter: `${defaultStatus}\nSeluruh parameter Spesifikasi terpenuhi\nLokasi : Pekanbaru`,
       },
     ]);
   };
@@ -334,17 +360,60 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
   };
 
   const handleRemoveDetailPelakuUsaha = (index: number) => {
-    setDetailPelakuUsaha((prev) => prev.filter((_, idx) => idx !== index));
+    const removedWasWinner = index === winnerIndex;
+    setDetailPelakuUsaha((prev) => {
+      const filtered = prev.filter((_, idx) => idx !== index);
+      if (removedWasWinner) {
+        return filtered.map((item) => ({
+          ...item,
+          dpu_evaluasi_berdasarkan_parameter: applyEvaluationStatus(
+            item.dpu_evaluasi_berdasarkan_parameter,
+            'Lulus/Gugur'
+          ),
+        }));
+      }
+      return filtered;
+    });
+    if (removedWasWinner) {
+      setSptNamaPelakuUsaha('');
+    }
   };
 
-  const handleSetPemenang = (vendor: DetailDaftarPelakuUsaha) => {
+  const handleSetPemenang = (vendor: DetailDaftarPelakuUsaha, winnerIdx: number) => {
+    if (!vendor.dpu_nama_pelaku_usaha_potensial.trim()) {
+      showToast('error', 'Isi Nama Pelaku Usaha Potensial terlebih dahulu sebelum menetapkan pemenang.');
+      return;
+    }
     setSptNamaPelakuUsaha(vendor.dpu_nama_pelaku_usaha_potensial);
     if (vendor.dpu_link_katalog) {
       if (!sptLinkKatalog.includes(vendor.dpu_link_katalog)) {
         setSptLinkKatalog((prev) => (prev ? `${prev}<br/><a href="${vendor.dpu_link_katalog}" target="_blank">${vendor.dpu_link_katalog}</a>` : `<p><a href="${vendor.dpu_link_katalog}" target="_blank">${vendor.dpu_link_katalog}</a></p>`));
       }
     }
+    setDetailPelakuUsaha((prev) =>
+      prev.map((item, idx) => ({
+        ...item,
+        dpu_evaluasi_berdasarkan_parameter: applyEvaluationStatus(
+          item.dpu_evaluasi_berdasarkan_parameter,
+          idx === winnerIdx ? 'Lulus' : 'Gugur'
+        ),
+      }))
+    );
     showToast('success', `${vendor.dpu_nama_pelaku_usaha_potensial} dipilih sebagai Pelaku Usaha yang Lulus.`);
+  };
+
+  const handleBatalkanPemenang = () => {
+    setSptNamaPelakuUsaha('');
+    setDetailPelakuUsaha((prev) =>
+      prev.map((item) => ({
+        ...item,
+        dpu_evaluasi_berdasarkan_parameter: applyEvaluationStatus(
+          item.dpu_evaluasi_berdasarkan_parameter,
+          'Lulus/Gugur'
+        ),
+      }))
+    );
+    showToast('success', 'Status pemenang dibatalkan.');
   };
 
   // -------------------------------------------------------------
@@ -482,8 +551,8 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
               type="button"
               onClick={() => setActiveTab('form')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${activeTab === 'form'
-                  ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
                 }`}
             >
               Form Input
@@ -492,8 +561,8 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
               type="button"
               onClick={() => setActiveTab('preview')}
               className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${activeTab === 'preview'
-                  ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
-                  : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
+                ? 'bg-white dark:bg-gray-900 text-gray-900 dark:text-white shadow-sm'
+                : 'text-gray-500 hover:text-gray-900 dark:hover:text-white'
                 }`}
             >
               Preview Cetak
@@ -689,7 +758,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
 
               <div>
                 <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
-                  ID RUP (spd_id_rup)
+                  ID RUP
                 </label>
                 <input
                   type="text"
@@ -1088,22 +1157,39 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
                       <span className="text-xs font-bold text-gray-700 dark:text-gray-300">
                         Pelaku Usaha #{idx + 1}
                       </span>
-                      {sptNamaPelakuUsaha && sptNamaPelakuUsaha.toLowerCase() === vendor.dpu_nama_pelaku_usaha_potensial.toLowerCase() && (
+                      {idx === winnerIndex && (
                         <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
                           Penyedia Lulus
                         </span>
                       )}
                     </div>
                     <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleSetPemenang(vendor)}
-                        className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 cursor-pointer"
-                        title="Jadikan sebagai pelaku usaha yang lulus untuk halaman 5"
-                      >
-                        ✓ Set Sebagai Pemenang / Lulus
-                      </button>
-                      <span className="text-gray-300 dark:text-gray-600">|</span>
+                      {!hasWinner && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() => handleSetPemenang(vendor, idx)}
+                            className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 cursor-pointer"
+                            title="Jadikan sebagai pelaku usaha yang lulus untuk halaman 5"
+                          >
+                            ✓ Set Sebagai Pemenang / Lulus
+                          </button>
+                          <span className="text-gray-300 dark:text-gray-600">|</span>
+                        </>
+                      )}
+                      {idx === winnerIndex && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={handleBatalkanPemenang}
+                            className="text-xs font-semibold text-amber-600 hover:text-amber-700 cursor-pointer"
+                            title="Batalkan pilihan pemenang"
+                          >
+                            ✕ Batalkan Pemenang
+                          </button>
+                          <span className="text-gray-300 dark:text-gray-600">|</span>
+                        </>
+                      )}
                       <button
                         type="button"
                         onClick={() => handleRemoveDetailPelakuUsaha(idx)}
@@ -1143,7 +1229,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
 
                     <div>
                       <label className="block text-[11px] font-semibold text-gray-600 dark:text-gray-400 mb-1">
-                        Harga (dpu_harga)
+                        Harga
                       </label>
                       <RupiahInput
                         value={vendor.dpu_harga}

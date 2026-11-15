@@ -67,6 +67,7 @@ export interface SpesifikasiTeknisWithDetails {
   kak: KerangkaAcuanKerja | null;
   masterDokumen: MasterDokumen | null;
   ppkPegawai: Pegawai | null;
+  pmhKodeRup?: string | null;
 }
 
 export interface SaveSpesifikasiTeknisPayload {

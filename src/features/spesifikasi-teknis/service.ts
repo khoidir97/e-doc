@@ -2,6 +2,7 @@ import { SpesifikasiTeknisRepository } from './repository';
 import { KerangkaAcuanKerjaRepository } from '@/features/kerangka-acuan-kerja/repository';
 import { MasterDokumenRepository } from '@/features/master-dokumen/repository';
 import { PegawaiRepository } from '@/features/pegawai/repository';
+import { PermohonanRepository } from '@/features/permohonan/repository';
 import {
   SpesifikasiTeknisWithDetails,
   SaveSpesifikasiTeknisPayload,
@@ -25,6 +26,8 @@ export class SpesifikasiTeknisService {
     if (ppkId) {
       ppkPegawai = await PegawaiRepository.findById(ppkId);
     }
+
+    const permohonan = await PermohonanRepository.findByKakId(kakId);
 
     // Default initial items if spesifikasi teknis does not exist yet
     let finalDetailTeknis = detailTeknis;
@@ -86,6 +89,7 @@ export class SpesifikasiTeknisService {
       kak,
       masterDokumen,
       ppkPegawai,
+      pmhKodeRup: permohonan?.pmh_kode_rup || null,
     };
   }
 
