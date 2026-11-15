@@ -6,6 +6,7 @@ export interface KerangkaAcuanKerja {
   kak_kegiatan: string | null;
   kak_kode_kegiatan: string | null;
   kak_sub_kegiatan: string | null;
+  kak_kode_sub_kegiatan?: string | null;
   kak_rekening: string | null;
   kak_kode_rekening: string | null;
   kak_pekerjaan: string | null;
@@ -73,6 +74,7 @@ export interface SaveKakPayload {
   kak_kegiatan?: string | null;
   kak_kode_kegiatan?: string | null;
   kak_sub_kegiatan?: string | null;
+  kak_kode_sub_kegiatan?: string | null;
   kak_rekening?: string | null;
   kak_kode_rekening?: string | null;
   kak_pekerjaan?: string | null;

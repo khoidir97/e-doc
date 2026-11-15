@@ -67,7 +67,7 @@ export class KerangkaAcuanKerjaRepository {
          COALESCE(NULLIF(TRIM(k.kak_kegiatan), ''), m.mdk_kegiatan, '') as kak_kegiatan,
          COALESCE(NULLIF(TRIM(k.kak_kode_kegiatan), ''), m.mdk_kode_kegiatan, '') as kak_kode_kegiatan,
          COALESCE(NULLIF(TRIM(k.kak_sub_kegiatan), ''), m.mdk_sub_kegiatan, '') as kak_sub_kegiatan,
-         COALESCE(m.mdk_kode_sub_kegiatan, '') as kak_kode_sub_kegiatan,
+         COALESCE(NULLIF(TRIM(k.kak_kode_sub_kegiatan), ''), m.mdk_kode_sub_kegiatan, '') as kak_kode_sub_kegiatan,
          COALESCE(NULLIF(TRIM(k.kak_rekening), ''), m.mdk_uraian_belanja, m.mdk_rekening_belanja, '') as kak_rekening,
          COALESCE(NULLIF(TRIM(k.kak_kode_rekening), ''), m.mdk_rekening_belanja, '') as kak_kode_rekening,
          COALESCE(NULLIF(TRIM(k.kak_tahun_anggaran), ''), m.mdk_apbd, '2026') as kak_tahun_anggaran,
@@ -127,6 +127,7 @@ export class KerangkaAcuanKerjaRepository {
             kak_kegiatan = ?,
             kak_kode_kegiatan = ?,
             kak_sub_kegiatan = ?,
+            kak_kode_sub_kegiatan = ?,
             kak_rekening = ?,
             kak_kode_rekening = ?,
             kak_pekerjaan = ?,
@@ -154,6 +155,7 @@ export class KerangkaAcuanKerjaRepository {
             payload.kak_kegiatan || null,
             payload.kak_kode_kegiatan || null,
             payload.kak_sub_kegiatan || null,
+            payload.kak_kode_sub_kegiatan || null,
             payload.kak_rekening || null,
             payload.kak_kode_rekening || null,
             payload.kak_pekerjaan || null,
@@ -179,13 +181,13 @@ export class KerangkaAcuanKerjaRepository {
         const [insertResult]: any = await connection.query(
           `INSERT INTO kerangka_acuan_kerja
             (kak_master_dokumen_id, kak_program, kak_kode_program, kak_kegiatan, kak_kode_kegiatan,
-             kak_sub_kegiatan, kak_rekening, kak_kode_rekening, kak_pekerjaan, kak_tahun_anggaran,
+             kak_sub_kegiatan, kak_kode_sub_kegiatan, kak_rekening, kak_kode_rekening, kak_pekerjaan, kak_tahun_anggaran,
              kak_latar_belakang, kak_maksud_dan_tujuan, kak_referensi_hukum,
              kak_target_sasaran, kak_nama_organisasi_dan_pengadaan, kak_sumber_dana_perkiraan_biaya,
              kak_perkiraan_biaya_id, kak_ruang_lingkup_lokasi_pekerjaan, kak_jangka_waktu_pelaksanaan,
              kak_metode_pemilihan, kak_spesifikasi_teknis_id, kak_persyaratan_kualifikasi_penyedia,
              kak_penutup, kak_created_by, kak_created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
           [
             payload.kak_master_dokumen_id || null,
             payload.kak_program || null,
@@ -193,6 +195,7 @@ export class KerangkaAcuanKerjaRepository {
             payload.kak_kegiatan || null,
             payload.kak_kode_kegiatan || null,
             payload.kak_sub_kegiatan || null,
+            payload.kak_kode_sub_kegiatan || null,
             payload.kak_rekening || null,
             payload.kak_kode_rekening || null,
             payload.kak_pekerjaan || null,

@@ -74,7 +74,7 @@ export default function PermohonanPrintPage({ params }: { params: Promise<{ id: 
   const defaultPaket = kak?.kak_pekerjaan || kak?.kak_rekening || masterDokumen?.mdk_pekerjaan || masterDokumen?.mdk_uraian_belanja || 'Pengadaan Barang / Jasa';
   const defaultMetode = kak?.kak_metode_pemilihan || 'e-purchasing melalui e katalog v.6';
   const defaultPagu = Number(masterDokumen?.mdk_pagu_anggaran) || totalHps || totalBiayaKak || 0;
-  const defaultHps = totalHps || totalBiayaKak || 0;
+  const defaultHps = 0;
 
   // Nilai-nilai dokumen
   const nomorSurat = permohonan?.pmh_nomor || `S.000.3.1/ BPKAD-ND/      / ${tahun}`;
@@ -315,7 +315,7 @@ export default function PermohonanPrintPage({ params }: { params: Promise<{ id: 
                   <td className="py-1 align-top">HPS</td>
                   <td className="w-4 py-1 align-top text-center">:</td>
                   <td className="py-1 align-top">
-                    <span>{formatRupiah(hps).replace('Rp ', 'Rp. ')},-</span>
+                    <span>{hps > 0 ? formatRupiah(hps).replace('Rp ', 'Rp. ') + ',-' : 'Non HPS'}</span>
                     {hps > 0 && (
                       <div className="italic text-[12px] text-gray-800">
                         ({terbilang(hps)})

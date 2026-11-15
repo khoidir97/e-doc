@@ -327,6 +327,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
         setKakKegiatan(kak.kak_kegiatan || currentMaster?.mdk_kegiatan || '');
         setKakKodeKegiatan(kak.kak_kode_kegiatan || currentMaster?.mdk_kode_kegiatan || '');
         setKakSubKegiatan(kak.kak_sub_kegiatan || currentMaster?.mdk_sub_kegiatan || '');
+        setKakKodeSubKegiatan(kak.kak_kode_sub_kegiatan || currentMaster?.mdk_kode_sub_kegiatan || '');
         setKakRekening(kak.kak_rekening || currentMaster?.mdk_uraian_belanja || '');
         setKakKodeRekening(kak.kak_kode_rekening || currentMaster?.mdk_rekening_belanja || '');
         setKakPekerjaan(kak.kak_pekerjaan || currentMaster?.mdk_pekerjaan || currentMaster?.mdk_uraian_belanja || '');
@@ -378,6 +379,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
           setKakKegiatan(currentMaster.mdk_kegiatan || '');
           setKakKodeKegiatan(currentMaster.mdk_kode_kegiatan || '');
           setKakSubKegiatan(currentMaster.mdk_sub_kegiatan || '');
+          setKakKodeSubKegiatan(currentMaster.mdk_kode_sub_kegiatan || '');
           setKakRekening(currentMaster.mdk_uraian_belanja || '');
           setKakKodeRekening(currentMaster.mdk_rekening_belanja || '');
           setKakPekerjaan(namaPekerjaan);
@@ -456,6 +458,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
         setKakKegiatan(kak.kak_kegiatan || '');
         setKakKodeKegiatan(kak.kak_kode_kegiatan || '');
         setKakSubKegiatan(kak.kak_sub_kegiatan || '');
+        setKakKodeSubKegiatan(kak.kak_kode_sub_kegiatan || res.data.masterDokumen?.mdk_kode_sub_kegiatan || '');
         setKakRekening(kak.kak_rekening || '');
         setKakKodeRekening(kak.kak_kode_rekening || '');
         setKakPekerjaan(kak.kak_pekerjaan || '');
@@ -677,6 +680,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
       kak_kegiatan: kakKegiatan || null,
       kak_kode_kegiatan: kakKodeKegiatan || null,
       kak_sub_kegiatan: kakSubKegiatan || null,
+      kak_kode_sub_kegiatan: kakKodeSubKegiatan || null,
       kak_rekening: kakRekening || null, // sama dengan belanja
       kak_kode_rekening: kakKodeRekening || null, // sama dengan kode rekening belanja
       kak_pekerjaan: kakPekerjaan || null,
@@ -764,6 +768,51 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
       prev.includes(kode) ? prev.filter((k) => k !== kode) : [...prev, kode]
     );
   };
+
+  // Pastikan nilai tersimpan selalu tampil di select walaupun list API belum/tidak memuatnya
+  const withSavedOption = (
+    opts: { value: string; label: string; sublabel?: string }[],
+    kode: string,
+    nama: string
+  ) => {
+    if (kode && !opts.some((o) => o.value === kode)) {
+      return [{ value: kode, label: nama || kode, sublabel: kode }, ...opts];
+    }
+    return opts;
+  };
+
+  const programOptions = withSavedOption(
+    programList.map((p) => ({ value: p.KODE_PROGRAM, label: p.NAMA_PROGRAM, sublabel: p.KODE_PROGRAM })),
+    kakKodeProgram,
+    kakProgram
+  );
+  const kegiatanOptions = withSavedOption(
+    kegiatanList.map((k) => ({
+      value: k.KODE_KEGIATAN,
+      label: k.NAMA_KEGIATAN,
+      sublabel: `${k.KODE_KEGIATAN}${k.PAGU ? ` · Pagu: Rp ${Number(k.PAGU).toLocaleString('id-ID')}` : ''}`,
+    })),
+    kakKodeKegiatan,
+    kakKegiatan
+  );
+  const subKegiatanOptions = withSavedOption(
+    subKegiatanList.map((sk) => ({
+      value: sk.KODE_SUB_KEGIATAN,
+      label: sk.NAMA_SUB_KEGIATAN,
+      sublabel: `${sk.KODE_SUB_KEGIATAN}${sk.PAGU ? ` · Pagu: Rp ${Number(sk.PAGU).toLocaleString('id-ID')}` : ''}`,
+    })),
+    kakKodeSubKegiatan,
+    kakSubKegiatan
+  );
+  const rekeningOptions = withSavedOption(
+    rekeningBelanjaList.map((r) => ({
+      value: r.KODE_REKENING,
+      label: r.NAMA_REKENING,
+      sublabel: `${r.KODE_REKENING} · Pagu: Rp ${Number(r.PAGU).toLocaleString('id-ID')}`,
+    })),
+    kakKodeRekening,
+    kakRekening
+  );
 
   return (
     <div className="p-1 sm:p-2 w-full space-y-6">
@@ -1047,11 +1096,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                     searchPlaceholder="Cari kode atau nama program..."
                     disabled={loadingProgram}
                     value={kakKodeProgram}
-                    options={programList.map((p) => ({
-                      value: p.KODE_PROGRAM,
-                      label: p.NAMA_PROGRAM,
-                      sublabel: p.KODE_PROGRAM,
-                    }))}
+                    options={programOptions}
                     onChange={(val: string) => {
                       const found = programList.find((p) => p.KODE_PROGRAM === val);
                       setKakKodeProgram(val);
@@ -1108,11 +1153,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                     searchPlaceholder="Cari kode atau nama kegiatan..."
                     disabled={loadingKegiatan || !kakKodeProgram}
                     value={kakKodeKegiatan}
-                    options={kegiatanList.map((k) => ({
-                      value: k.KODE_KEGIATAN,
-                      label: k.NAMA_KEGIATAN,
-                      sublabel: `${k.KODE_KEGIATAN}${k.PAGU ? ` · Pagu: Rp ${Number(k.PAGU).toLocaleString('id-ID')}` : ''}`,
-                    }))}
+                    options={kegiatanOptions}
                     onChange={(val: string) => {
                       const found = kegiatanList.find((k) => k.KODE_KEGIATAN === val);
                       setKakKodeKegiatan(val);
@@ -1166,11 +1207,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                     searchPlaceholder="Cari kode atau nama sub kegiatan..."
                     disabled={loadingSubKegiatan || !kakKodeKegiatan}
                     value={kakKodeSubKegiatan}
-                    options={subKegiatanList.map((sk) => ({
-                      value: sk.KODE_SUB_KEGIATAN,
-                      label: sk.NAMA_SUB_KEGIATAN,
-                      sublabel: `${sk.KODE_SUB_KEGIATAN}${sk.PAGU ? ` · Pagu: Rp ${Number(sk.PAGU).toLocaleString('id-ID')}` : ''}`,
-                    }))}
+                    options={subKegiatanOptions}
                     onChange={(val: string) => {
                       const found = subKegiatanList.find((sk) => sk.KODE_SUB_KEGIATAN === val);
                       setKakKodeSubKegiatan(val);
@@ -1221,11 +1258,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                     searchPlaceholder="Cari kode atau nama rekening..."
                     disabled={!kakKodeSubKegiatan || loadingRekBel}
                     value={kakKodeRekening}
-                    options={rekeningBelanjaList.map((r) => ({
-                      value: r.KODE_REKENING,
-                      label: r.NAMA_REKENING,
-                      sublabel: `${r.KODE_REKENING} · Pagu: Rp ${Number(r.PAGU).toLocaleString('id-ID')}`,
-                    }))}
+                    options={rekeningOptions}
                     onChange={(val: string) => {
                       const found = rekeningBelanjaList.find((r) => r.KODE_REKENING === val);
                       setKakKodeRekening(val);
