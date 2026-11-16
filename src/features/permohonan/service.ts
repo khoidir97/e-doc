@@ -54,6 +54,10 @@ export class PermohonanService {
     return await PermohonanRepository.getKakOptions();
   }
 
+  static async getPegawaiList(): Promise<{ pgw_id: number; pgw_nama: string; pgw_nip: string; pgw_jabatan: string }[]> {
+    return await PermohonanRepository.getPegawaiList();
+  }
+
   static async save(payload: SavePermohonanPayload, userId?: number | null): Promise<number> {
     return await PermohonanRepository.save(payload, userId);
   }

@@ -5,7 +5,14 @@ export class PermohonanRepository {
   static async findByKakId(kakId: number): Promise<Permohonan | null> {
     await initDatabase();
     const [rows] = await pool.query<any[]>(
-      `SELECT * FROM permohonan WHERE pmh_kak_id = ? AND pmh_deleted_at IS NULL LIMIT 1`,
+      `SELECT p.*,
+              pgw.pgw_nama AS ppk_nama,
+              pgw.pgw_nip AS ppk_nip,
+              pgw.pgw_jabatan AS ppk_jabatan
+       FROM permohonan p
+       LEFT JOIN pegawai pgw ON p.pmh_ppk_pgw_id = pgw.pgw_id
+       WHERE p.pmh_kak_id = ? AND p.pmh_deleted_at IS NULL
+       LIMIT 1`,
       [kakId]
     );
     return rows.length > 0 ? (rows[0] as Permohonan) : null;
@@ -14,10 +21,25 @@ export class PermohonanRepository {
   static async findById(pmhId: number): Promise<Permohonan | null> {
     await initDatabase();
     const [rows] = await pool.query<any[]>(
-      `SELECT * FROM permohonan WHERE pmh_id = ? AND pmh_deleted_at IS NULL LIMIT 1`,
+      `SELECT p.*,
+              pgw.pgw_nama AS ppk_nama,
+              pgw.pgw_nip AS ppk_nip,
+              pgw.pgw_jabatan AS ppk_jabatan
+       FROM permohonan p
+       LEFT JOIN pegawai pgw ON p.pmh_ppk_pgw_id = pgw.pgw_id
+       WHERE p.pmh_id = ? AND p.pmh_deleted_at IS NULL
+       LIMIT 1`,
       [pmhId]
     );
     return rows.length > 0 ? (rows[0] as Permohonan) : null;
+  }
+
+  static async getPegawaiList(): Promise<{ pgw_id: number; pgw_nama: string; pgw_nip: string; pgw_jabatan: string }[]> {
+    await initDatabase();
+    const [rows] = await pool.query<any[]>(
+      `SELECT pgw_id, pgw_nama, pgw_nip, pgw_jabatan FROM pegawai WHERE pgw_deleted_at IS NULL ORDER BY pgw_nama ASC`
+    );
+    return rows as { pgw_id: number; pgw_nama: string; pgw_nip: string; pgw_jabatan: string }[];
   }
 
   static async getKakOptions(): Promise<KakOptionItem[]> {
@@ -95,6 +117,7 @@ export class PermohonanRepository {
             pmh_metode_pemilihan = ?,
             pmh_sumber_dana = ?,
             pmh_paragraf2 = ?,
+            pmh_ppk_pgw_id = ?,
             pmh_updated_by = ?,
             pmh_updated_at = NOW()
           WHERE pmh_id = ?`,
@@ -113,6 +136,7 @@ export class PermohonanRepository {
             payload.pmh_metode_pemilihan || null,
             payload.pmh_sumber_dana || null,
             payload.pmh_paragraf2 || null,
+            payload.pmh_ppk_pgw_id || null,
             userId ?? null,
             pmhId,
           ]
@@ -122,8 +146,8 @@ export class PermohonanRepository {
           `INSERT INTO permohonan
             (pmh_kak_id, pmh_tanggal, pmh_nomor, pmh_sifat, pmh_lampiran, pmh_hal,
              pmh_paragraf1, pmh_kode_rup, pmh_nama_paket, pmh_pagu_anggaran, pmh_hps,
-             pmh_metode_pemilihan, pmh_sumber_dana, pmh_paragraf2, pmh_created_by, pmh_created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+             pmh_metode_pemilihan, pmh_sumber_dana, pmh_paragraf2, pmh_ppk_pgw_id, pmh_created_by, pmh_created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
           [
             payload.pmh_kak_id,
             payload.pmh_tanggal || null,
@@ -139,6 +163,7 @@ export class PermohonanRepository {
             payload.pmh_metode_pemilihan || null,
             payload.pmh_sumber_dana || null,
             payload.pmh_paragraf2 || null,
+            payload.pmh_ppk_pgw_id || null,
             userId ?? null,
           ]
         );

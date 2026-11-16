@@ -224,3 +224,22 @@ export async function getHpsItemsForKakAction(mdkId: number): Promise<ActionResp
   }
 }
 
+export async function getPegawaiListForKakAction(): Promise<
+  ActionResponse<{ pgw_id: number; pgw_nama: string; pgw_nip: string; pgw_jabatan: string }[]>
+> {
+  try {
+    const list = await KerangkaAcuanKerjaService.getPegawaiList();
+    return {
+      success: true,
+      message: 'Berhasil mengambil daftar pegawai',
+      data: list,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || 'Gagal mengambil daftar pegawai',
+      data: [],
+    };
+  }
+}
+

@@ -227,7 +227,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
       setAppliedNotice(null);
       setSelectedKakId('');
       setSelectedKakDetail(null);
-      setInputMode('manual');
+      setInputMode('kak');
     }
     setActiveTab(1);
     setError('');
@@ -1001,8 +1001,8 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                       setSelectedKakDetail(null);
                     }}
                     className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${inputMode === 'manual'
-                        ? 'bg-white dark:bg-gray-800 text-brand-600 dark:text-brand-400 shadow-xs'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      ? 'bg-white dark:bg-gray-800 text-brand-600 dark:text-brand-400 shadow-xs'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                       }`}
                   >
                     <span>✏️</span>
@@ -1012,8 +1012,8 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                     type="button"
                     onClick={() => setInputMode('kak')}
                     className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 ${inputMode === 'kak'
-                        ? 'bg-white dark:bg-gray-800 text-brand-600 dark:text-brand-400 shadow-xs'
-                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
+                      ? 'bg-white dark:bg-gray-800 text-brand-600 dark:text-brand-400 shadow-xs'
+                      : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                       }`}
                   >
                     <span>📋</span>
@@ -1478,8 +1478,8 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                               key={item.KODE_STANDAR_HARGA}
                               onClick={() => toggleSelectItem(item.KODE_STANDAR_HARGA)}
                               className={`p-3.5 rounded-xl border transition-all cursor-pointer select-none flex flex-col justify-between ${isChecked
-                                  ? 'border-brand-500 bg-brand-50/40 dark:bg-brand-950/30 ring-1.5 ring-brand-500/20 shadow-xs'
-                                  : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'
+                                ? 'border-brand-500 bg-brand-50/40 dark:bg-brand-950/30 ring-1.5 ring-brand-500/20 shadow-xs'
+                                : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 hover:border-gray-300 dark:hover:border-gray-600'
                                 }`}
                             >
                               <div className="flex items-start gap-3">
@@ -1594,18 +1594,15 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                     className="w-full px-3.5 py-2.5 text-sm rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-white focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 focus:outline-none transition-all"
                   />
                 </div>
-
-                <div className="md:col-span-2">
-                  <div className="flex items-center justify-between mb-1">
-                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">
-                      Pekerjaan
-                    </label>
-                    {selectedRincianItems.length > 0 && (
-                      <span className="text-[11px] text-brand-600 dark:text-brand-400 font-medium">
-                        (Dapat otomatis terisi dari tombol &quot;Terapkan ke Form&quot; di Tab 1)
-                      </span>
-                    )}
-                  </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">
+                    Pekerjaan
+                  </label>
+                  {selectedRincianItems.length > 0 && (
+                    <span className="text-[11px] text-brand-600 dark:text-brand-400 font-medium">
+                      (Dapat otomatis terisi dari tombol &quot;Terapkan ke Form&quot; di Tab 1)
+                    </span>
+                  )}
                   <textarea
                     rows={2}
                     placeholder="Nama paket pekerjaan"
@@ -1615,7 +1612,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
                   />
                 </div>
 
-                <div className="md:col-span-2">
+                <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Keterangan Tambahan
                   </label>

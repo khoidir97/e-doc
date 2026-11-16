@@ -9,6 +9,7 @@ import {
   getManualKakListAction,
   saveKerangkaAcuanKerjaAction,
   getHpsItemsForKakAction,
+  getPegawaiListForKakAction,
 } from '../actions';
 import {
   KerangkaAcuanKerja,
@@ -38,7 +39,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
   initialMasterDokumenId,
 }) => {
   // Mode: 'master' (menggunakan Master Dokumen) atau 'manual' (mengisi manual / tarik API BPKAD)
-  const [selectedMode, setSelectedMode] = useState<'master' | 'manual'>('master');
+  const [selectedMode, setSelectedMode] = useState<'master' | 'manual'>('manual');
 
   // Master Dokumen states
   const [masterDokumenList, setMasterDokumenList] = useState<MasterDokumen[]>([]);
@@ -88,6 +89,10 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
   const [kakKodeRekening, setKakKodeRekening] = useState(''); // sama dengan kode rekening belanja
   const [kakPekerjaan, setKakPekerjaan] = useState('');
   const [kakTahunAnggaran, setKakTahunAnggaran] = useState('2026');
+  const [kakPpkPgwId, setKakPpkPgwId] = useState<number | null>(null);
+  const [pegawaiList, setPegawaiList] = useState<
+    { pgw_id: number; pgw_nama: string; pgw_nip: string; pgw_jabatan: string }[]
+  >([]);
 
   // Konten 12 Poin KAK
   const [latarBelakang, setLatarBelakang] = useState('');
@@ -160,11 +165,17 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
     };
   }, []);
 
-  // Fetch Master Dokumen Options
+  // Fetch Master Dokumen Options & Pegawai List
   useEffect(() => {
     async function initOptions() {
       setLoadingOptions(true);
-      const res = await getMasterDokumenOptionsAction();
+      const [res, pgwRes] = await Promise.all([
+        getMasterDokumenOptionsAction(),
+        getPegawaiListForKakAction(),
+      ]);
+      if (pgwRes.success && pgwRes.data) {
+        setPegawaiList(pgwRes.data);
+      }
       if (res.success && res.data) {
         setMasterDokumenList(res.data);
         const targetId = initialMasterDokumenId || (res.data.length > 0 ? res.data[0].mdk_id : '');
@@ -336,6 +347,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
           currentMaster?.mdk_apbd?.match(/\b(20\d\d)\b/)?.[1] ||
           '2026'
         );
+        setKakPpkPgwId(kak.kak_ppk_pgw_id || currentMaster?.mdk_nama_pejabat_id || null);
 
         setLatarBelakang(kak.kak_latar_belakang || '');
         setMaksudDanTujuan(kak.kak_maksud_dan_tujuan || '');
@@ -371,9 +383,10 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
           const namaPekerjaan = currentMaster.mdk_pekerjaan || currentMaster.mdk_uraian_belanja || 'Pengadaan Barang / Jasa';
           const tahunAnggaran = currentMaster.mdk_apbd?.match(/\b(20\d\d)\b/)?.[1] || '2026';
           const noDpa = currentMaster.mdk_no_dpa || '-';
+          const defaultPpkId = currentMaster.mdk_nama_pejabat_id || null;
           const ppkNama = currentMaster.mdk_nama_pejabat || 'DANIEL PERDANA, SE';
 
-          // Set 9 DB fields
+          // Set DB fields
           setKakProgram(currentMaster.mdk_program || '');
           setKakKodeProgram(currentMaster.mdk_kode_program || '');
           setKakKegiatan(currentMaster.mdk_kegiatan || '');
@@ -384,6 +397,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
           setKakKodeRekening(currentMaster.mdk_rekening_belanja || '');
           setKakPekerjaan(namaPekerjaan);
           setKakTahunAnggaran(tahunAnggaran);
+          setKakPpkPgwId(defaultPpkId);
 
           const defaults = getSmartDefaults({
             pekerjaan: namaPekerjaan,
@@ -463,6 +477,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
         setKakKodeRekening(kak.kak_kode_rekening || '');
         setKakPekerjaan(kak.kak_pekerjaan || '');
         setKakTahunAnggaran(kak.kak_tahun_anggaran || '2026');
+        setKakPpkPgwId(kak.kak_ppk_pgw_id || null);
 
         setLatarBelakang(kak.kak_latar_belakang || '');
         setMaksudDanTujuan(kak.kak_maksud_dan_tujuan || '');
@@ -511,6 +526,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
     setKakKodeRekening('');
     setKakPekerjaan('');
     setKakTahunAnggaran('2026');
+    setKakPpkPgwId(null);
 
     const defaults = getSmartDefaults({
       pekerjaan: 'Pengadaan Barang / Jasa',
@@ -594,8 +610,8 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
 
     // 1. Set kakPekerjaan jika masih kosong atau ganti dengan gabungan nama barang
     const namaList = selectedItems.map((i) => i.NAMA_STANDAR_HARGA.trim()).filter(Boolean);
-    const pekerjaanText = namaList.join(', ');
-    setKakPekerjaan(pekerjaanText);
+    // const pekerjaanText = namaList.join(', ');
+    // setKakPekerjaan(pekerjaanText);
 
     // 2. Set Tabel Perkiraan Biaya
     const rows: DetailKakPerkiraanBiaya[] = selectedItems.map((item) => {
@@ -620,7 +636,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
 
     // 4. Update Smart Defaults Template agar sinkron dengan nama pekerjaan baru
     const defaults = getSmartDefaults({
-      pekerjaan: pekerjaanText,
+      // pekerjaan: pekerjaanText,
       tahunAnggaran: kakTahunAnggaran,
     });
     setLatarBelakang(defaults.defaultLatarBelakang);
@@ -636,13 +652,27 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
     }, 4500);
   };
 
+  const handleSelectPpk = (pgwId: number) => {
+    setKakPpkPgwId(pgwId);
+    const found = pegawaiList.find((p) => p.pgw_id === pgwId);
+    if (found) {
+      setNamaOrganisasi((prev) => {
+        if (/c\.\s*PPK\s*:/i.test(prev)) {
+          return prev.replace(/(c\.\s*PPK\s*:\s*)([^<]*)/i, `$1${found.pgw_nama}`);
+        }
+        return prev;
+      });
+    }
+  };
+
   // Regenerate template KAK teks dengan data terbaru
   const handleRegenerateTemplate = () => {
+    const selectedPpk = pegawaiList.find((p) => p.pgw_id === Number(kakPpkPgwId));
     const defaults = getSmartDefaults({
       pekerjaan: kakPekerjaan || kakRekening || 'Pengadaan Barang / Jasa',
       tahunAnggaran: kakTahunAnggaran,
       noDpa: selectedMasterDokumen?.mdk_no_dpa || '-',
-      ppkNama: selectedMasterDokumen?.mdk_nama_pejabat || 'DANIEL PERDANA, SE',
+      ppkNama: selectedPpk?.pgw_nama || selectedMasterDokumen?.mdk_nama_pejabat || 'DANIEL PERDANA, SE',
     });
     setLatarBelakang(defaults.defaultLatarBelakang);
     setMaksudDanTujuan(defaults.defaultMaksudTujuan);
@@ -685,6 +715,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
       kak_kode_rekening: kakKodeRekening || null, // sama dengan kode rekening belanja
       kak_pekerjaan: kakPekerjaan || null,
       kak_tahun_anggaran: kakTahunAnggaran || null,
+      kak_ppk_pgw_id: kakPpkPgwId ? Number(kakPpkPgwId) : null,
       kak_latar_belakang: latarBelakang,
       kak_maksud_dan_tujuan: maksudDanTujuan,
       kak_referensi_hukum: referensiHukum,
@@ -842,7 +873,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
             type="button"
             onClick={handlePrintPdf}
             disabled={saving}
-            className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -1311,6 +1342,23 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                     className="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs focus:ring-1 focus:ring-brand-500 focus:outline-none"
                   />
                 </div>
+
+                {/* 7. Pejabat Pembuat Komitmen (PPK) */}
+                <div className="md:col-span-2">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Nama Pejabat Pembuat Komitmen (PPK)
+                  </label>
+                  <SearchableSelect
+                    options={pegawaiList.map((p) => ({
+                      value: p.pgw_id,
+                      label: `${p.pgw_nama} - ${p.pgw_nip} (${p.pgw_jabatan || 'PPK'})`,
+                    }))}
+                    value={kakPpkPgwId || ''}
+                    onChange={(val) => handleSelectPpk(Number(val))}
+                    placeholder="-- Pilih Pegawai PPK --"
+                    searchPlaceholder="Cari nama, NIP, atau jabatan pegawai..."
+                  />
+                </div>
               </div>
 
               {/* Pemilihan Item Rincian Objek dari Api-RO (Optional Quick Apply) */}
@@ -1543,6 +1591,22 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                     Tahun {kakTahunAnggaran || '2026'}
                   </p>
                 </div>
+
+                {/* Pejabat PPK */}
+                <div>
+                  <span className="text-gray-400 dark:text-gray-500 font-semibold block text-[10px] uppercase tracking-wider mb-0.5">
+                    Pejabat PPK
+                  </span>
+                  <p className="font-semibold text-gray-900 dark:text-white leading-snug">
+                    {(() => {
+                      const foundPpk = pegawaiList.find((p) => p.pgw_id === Number(kakPpkPgwId));
+                      if (foundPpk) {
+                        return `${foundPpk.pgw_nama} (NIP. ${foundPpk.pgw_nip})`;
+                      }
+                      return <span className="text-gray-400 italic text-[11px] font-normal">Belum dipilih</span>;
+                    })()}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -1644,6 +1708,21 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
             <p className="text-xs text-gray-500 dark:text-gray-400">
               K/L/PD, Perangkat Daerah, dan nama Pejabat Pembuat Komitmen (PPK).
             </p>
+            <div>
+              <label className="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">
+                Pilih Pejabat Pembuat Komitmen (PPK)
+              </label>
+              <SearchableSelect
+                options={pegawaiList.map((p) => ({
+                  value: p.pgw_id,
+                  label: `${p.pgw_nama} - ${p.pgw_nip} (${p.pgw_jabatan || 'PPK'})`,
+                }))}
+                value={kakPpkPgwId || ''}
+                onChange={(val) => handleSelectPpk(Number(val))}
+                placeholder="-- Pilih Pegawai PPK --"
+                searchPlaceholder="Cari nama, NIP, atau jabatan pegawai..."
+              />
+            </div>
             <RichTextEditor
               value={namaOrganisasi}
               onChange={setNamaOrganisasi}
@@ -2025,7 +2104,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                 type="button"
                 onClick={handlePrintPdf}
                 disabled={saving}
-                className="flex-1 sm:flex-initial px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                className="flex-1 sm:flex-initial px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />

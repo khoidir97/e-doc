@@ -142,9 +142,9 @@ export default function PermohonanPrintPage({ params }: { params: Promise<{ id: 
     : defaultParagraf2Html;
 
   // Pejabat PPK
-  const namaPpk = masterDokumen?.mdk_nama_pejabat || 'DANIEL PERDANA, SE';
-  const nipPpk = masterDokumen?.mdk_nip_pejabat || '197507242001121006';
-  const jabatanPpk = masterDokumen?.mdk_jabatan_pejabat || 'Plt. Kepala Badan';
+  const namaPpk = permohonan?.ppk_nama || kak?.ppk_nama || masterDokumen?.mdk_nama_pejabat || 'DANIEL PERDANA, SE';
+  const nipPpk = permohonan?.ppk_nip || kak?.ppk_nip || masterDokumen?.mdk_nip_pejabat || '197507242001121006';
+  const jabatanPpk = permohonan?.ppk_jabatan || kak?.ppk_jabatan || masterDokumen?.mdk_jabatan_pejabat || 'Plt. Kepala Badan';
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-6 print:py-0 print:bg-white text-black font-serif">

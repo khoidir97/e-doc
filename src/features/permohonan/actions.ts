@@ -91,6 +91,25 @@ export async function getKakOptionsForPermohonanAction(): Promise<ActionResponse
   }
 }
 
+export async function getPegawaiListForPermohonanAction(): Promise<
+  ActionResponse<{ pgw_id: number; pgw_nama: string; pgw_nip: string; pgw_jabatan: string }[]>
+> {
+  try {
+    const data = await PermohonanService.getPegawaiList();
+    return {
+      success: true,
+      message: 'Berhasil mengambil daftar pegawai',
+      data,
+    };
+  } catch (error: any) {
+    return {
+      success: false,
+      message: error.message || 'Gagal mengambil daftar pegawai',
+      data: [],
+    };
+  }
+}
+
 export async function savePermohonanAction(
   payload: SavePermohonanPayload
 ): Promise<ActionResponse<{ pmhId: number }>> {

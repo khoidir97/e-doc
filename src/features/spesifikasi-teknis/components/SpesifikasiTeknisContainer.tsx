@@ -163,6 +163,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
         '';
 
       const defaultPpkId =
+        kak?.kak_ppk_pgw_id ||
         ppk?.pgw_id ||
         masterDokumen?.mdk_nama_pejabat_id ||
         null;

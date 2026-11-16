@@ -112,10 +112,13 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
   const totalBiaya = perkiraanBiayaList.reduce((acc, curr) => acc + (Number(curr.kpb_jumlah) || 0), 0);
   const terbilangText = terbilang(totalBiaya);
 
-  const isPA = masterDokumen?.mdk_jabatan_pejabat?.trim().toUpperCase() === 'PA';
+  const jabatanPejabatRaw = (kak?.ppk_jabatan || masterDokumen?.mdk_jabatan_pejabat || '').trim().toUpperCase();
+  const isPA =
+    jabatanPejabatRaw === 'PA' ||
+    (jabatanPejabatRaw.includes('PENGGUNA ANGGARAN') && !jabatanPejabatRaw.includes('KUASA'));
   const labelKpaPpk = isPA ? 'Pengguna Anggaran (PA)' : 'Kuasa Pengguna Anggaran (KPA)';
-  const namaPejabat = masterDokumen?.mdk_nama_pejabat || 'DANIEL PERDANA, SE';
-  const nipPejabat = masterDokumen?.mdk_nip_pejabat || '197507242001121006';
+  const namaPejabat = kak?.ppk_nama || masterDokumen?.mdk_nama_pejabat || 'DANIEL PERDANA, SE';
+  const nipPejabat = kak?.ppk_nip || masterDokumen?.mdk_nip_pejabat || '197507242001121006';
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 py-6 print:py-0 print:bg-white text-black font-serif">

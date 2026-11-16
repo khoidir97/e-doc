@@ -16,6 +16,7 @@ export const savePermohonanSchema = z.object({
   pmh_metode_pemilihan: z.string().nullable().optional(),
   pmh_sumber_dana: z.string().nullable().optional(),
   pmh_paragraf2: z.string().nullable().optional(),
+  pmh_ppk_pgw_id: z.coerce.number().nullable().optional(),
 });
 
 export type SavePermohonanSchemaType = z.infer<typeof savePermohonanSchema>;

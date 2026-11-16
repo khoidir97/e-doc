@@ -10,6 +10,10 @@ export class KerangkaAcuanKerjaService {
     return await KerangkaAcuanKerjaRepository.getAllKakForSelection();
   }
 
+  static async getPegawaiList(): Promise<{ pgw_id: number; pgw_nama: string; pgw_nip: string; pgw_jabatan: string }[]> {
+    return await KerangkaAcuanKerjaRepository.getPegawaiList();
+  }
+
   static async getByMasterDokumenId(mdkId: number): Promise<KerangkaAcuanKerjaWithDetails> {
     const kak = await KerangkaAcuanKerjaRepository.findByMasterDokumenId(mdkId);
     if (!kak) {

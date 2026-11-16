@@ -22,7 +22,7 @@ export class SpesifikasiTeknisService {
     }
 
     let ppkPegawai = null;
-    const ppkId = spesifikasiTeknis?.spt_spt_ppk_pgw_id || masterDokumen?.mdk_nama_pejabat_id;
+    const ppkId = spesifikasiTeknis?.spt_spt_ppk_pgw_id || kak?.kak_ppk_pgw_id || masterDokumen?.mdk_nama_pejabat_id;
     if (ppkId) {
       ppkPegawai = await PegawaiRepository.findById(ppkId);
     }

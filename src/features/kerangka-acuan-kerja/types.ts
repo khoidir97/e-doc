@@ -11,6 +11,10 @@ export interface KerangkaAcuanKerja {
   kak_kode_rekening: string | null;
   kak_pekerjaan: string | null;
   kak_tahun_anggaran: string | null;
+  kak_ppk_pgw_id?: number | null;
+  ppk_nama?: string | null;
+  ppk_nip?: string | null;
+  ppk_jabatan?: string | null;
   kak_latar_belakang: string | null;
   kak_maksud_dan_tujuan: string | null;
   kak_referensi_hukum: string | null;
@@ -79,6 +83,7 @@ export interface SaveKakPayload {
   kak_kode_rekening?: string | null;
   kak_pekerjaan?: string | null;
   kak_tahun_anggaran?: string | null;
+  kak_ppk_pgw_id?: number | null;
   kak_latar_belakang?: string | null;
   kak_maksud_dan_tujuan?: string | null;
   kak_referensi_hukum?: string | null;

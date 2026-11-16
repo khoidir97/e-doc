@@ -11,7 +11,14 @@ export class KerangkaAcuanKerjaRepository {
   static async findByMasterDokumenId(mdkId: number): Promise<KerangkaAcuanKerja | null> {
     await initDatabase();
     const [rows] = await pool.query<any[]>(
-      `SELECT * FROM kerangka_acuan_kerja WHERE kak_master_dokumen_id = ? AND kak_deleted_at IS NULL LIMIT 1`,
+      `SELECT k.*,
+              p.pgw_nama AS ppk_nama,
+              p.pgw_nip AS ppk_nip,
+              p.pgw_jabatan AS ppk_jabatan
+       FROM kerangka_acuan_kerja k
+       LEFT JOIN pegawai p ON k.kak_ppk_pgw_id = p.pgw_id
+       WHERE k.kak_master_dokumen_id = ? AND k.kak_deleted_at IS NULL
+       LIMIT 1`,
       [mdkId]
     );
     return rows.length > 0 ? (rows[0] as KerangkaAcuanKerja) : null;
@@ -20,7 +27,14 @@ export class KerangkaAcuanKerjaRepository {
   static async findById(kakId: number): Promise<KerangkaAcuanKerja | null> {
     await initDatabase();
     const [rows] = await pool.query<any[]>(
-      `SELECT * FROM kerangka_acuan_kerja WHERE kak_id = ? AND kak_deleted_at IS NULL LIMIT 1`,
+      `SELECT k.*,
+              p.pgw_nama AS ppk_nama,
+              p.pgw_nip AS ppk_nip,
+              p.pgw_jabatan AS ppk_jabatan
+       FROM kerangka_acuan_kerja k
+       LEFT JOIN pegawai p ON k.kak_ppk_pgw_id = p.pgw_id
+       WHERE k.kak_id = ? AND k.kak_deleted_at IS NULL
+       LIMIT 1`,
       [kakId]
     );
     return rows.length > 0 ? (rows[0] as KerangkaAcuanKerja) : null;
@@ -47,12 +61,25 @@ export class KerangkaAcuanKerjaRepository {
   static async getManualKakList(): Promise<KerangkaAcuanKerja[]> {
     await initDatabase();
     const [rows] = await pool.query<any[]>(
-      `SELECT * FROM kerangka_acuan_kerja 
-       WHERE (kak_master_dokumen_id IS NULL OR kak_master_dokumen_id = 0) 
-         AND kak_deleted_at IS NULL 
-       ORDER BY kak_id DESC`
+      `SELECT k.*,
+              p.pgw_nama AS ppk_nama,
+              p.pgw_nip AS ppk_nip,
+              p.pgw_jabatan AS ppk_jabatan
+       FROM kerangka_acuan_kerja k
+       LEFT JOIN pegawai p ON k.kak_ppk_pgw_id = p.pgw_id
+       WHERE (k.kak_master_dokumen_id IS NULL OR k.kak_master_dokumen_id = 0) 
+         AND k.kak_deleted_at IS NULL 
+       ORDER BY k.kak_id DESC`
     );
     return rows as KerangkaAcuanKerja[];
+  }
+
+  static async getPegawaiList(): Promise<{ pgw_id: number; pgw_nama: string; pgw_nip: string; pgw_jabatan: string }[]> {
+    await initDatabase();
+    const [rows] = await pool.query<any[]>(
+      `SELECT pgw_id, pgw_nama, pgw_nip, pgw_jabatan FROM pegawai WHERE pgw_deleted_at IS NULL ORDER BY pgw_nama ASC`
+    );
+    return rows as { pgw_id: number; pgw_nama: string; pgw_nip: string; pgw_jabatan: string }[];
   }
 
   static async getAllKakForSelection(): Promise<KakOptionItem[]> {
@@ -132,6 +159,7 @@ export class KerangkaAcuanKerjaRepository {
             kak_kode_rekening = ?,
             kak_pekerjaan = ?,
             kak_tahun_anggaran = ?,
+            kak_ppk_pgw_id = ?,
             kak_latar_belakang = ?,
             kak_maksud_dan_tujuan = ?,
             kak_referensi_hukum = ?,
@@ -160,6 +188,7 @@ export class KerangkaAcuanKerjaRepository {
             payload.kak_kode_rekening || null,
             payload.kak_pekerjaan || null,
             payload.kak_tahun_anggaran || null,
+            payload.kak_ppk_pgw_id || null,
             payload.kak_latar_belakang || null,
             payload.kak_maksud_dan_tujuan || null,
             payload.kak_referensi_hukum || null,
@@ -182,12 +211,12 @@ export class KerangkaAcuanKerjaRepository {
           `INSERT INTO kerangka_acuan_kerja
             (kak_master_dokumen_id, kak_program, kak_kode_program, kak_kegiatan, kak_kode_kegiatan,
              kak_sub_kegiatan, kak_kode_sub_kegiatan, kak_rekening, kak_kode_rekening, kak_pekerjaan, kak_tahun_anggaran,
-             kak_latar_belakang, kak_maksud_dan_tujuan, kak_referensi_hukum,
+             kak_ppk_pgw_id, kak_latar_belakang, kak_maksud_dan_tujuan, kak_referensi_hukum,
              kak_target_sasaran, kak_nama_organisasi_dan_pengadaan, kak_sumber_dana_perkiraan_biaya,
              kak_perkiraan_biaya_id, kak_ruang_lingkup_lokasi_pekerjaan, kak_jangka_waktu_pelaksanaan,
              kak_metode_pemilihan, kak_spesifikasi_teknis_id, kak_persyaratan_kualifikasi_penyedia,
              kak_penutup, kak_created_by, kak_created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
           [
             payload.kak_master_dokumen_id || null,
             payload.kak_program || null,
@@ -200,6 +229,7 @@ export class KerangkaAcuanKerjaRepository {
             payload.kak_kode_rekening || null,
             payload.kak_pekerjaan || null,
             payload.kak_tahun_anggaran || null,
+            payload.kak_ppk_pgw_id || null,
             payload.kak_latar_belakang || null,
             payload.kak_maksud_dan_tujuan || null,
             payload.kak_referensi_hukum || null,

@@ -17,6 +17,10 @@ export interface Permohonan {
   pmh_metode_pemilihan: string | null;
   pmh_sumber_dana: string | null;
   pmh_paragraf2: string | null;
+  pmh_ppk_pgw_id?: number | null;
+  ppk_nama?: string | null;
+  ppk_nip?: string | null;
+  ppk_jabatan?: string | null;
   pmh_created_at: string | Date | null;
   pmh_created_by: number | null;
   pmh_updated_at: string | Date | null;
@@ -41,6 +45,7 @@ export interface SavePermohonanPayload {
   pmh_metode_pemilihan?: string | null;
   pmh_sumber_dana?: string | null;
   pmh_paragraf2?: string | null;
+  pmh_ppk_pgw_id?: number | null;
 }
 
 export interface PermohonanWithDetails {

@@ -5,6 +5,7 @@ import {
   getKakOptionsForPermohonanAction,
   getPermohonanByKakIdAction,
   savePermohonanAction,
+  getPegawaiListForPermohonanAction,
 } from '../actions';
 import {
   KakOptionItem,
@@ -60,6 +61,10 @@ export const PermohonanContainer: React.FC<PermohonanContainerProps> = ({
   const [pmhParagraf2, setPmhParagraf2] = useState<string>(
     '<p>Berkaitan dengan hal tersebut di atas, bersama ini kami lampirkan Dokumen Persiapan Pengadaan (DPP), antara lain:</p><ol><li>KAK</li><li>Spesifikasi Teknis</li></ol><p>Demikian disampaikan untuk diproses lebih lanjut sesuai dengan ketentuan dan peraturan perundang-undangan yang berlaku.</p>'
   );
+  const [pmhPpkPgwId, setPmhPpkPgwId] = useState<number | null>(null);
+  const [pegawaiList, setPegawaiList] = useState<
+    { pgw_id: number; pgw_nama: string; pgw_nip: string; pgw_jabatan: string }[]
+  >([]);
 
   const showToast = (type: 'success' | 'error', message: string) => {
     setNotification({ type, message });
@@ -102,11 +107,17 @@ export const PermohonanContainer: React.FC<PermohonanContainerProps> = ({
     }
   };
 
-  // Fetch KAK options on mount
+  // Fetch KAK options & Pegawai List on mount
   useEffect(() => {
     async function initKakList() {
       setLoadingOptions(true);
-      const res = await getKakOptionsForPermohonanAction();
+      const [res, pgwRes] = await Promise.all([
+        getKakOptionsForPermohonanAction(),
+        getPegawaiListForPermohonanAction(),
+      ]);
+      if (pgwRes.success && pgwRes.data) {
+        setPegawaiList(pgwRes.data);
+      }
       if (res.success && res.data) {
         setKakOptions(res.data);
         const targetId = initialKakId || (res.data.length > 0 ? res.data[0].kak_id : '');
@@ -136,6 +147,7 @@ export const PermohonanContainer: React.FC<PermohonanContainerProps> = ({
       const defaultMetode = kak?.kak_metode_pemilihan || 'e-purchasing melalui e katalog v.6';
       const defaultPagu = Number(masterDokumen?.mdk_pagu_anggaran) || totalHps || totalBiayaKak || 0;
       const defaultHps = totalHps || totalBiayaKak || 0;
+      const defaultPpkId = kak?.kak_ppk_pgw_id || masterDokumen?.mdk_nama_pejabat_id || null;
 
       if (permohonan) {
         // Data permohonan sudah ada di database
@@ -159,6 +171,7 @@ export const PermohonanContainer: React.FC<PermohonanContainerProps> = ({
         setPmhMetodePemilihan(permohonan.pmh_metode_pemilihan || defaultMetode);
         setPmhSumberDana(permohonan.pmh_sumber_dana || `APBD Pemerintah Kota Pekanbaru Tahun Anggaran ${tahun}`);
         setPmhParagraf2(ensureHtmlParagraf2(permohonan.pmh_paragraf2 || ''));
+        setPmhPpkPgwId(permohonan.pmh_ppk_pgw_id || defaultPpkId);
 
         setHasSavedData(true);
       } else {
@@ -185,6 +198,7 @@ export const PermohonanContainer: React.FC<PermohonanContainerProps> = ({
         setPmhParagraf2(
           '<p>Berkaitan dengan hal tersebut di atas, bersama ini kami lampirkan Dokumen Persiapan Pengadaan (DPP), antara lain:</p><ol><li>KAK</li><li>Spesifikasi Teknis</li></ol><p>Demikian disampaikan untuk diproses lebih lanjut sesuai dengan ketentuan dan peraturan perundang-undangan yang berlaku.</p>'
         );
+        setPmhPpkPgwId(defaultPpkId);
       }
     } else {
       showToast('error', res.message || 'Gagal memuat detail KAK.');
@@ -233,6 +247,7 @@ export const PermohonanContainer: React.FC<PermohonanContainerProps> = ({
       pmh_metode_pemilihan: pmhMetodePemilihan || null,
       pmh_sumber_dana: pmhSumberDana || null,
       pmh_paragraf2: pmhParagraf2 || null,
+      pmh_ppk_pgw_id: pmhPpkPgwId ? Number(pmhPpkPgwId) : null,
     };
 
     const res = await savePermohonanAction(payload);
@@ -268,9 +283,10 @@ export const PermohonanContainer: React.FC<PermohonanContainerProps> = ({
   };
 
   // Info Pejabat PPK
-  const namaPpk = selectedMasterDokumen?.mdk_nama_pejabat || 'DANIEL PERDANA, SE';
-  const nipPpk = selectedMasterDokumen?.mdk_nip_pejabat || '197507242001121006';
-  const jabatanPpk = selectedMasterDokumen?.mdk_jabatan_pejabat || 'Plt. Sekretaris Badan';
+  const selectedPpk = pegawaiList.find((p) => p.pgw_id === Number(pmhPpkPgwId));
+  const namaPpk = selectedPpk?.pgw_nama || selectedKak?.ppk_nama || selectedMasterDokumen?.mdk_nama_pejabat || 'DANIEL PERDANA, SE';
+  const nipPpk = selectedPpk?.pgw_nip || selectedKak?.ppk_nip || selectedMasterDokumen?.mdk_nip_pejabat || '197507242001121006';
+  const jabatanPpk = selectedPpk?.pgw_jabatan || selectedKak?.ppk_jabatan || selectedMasterDokumen?.mdk_jabatan_pejabat || 'Plt. Sekretaris Badan';
 
   return (
     <div className="p-1 sm:p-2 w-full space-y-6">
@@ -324,7 +340,7 @@ export const PermohonanContainer: React.FC<PermohonanContainerProps> = ({
             type="button"
             onClick={handlePrintPdf}
             disabled={saving}
-            className="px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            className="px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-md transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
@@ -365,7 +381,7 @@ export const PermohonanContainer: React.FC<PermohonanContainerProps> = ({
             options={kakOptions.map((k) => ({
               value: k.kak_id,
               label: k.kak_pekerjaan || `Dokumen KAK #${k.kak_id}`,
-              sublabel: `Metode: ${k.kak_metode_pemilihan || '-'} · [${k.has_permohonan ? '✓ Permohonan Ada' : 'Belum Ada Permohonan'}]`,
+              sublabel: `Metode: ${k.kak_metode_pemilihan || '-'} · [${k.has_permohonan ? '✓ Permohonan Ada' : '<span class="badge">Belum Ada Permohonan</span>'}]`,
             }))}
             value={selectedKakId}
             onChange={(val) => handleSelectKak(val)}
@@ -702,7 +718,22 @@ export const PermohonanContainer: React.FC<PermohonanContainerProps> = ({
               <h3 className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider">
                 Pejabat Pembuat Komitmen (PPK) Penandatangan
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div>
+                <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Pilih Pegawai PPK
+                </label>
+                <SearchableSelect
+                  options={pegawaiList.map((p) => ({
+                    value: p.pgw_id,
+                    label: `${p.pgw_nama} - ${p.pgw_nip} (${p.pgw_jabatan || 'PPK'})`,
+                  }))}
+                  value={pmhPpkPgwId || ''}
+                  onChange={(val) => setPmhPpkPgwId(Number(val))}
+                  placeholder="-- Pilih Pegawai PPK --"
+                  searchPlaceholder="Cari nama, NIP, atau jabatan pegawai..."
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs pt-2 border-t border-gray-100 dark:border-gray-800">
                 <div>
                   <span className="text-gray-400 block font-medium text-[11px]">Nama PPK:</span>
                   <span className="font-bold text-gray-900 dark:text-white">{namaPpk}</span>
@@ -729,7 +760,7 @@ export const PermohonanContainer: React.FC<PermohonanContainerProps> = ({
                   type="button"
                   onClick={handlePrintPdf}
                   disabled={saving}
-                  className="flex-1 sm:flex-initial px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="flex-1 sm:flex-initial px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
