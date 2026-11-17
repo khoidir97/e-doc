@@ -87,8 +87,9 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
   const [kakKodeSubKegiatan, setKakKodeSubKegiatan] = useState('');
   const [kakRekening, setKakRekening] = useState(''); // sama dengan belanja
   const [kakKodeRekening, setKakKodeRekening] = useState(''); // sama dengan kode rekening belanja
+  const currentYear = new Date().getFullYear().toString();
   const [kakPekerjaan, setKakPekerjaan] = useState('');
-  const [kakTahunAnggaran, setKakTahunAnggaran] = useState('2026');
+  const [kakTahunAnggaran, setKakTahunAnggaran] = useState(currentYear);
   const [kakPpkPgwId, setKakPpkPgwId] = useState<number | null>(null);
   const [pegawaiList, setPegawaiList] = useState<
     { pgw_id: number; pgw_nama: string; pgw_nip: string; pgw_jabatan: string }[]
@@ -127,7 +128,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
     ppkNama?: string;
   }) => {
     const namaPekerjaan = data.pekerjaan || 'Pengadaan Barang / Jasa';
-    const tahunAnggaran = data.tahunAnggaran || '2026';
+    const tahunAnggaran = data.tahunAnggaran || currentYear;
     const noDpa = data.noDpa || '-';
     const ppkNama = data.ppkNama || 'DANIEL PERDANA, SE';
 
@@ -345,7 +346,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
         setKakTahunAnggaran(
           kak.kak_tahun_anggaran ||
           currentMaster?.mdk_apbd?.match(/\b(20\d\d)\b/)?.[1] ||
-          '2026'
+          currentYear
         );
         setKakPpkPgwId(kak.kak_ppk_pgw_id || currentMaster?.mdk_nama_pejabat_id || null);
 
@@ -381,7 +382,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
 
         if (currentMaster) {
           const namaPekerjaan = currentMaster.mdk_pekerjaan || currentMaster.mdk_uraian_belanja || 'Pengadaan Barang / Jasa';
-          const tahunAnggaran = currentMaster.mdk_apbd?.match(/\b(20\d\d)\b/)?.[1] || '2026';
+          const tahunAnggaran = currentMaster.mdk_apbd?.match(/\b(20\d\d)\b/)?.[1] || currentYear;
           const noDpa = currentMaster.mdk_no_dpa || '-';
           const defaultPpkId = currentMaster.mdk_nama_pejabat_id || null;
           const ppkNama = currentMaster.mdk_nama_pejabat || 'DANIEL PERDANA, SE';
@@ -476,7 +477,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
         setKakRekening(kak.kak_rekening || '');
         setKakKodeRekening(kak.kak_kode_rekening || '');
         setKakPekerjaan(kak.kak_pekerjaan || '');
-        setKakTahunAnggaran(kak.kak_tahun_anggaran || '2026');
+        setKakTahunAnggaran(kak.kak_tahun_anggaran || currentYear);
         setKakPpkPgwId(kak.kak_ppk_pgw_id || null);
 
         setLatarBelakang(kak.kak_latar_belakang || '');
@@ -525,12 +526,12 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
     setKakRekening('');
     setKakKodeRekening('');
     setKakPekerjaan('');
-    setKakTahunAnggaran('2026');
+    setKakTahunAnggaran(currentYear);
     setKakPpkPgwId(null);
 
     const defaults = getSmartDefaults({
       pekerjaan: 'Pengadaan Barang / Jasa',
-      tahunAnggaran: '2026',
+      tahunAnggaran: currentYear,
     });
 
     setLatarBelakang(defaults.defaultLatarBelakang);
@@ -911,7 +912,6 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
             >
-              <span>📋</span>
               Pilih Master Dokumen
             </button>
             <button
@@ -927,7 +927,6 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                 : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white'
                 }`}
             >
-              <span>⚡</span>
               Isi Manual (Tarik API BPKAD)
             </button>
           </div>
@@ -1588,7 +1587,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                     Tahun Anggaran
                   </span>
                   <p className="font-semibold text-gray-900 dark:text-white leading-snug">
-                    Tahun {kakTahunAnggaran || '2026'}
+                    Tahun {kakTahunAnggaran || currentYear}
                   </p>
                 </div>
 
