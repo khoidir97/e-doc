@@ -73,7 +73,7 @@ export default function PermohonanPrintPage({ params }: { params: Promise<{ id: 
   const tahun = kak?.kak_tahun_anggaran || '2026';
   const defaultPaket = kak?.kak_pekerjaan || kak?.kak_rekening || masterDokumen?.mdk_pekerjaan || masterDokumen?.mdk_uraian_belanja || 'Pengadaan Barang / Jasa';
   const defaultMetode = kak?.kak_metode_pemilihan || 'e-purchasing melalui e katalog v.6';
-  const defaultPagu = Number(masterDokumen?.mdk_pagu_anggaran) || totalHps || totalBiayaKak || 0;
+  const defaultPagu = Number(kak?.kak_pagu_anggaran) || Number(masterDokumen?.mdk_pagu_anggaran) || totalHps || totalBiayaKak || 0;
   const defaultHps = 0;
 
   // Nilai-nilai dokumen

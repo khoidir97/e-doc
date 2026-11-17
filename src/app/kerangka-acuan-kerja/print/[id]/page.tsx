@@ -168,8 +168,76 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
           }
           @page {
             size: A4 portrait;
-            margin: 15mm 15mm 15mm 15mm;
+            margin: 20mm 20mm 20mm 20mm;
           }
+          /* Cover: tepat 1 halaman A4 (297mm - margin atas/bawah 40mm) */
+          .kak-cover {
+            width: 100% !important;
+            max-width: none !important;
+            height: 257mm !important;
+            min-height: 0 !important;
+            max-height: 257mm !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+            page-break-after: always;
+            break-after: page;
+          }
+          .kak-cover-frame {
+            height: 100% !important;
+            box-sizing: border-box !important;
+            padding: 10mm 8mm !important;
+          }
+          .kak-sheet {
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+          }
+          .kak-sheet thead {
+            display: table-header-group;
+          }
+          .kak-sheet .kak-inner-table tr {
+            break-inside: avoid;
+            page-break-inside: avoid;
+          }
+          .kak-section-label {
+            break-after: avoid;
+            page-break-after: avoid;
+          }
+        }
+
+        /* Ukuran font standar dokumen: 12pt */
+        .kak-sheet,
+        .kak-sheet p,
+        .kak-sheet td,
+        .kak-sheet th,
+        .kak-sheet li,
+        .kak-sheet span,
+        .kak-sheet div,
+        .kak-content * {
+          font-size: 12pt !important;
+          line-height: 1.5;
+        }
+        .kak-sheet .kak-title {
+          font-size: 14pt !important;
+        }
+        .kak-cover-table td {
+          font-size: 12pt !important;
+          line-height: 1.5;
+        }
+        .kak-cover-title {
+          font-size: 18pt !important;
+        }
+        .kak-cover-subtitle {
+          font-size: 14pt !important;
+        }
+        .kak-sheet .kak-inner-table td,
+        .kak-sheet .kak-inner-table th {
+          font-size: 11pt !important;
         }
 
         .kak-content ul {
@@ -195,28 +263,28 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
       {/* ======================================================== */}
       {/* HALAMAN 1: COVER KERANGKA ACUAN KERJA (KAK) / TOR        */}
       {/* ======================================================== */}
-      <div className="page-break-after mx-auto max-w-[210mm] min-h-[297mm] bg-white text-black p-8 sm:p-12 shadow-xl print:shadow-none print:m-0 print:p-0 flex flex-col justify-between">
+      <div className="kak-cover mx-auto w-[210mm] h-[297mm] bg-white text-black p-[20mm] shadow-xl flex flex-col">
         {/* Outer Double Frame matching PDF cover */}
-        <div className="border-4 border-double border-black p-6 sm:p-8 flex-1 flex flex-col justify-between">
+        <div className="kak-cover-frame border-4 border-double border-black p-8 flex-1 flex flex-col justify-between">
           {/* Top: Kop Surat BPKAD */}
           <KopSuratBpkad />
 
           {/* Middle: Title */}
-          <div className="text-center my-12 space-y-1">
-            <h1 className="font-extrabold text-xl sm:text-2xl tracking-wide uppercase">
+          <div className="text-center space-y-1">
+            <h1 className="kak-cover-title font-extrabold tracking-wide uppercase">
               KERANGKA ACUAN KERJA (KAK)
             </h1>
-            <p className="font-semibold text-base sm:text-lg italic tracking-wider">
+            <p className="kak-cover-subtitle font-semibold italic tracking-wider">
               Term Of Reference (TOR)
             </p>
           </div>
 
           {/* Bottom: Metadata Table */}
-          <div className="my-8 pl-4 sm:pl-8">
-            <table className="w-full text-[13px] border-collapse leading-relaxed">
+          <div className="pl-2">
+            <table className="kak-cover-table w-full border-collapse">
               <tbody>
                 <tr>
-                  <td className="w-40 py-2 align-top font-bold">SKPD</td>
+                  <td className="w-36 py-1.5 align-top font-bold">SKPD</td>
                   <td className="w-4 py-2 align-top text-center font-bold">:</td>
                   <td className="py-2 align-top font-bold">
                     Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru
@@ -259,30 +327,30 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
           </div>
 
           {/* Decorative Bottom Spacing */}
-          <div className="h-6"></div>
+          <div className="h-2"></div>
         </div>
       </div>
 
       {/* ======================================================== */}
       {/* HALAMAN 2 DST: ISI KERANGKA ACUAN KERJA (12 POIN)        */}
       {/* ======================================================== */}
-      <div className="mx-auto max-w-[210mm] bg-white text-black p-8 sm:p-12 shadow-xl print:shadow-none print:m-0 print:p-0 leading-relaxed text-[12px] mt-8 print:mt-0">
+      <div className="kak-sheet mx-auto w-[210mm] bg-white text-black p-[20mm] shadow-xl leading-relaxed mt-8 print:mt-0">
         {/* Header Isi KAK */}
         <div className="text-center mb-6">
-          <h2 className="font-extrabold text-sm sm:text-base tracking-wider uppercase">
+          <h2 className="kak-title font-extrabold tracking-wider uppercase">
             KERANGKA ACUAN KERJA (KAK)
           </h2>
-          <h3 className="font-extrabold text-sm uppercase">PENGADAAN BARANG</h3>
-          <p className="font-bold text-xs uppercase mt-0.5">
+          <h3 className="font-extrabold uppercase">PENGADAAN BARANG</h3>
+          <p className="font-bold uppercase mt-0.5">
             PEKERJAAN : {namaPekerjaan}
           </p>
         </div>
 
         {/* 12 Sections in Clean 3-Column Table Format matching the PDF */}
-        <table className="w-full border-collapse text-[12px]">
+        <table className="w-full border-collapse">
           <tbody>
             {/* 1. LATAR BELAKANG */}
-            <tr className="avoid-break">
+            <tr>
               <td className="w-44 py-2 align-top font-bold uppercase tracking-tight">
                 1. LATAR BELAKANG
               </td>
@@ -293,7 +361,7 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
             </tr>
 
             {/* 2. MAKSUD DAN TUJUAN */}
-            <tr className="avoid-break">
+            <tr>
               <td className="py-2 align-top font-bold uppercase tracking-tight">
                 2. MAKSUD DAN TUJUAN
               </td>
@@ -304,7 +372,7 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
             </tr>
 
             {/* 3. REFERENSI HUKUM */}
-            <tr className="avoid-break">
+            <tr>
               <td className="py-2 align-top font-bold uppercase tracking-tight">
                 3. REFERENSI HUKUM
               </td>
@@ -315,7 +383,7 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
             </tr>
 
             {/* 4. TARGET / SASARAN */}
-            <tr className="avoid-break">
+            <tr>
               <td className="py-2 align-top font-bold uppercase tracking-tight">
                 4. TARGET/ SASARAN
               </td>
@@ -326,7 +394,7 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
             </tr>
 
             {/* 5. NAMA ORGANISASI PENGADAAN JASA LAINNYA */}
-            <tr className="avoid-break">
+            <tr>
               <td className="py-2 align-top font-bold uppercase tracking-tight leading-snug">
                 5. NAMA ORGANISASI PENGADAAN JASA LAINNYA
               </td>
@@ -337,7 +405,7 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
             </tr>
 
             {/* 6. SUMBER DANA DAN PERKIRAAN BIAYA */}
-            <tr className="avoid-break">
+            <tr>
               <td className="py-2 align-top font-bold uppercase tracking-tight leading-snug">
                 6. SUMBER DANA DAN PERKIRAAN BIAYA
               </td>
@@ -348,7 +416,7 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
 
                 {/* Tabel Perkiraan Biaya */}
                 <div className="my-2">
-                  <table className="w-full border-collapse border border-black text-[11px]">
+                  <table className="kak-inner-table w-full border-collapse border border-black">
                     <thead>
                       <tr className="border-b border-black text-center font-bold bg-gray-50/50">
                         <th className="border border-black px-2 py-1.5 w-10">No</th>
@@ -385,14 +453,14 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
                   </table>
                 </div>
 
-                <p className="italic font-serif mt-1 text-[11px]">
+                <p className="italic font-serif mt-1">
                   Terbilang : {terbilangText} Rupiah
                 </p>
               </td>
             </tr>
 
             {/* 7. RUANG LINGKUP DAN LOKASI PEKERJAAN */}
-            <tr className="avoid-break">
+            <tr>
               <td className="py-2 align-top font-bold uppercase tracking-tight leading-snug">
                 7. RUANG LINGKUP DAN LOKASI PEKERJAAN
               </td>
@@ -403,7 +471,7 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
             </tr>
 
             {/* 8. JANGKA WAKTU PELAKSANAAN */}
-            <tr className="avoid-break">
+            <tr>
               <td className="py-2 align-top font-bold uppercase tracking-tight leading-snug">
                 8. JANGKA WAKTU PELAKSANAAN
               </td>
@@ -414,7 +482,7 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
             </tr>
 
             {/* 9. METODA PEMILIHAN */}
-            <tr className="avoid-break">
+            <tr>
               <td className="py-2 align-top font-bold uppercase tracking-tight leading-snug">
                 9. METODA PEMILIHAN
               </td>
@@ -425,13 +493,13 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
             </tr>
 
             {/* 10. SPESIFIKASI TEKNIS */}
-            <tr className="avoid-break">
+            <tr>
               <td className="py-2 align-top font-bold uppercase tracking-tight leading-snug">
                 10. SPESIFIKASI TEKNIS
               </td>
               <td className="py-2 align-top text-center font-bold">:</td>
               <td className="py-2 align-top text-justify leading-relaxed">
-                <table className="w-full border-collapse border border-black text-[11px] my-1">
+                <table className="kak-inner-table w-full border-collapse border border-black my-1">
                   <thead>
                     <tr className="border-b border-black text-center font-bold bg-gray-50/50">
                       <th className="border border-black px-2 py-1.5 w-10">No</th>
@@ -457,7 +525,7 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
             </tr>
 
             {/* 11. PERSYARATAN KUALIFIKASI PENYEDIA */}
-            <tr className="avoid-break">
+            <tr>
               <td className="py-2 align-top font-bold uppercase tracking-tight leading-snug">
                 11. PERSYARATAN KUALIFIKASI PENYEDIA
               </td>
@@ -468,7 +536,7 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
             </tr>
 
             {/* 12. PENUTUP */}
-            <tr className="avoid-break">
+            <tr>
               <td className="py-2 align-top font-bold uppercase tracking-tight leading-snug">
                 12. PENUTUP
               </td>
@@ -482,7 +550,7 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
 
         {/* Tanda Tangan PPK di Akhir Dokumen */}
         <div className="avoid-break pt-8 flex justify-end">
-          <div className="w-80 text-left text-[12px] space-y-1">
+          <div className="w-80 text-left space-y-1">
             <div className="flex items-center gap-1">
               <span>Pekanbaru,</span>
               <input
@@ -499,10 +567,10 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
               <p className="font-semibold">BPKAD Kota Pekanbaru</p>
             </div>
             <div className="pt-20">
-              <p className="font-bold underline uppercase text-sm">
+              <p className="font-bold underline uppercase">
                 {namaPejabat}
               </p>
-              <p className="text-[11px] font-mono mt-0.5">
+              <p className="font-mono mt-0.5">
                 NIP. {nipPejabat}
               </p>
             </div>

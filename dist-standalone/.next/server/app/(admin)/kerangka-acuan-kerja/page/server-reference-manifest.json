@@ -1,0 +1,110 @@
+{
+  "node": {
+    "008d308c1f747035d745970d87b8c82249e1a4b2dc": {
+      "workers": {
+        "app/(admin)/kerangka-acuan-kerja/page": {
+          "moduleId": 75651,
+          "async": false,
+          "exportedName": "getMasterDokumenOptionsAction",
+          "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/kerangka-acuan-kerja/page": "action-browser"
+      },
+      "exportedName": "getMasterDokumenOptionsAction",
+      "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+    },
+    "4014feb10f1cde3b41c3c0186cc5b88aaf3f0ea37c": {
+      "workers": {
+        "app/(admin)/kerangka-acuan-kerja/page": {
+          "moduleId": 75651,
+          "async": false,
+          "exportedName": "getKerangkaAcuanKerjaByMasterDokumenAction",
+          "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/kerangka-acuan-kerja/page": "action-browser"
+      },
+      "exportedName": "getKerangkaAcuanKerjaByMasterDokumenAction",
+      "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+    },
+    "404c1beae1174cce2d828a4459b8b4011380eae52e": {
+      "workers": {
+        "app/(admin)/kerangka-acuan-kerja/page": {
+          "moduleId": 75651,
+          "async": false,
+          "exportedName": "getKerangkaAcuanKerjaByIdAction",
+          "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/kerangka-acuan-kerja/page": "action-browser"
+      },
+      "exportedName": "getKerangkaAcuanKerjaByIdAction",
+      "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+    },
+    "001b127d2d11d148ab2f5680065d5bc198db5e6f39": {
+      "workers": {
+        "app/(admin)/kerangka-acuan-kerja/page": {
+          "moduleId": 75651,
+          "async": false,
+          "exportedName": "getManualKakListAction",
+          "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/kerangka-acuan-kerja/page": "action-browser"
+      },
+      "exportedName": "getManualKakListAction",
+      "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+    },
+    "40f58f882aad61c8af419a489d70f3265abd0982cc": {
+      "workers": {
+        "app/(admin)/kerangka-acuan-kerja/page": {
+          "moduleId": 75651,
+          "async": false,
+          "exportedName": "saveKerangkaAcuanKerjaAction",
+          "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/kerangka-acuan-kerja/page": "action-browser"
+      },
+      "exportedName": "saveKerangkaAcuanKerjaAction",
+      "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+    },
+    "4090769509fb4f5172decbfc751d888f9e2b0023f1": {
+      "workers": {
+        "app/(admin)/kerangka-acuan-kerja/page": {
+          "moduleId": 75651,
+          "async": false,
+          "exportedName": "getHpsItemsForKakAction",
+          "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/kerangka-acuan-kerja/page": "action-browser"
+      },
+      "exportedName": "getHpsItemsForKakAction",
+      "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+    },
+    "009de2523cde2daca63d37887b2abe704de40966af": {
+      "workers": {
+        "app/(admin)/kerangka-acuan-kerja/page": {
+          "moduleId": 75651,
+          "async": false,
+          "exportedName": "getPegawaiListForKakAction",
+          "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/kerangka-acuan-kerja/page": "action-browser"
+      },
+      "exportedName": "getPegawaiListForKakAction",
+      "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+    }
+  },
+  "edge": {}
+}

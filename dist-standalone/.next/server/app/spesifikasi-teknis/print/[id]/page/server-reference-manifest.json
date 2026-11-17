@@ -1,0 +1,35 @@
+{
+  "node": {
+    "408711927da1a43e5e6a2c504eef0fa4bd2f3c1eb4": {
+      "workers": {
+        "app/spesifikasi-teknis/print/[id]/page": {
+          "moduleId": 21229,
+          "async": false,
+          "exportedName": "getSpesifikasiTeknisByIdAction",
+          "filename": "src/features/spesifikasi-teknis/actions.ts"
+        }
+      },
+      "layer": {
+        "app/spesifikasi-teknis/print/[id]/page": "action-browser"
+      },
+      "exportedName": "getSpesifikasiTeknisByIdAction",
+      "filename": "src/features/spesifikasi-teknis/actions.ts"
+    },
+    "40fe1b315391bf52507cd3cd63df20ee7d171d3dc0": {
+      "workers": {
+        "app/spesifikasi-teknis/print/[id]/page": {
+          "moduleId": 21229,
+          "async": false,
+          "exportedName": "getSpesifikasiTeknisByKakIdAction",
+          "filename": "src/features/spesifikasi-teknis/actions.ts"
+        }
+      },
+      "layer": {
+        "app/spesifikasi-teknis/print/[id]/page": "action-browser"
+      },
+      "exportedName": "getSpesifikasiTeknisByKakIdAction",
+      "filename": "src/features/spesifikasi-teknis/actions.ts"
+    }
+  },
+  "edge": {}
+}

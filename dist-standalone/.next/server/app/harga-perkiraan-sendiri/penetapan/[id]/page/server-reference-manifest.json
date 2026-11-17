@@ -1,0 +1,20 @@
+{
+  "node": {
+    "4023f46d253b3e51e1e4359e2d2836ec9eb00e270b": {
+      "workers": {
+        "app/harga-perkiraan-sendiri/penetapan/[id]/page": {
+          "moduleId": 10307,
+          "async": false,
+          "exportedName": "getHargaPerkiraanSendiriWithDetailsAction",
+          "filename": "src/features/harga-perkiraan-sendiri/actions.ts"
+        }
+      },
+      "layer": {
+        "app/harga-perkiraan-sendiri/penetapan/[id]/page": "action-browser"
+      },
+      "exportedName": "getHargaPerkiraanSendiriWithDetailsAction",
+      "filename": "src/features/harga-perkiraan-sendiri/actions.ts"
+    }
+  },
+  "edge": {}
+}

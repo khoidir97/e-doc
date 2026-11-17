@@ -1,0 +1,35 @@
+{
+  "node": {
+    "4014feb10f1cde3b41c3c0186cc5b88aaf3f0ea37c": {
+      "workers": {
+        "app/kerangka-acuan-kerja/print/[id]/page": {
+          "moduleId": 36591,
+          "async": false,
+          "exportedName": "getKerangkaAcuanKerjaByMasterDokumenAction",
+          "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+        }
+      },
+      "layer": {
+        "app/kerangka-acuan-kerja/print/[id]/page": "action-browser"
+      },
+      "exportedName": "getKerangkaAcuanKerjaByMasterDokumenAction",
+      "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+    },
+    "404c1beae1174cce2d828a4459b8b4011380eae52e": {
+      "workers": {
+        "app/kerangka-acuan-kerja/print/[id]/page": {
+          "moduleId": 36591,
+          "async": false,
+          "exportedName": "getKerangkaAcuanKerjaByIdAction",
+          "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+        }
+      },
+      "layer": {
+        "app/kerangka-acuan-kerja/print/[id]/page": "action-browser"
+      },
+      "exportedName": "getKerangkaAcuanKerjaByIdAction",
+      "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+    }
+  },
+  "edge": {}
+}

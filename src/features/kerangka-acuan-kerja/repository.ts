@@ -99,6 +99,7 @@ export class KerangkaAcuanKerjaRepository {
          COALESCE(NULLIF(TRIM(k.kak_kode_rekening), ''), m.mdk_rekening_belanja, '') as kak_kode_rekening,
          COALESCE(NULLIF(TRIM(k.kak_tahun_anggaran), ''), m.mdk_apbd, '2026') as kak_tahun_anggaran,
          COALESCE(
+           NULLIF(k.kak_pagu_anggaran, 0),
            (SELECT SUM(kpb_jumlah) FROM detail_kak_perkiraan_biaya WHERE kpb_kak_id = k.kak_id AND kpb_deleted_at IS NULL),
            m.mdk_pagu_anggaran,
            0
@@ -133,6 +134,12 @@ export class KerangkaAcuanKerjaRepository {
       await connection.beginTransaction();
 
       let kakId: number | null = payload.kak_id ? Number(payload.kak_id) : null;
+      const itemBelanjaJson =
+        payload.kak_item_belanja !== undefined && payload.kak_item_belanja !== null
+          ? typeof payload.kak_item_belanja === 'string'
+            ? payload.kak_item_belanja
+            : JSON.stringify(payload.kak_item_belanja)
+          : null;
 
       // If kakId not specified, check if existing record for this master dokumen
       if (!kakId && payload.kak_master_dokumen_id) {
@@ -159,6 +166,8 @@ export class KerangkaAcuanKerjaRepository {
             kak_kode_rekening = ?,
             kak_pekerjaan = ?,
             kak_tahun_anggaran = ?,
+            kak_pagu_anggaran = ?,
+            kak_item_belanja = ?,
             kak_ppk_pgw_id = ?,
             kak_latar_belakang = ?,
             kak_maksud_dan_tujuan = ?,
@@ -188,6 +197,8 @@ export class KerangkaAcuanKerjaRepository {
             payload.kak_kode_rekening || null,
             payload.kak_pekerjaan || null,
             payload.kak_tahun_anggaran || null,
+            Number(payload.kak_pagu_anggaran) || 0,
+            itemBelanjaJson,
             payload.kak_ppk_pgw_id || null,
             payload.kak_latar_belakang || null,
             payload.kak_maksud_dan_tujuan || null,
@@ -211,12 +222,12 @@ export class KerangkaAcuanKerjaRepository {
           `INSERT INTO kerangka_acuan_kerja
             (kak_master_dokumen_id, kak_program, kak_kode_program, kak_kegiatan, kak_kode_kegiatan,
              kak_sub_kegiatan, kak_kode_sub_kegiatan, kak_rekening, kak_kode_rekening, kak_pekerjaan, kak_tahun_anggaran,
-             kak_ppk_pgw_id, kak_latar_belakang, kak_maksud_dan_tujuan, kak_referensi_hukum,
+             kak_pagu_anggaran, kak_item_belanja, kak_ppk_pgw_id, kak_latar_belakang, kak_maksud_dan_tujuan, kak_referensi_hukum,
              kak_target_sasaran, kak_nama_organisasi_dan_pengadaan, kak_sumber_dana_perkiraan_biaya,
              kak_perkiraan_biaya_id, kak_ruang_lingkup_lokasi_pekerjaan, kak_jangka_waktu_pelaksanaan,
              kak_metode_pemilihan, kak_spesifikasi_teknis_id, kak_persyaratan_kualifikasi_penyedia,
              kak_penutup, kak_created_by, kak_created_at)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,
           [
             payload.kak_master_dokumen_id || null,
             payload.kak_program || null,
@@ -229,6 +240,8 @@ export class KerangkaAcuanKerjaRepository {
             payload.kak_kode_rekening || null,
             payload.kak_pekerjaan || null,
             payload.kak_tahun_anggaran || null,
+            Number(payload.kak_pagu_anggaran) || 0,
+            itemBelanjaJson,
             payload.kak_ppk_pgw_id || null,
             payload.kak_latar_belakang || null,
             payload.kak_maksud_dan_tujuan || null,

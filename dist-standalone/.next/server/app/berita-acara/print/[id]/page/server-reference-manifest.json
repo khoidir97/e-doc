@@ -1,6 +1,6 @@
 {
   "node": {
-    "40d08a5635192ee329a9b151aaef5add7c8e3142ea": {
+    "60d08a5635192ee329a9b151aaef5add7c8e3142ea": {
       "workers": {
         "app/berita-acara/print/[id]/page": {
           "moduleId": 2608,

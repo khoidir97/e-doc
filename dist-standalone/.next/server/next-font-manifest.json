@@ -54,6 +54,9 @@
     "[project]/src/app/(admin)/harga-perkiraan-sendiri/page": [
       "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2"
     ],
+    "[project]/src/app/(admin)/kerangka-acuan-kerja/page": [
+      "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2"
+    ],
     "[project]/src/app/(admin)/kwitansi/page": [
       "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2"
     ],
@@ -81,10 +84,16 @@
     "[project]/src/app/(admin)/perhitungan-paket/page": [
       "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2"
     ],
+    "[project]/src/app/(admin)/permohonan/page": [
+      "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2"
+    ],
     "[project]/src/app/(admin)/perusahaan/page": [
       "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2"
     ],
     "[project]/src/app/(admin)/rencana-anggaran-biaya/page": [
+      "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2"
+    ],
+    "[project]/src/app/(admin)/spesifikasi-teknis/page": [
       "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2"
     ],
     "[project]/src/app/(admin)/survey/page": [
@@ -108,7 +117,13 @@
     "[project]/src/app/faktur/print/[id]/page": [
       "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2"
     ],
+    "[project]/src/app/harga-perkiraan-sendiri/penetapan/[id]/page": [
+      "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2"
+    ],
     "[project]/src/app/harga-perkiraan-sendiri/print/[id]/page": [
+      "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2"
+    ],
+    "[project]/src/app/kerangka-acuan-kerja/print/[id]/page": [
       "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2"
     ],
     "[project]/src/app/kwitansi/print/[id]/page": [
@@ -126,7 +141,13 @@
     "[project]/src/app/perhitungan-paket/print/[id]/page": [
       "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2"
     ],
+    "[project]/src/app/permohonan/print/[id]/page": [
+      "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2"
+    ],
     "[project]/src/app/rencana-anggaran-biaya/print/[id]/page": [
+      "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2"
+    ],
+    "[project]/src/app/spesifikasi-teknis/print/[id]/page": [
       "static/media/1b99372b3eaef0c8-s.p.758e15a8.woff2"
     ],
     "[project]/src/app/survey/print/[id]/page": [

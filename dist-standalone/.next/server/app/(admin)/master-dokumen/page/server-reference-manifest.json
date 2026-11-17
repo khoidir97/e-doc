@@ -3,7 +3,7 @@
     "70ccf360f9cc6f086af7ac977f044b7fc1a69cc019": {
       "workers": {
         "app/(admin)/master-dokumen/page": {
-          "moduleId": 22117,
+          "moduleId": 98265,
           "async": false,
           "exportedName": "getMasterDokumenListAction",
           "filename": "src/features/master-dokumen/actions.ts"
@@ -18,7 +18,7 @@
     "40b0583c32ccbfe05c22dcd06bbabf4ffbf2c4ac9d": {
       "workers": {
         "app/(admin)/master-dokumen/page": {
-          "moduleId": 22117,
+          "moduleId": 98265,
           "async": false,
           "exportedName": "createMasterDokumenAction",
           "filename": "src/features/master-dokumen/actions.ts"
@@ -33,7 +33,7 @@
     "40e65c860f02da8bdd4c94186efbd47cfa66dbe43f": {
       "workers": {
         "app/(admin)/master-dokumen/page": {
-          "moduleId": 22117,
+          "moduleId": 98265,
           "async": false,
           "exportedName": "updateMasterDokumenAction",
           "filename": "src/features/master-dokumen/actions.ts"
@@ -48,7 +48,7 @@
     "408aa0082b30d8dd0c34e718ccad1f7354fb02fcd4": {
       "workers": {
         "app/(admin)/master-dokumen/page": {
-          "moduleId": 22117,
+          "moduleId": 98265,
           "async": false,
           "exportedName": "deleteMasterDokumenAction",
           "filename": "src/features/master-dokumen/actions.ts"
@@ -63,7 +63,7 @@
     "40b9a37c98c464bd33ff079a23f4a5d791fa255fb4": {
       "workers": {
         "app/(admin)/master-dokumen/page": {
-          "moduleId": 22117,
+          "moduleId": 98265,
           "async": false,
           "exportedName": "copyMasterDokumenAction",
           "filename": "src/features/master-dokumen/actions.ts"
@@ -78,7 +78,7 @@
     "605df2eafab583d677e6080358a239081f2d957494": {
       "workers": {
         "app/(admin)/master-dokumen/page": {
-          "moduleId": 22117,
+          "moduleId": 98265,
           "async": false,
           "exportedName": "toggleLockMasterDokumenAction",
           "filename": "src/features/master-dokumen/actions.ts"
@@ -93,7 +93,7 @@
     "70f250587adf407504c3f9a82f29bd7068310415af": {
       "workers": {
         "app/(admin)/master-dokumen/page": {
-          "moduleId": 22117,
+          "moduleId": 98265,
           "async": false,
           "exportedName": "getPegawaiListAction",
           "filename": "src/features/pegawai/actions.ts"
@@ -105,10 +105,25 @@
       "exportedName": "getPegawaiListAction",
       "filename": "src/features/pegawai/actions.ts"
     },
+    "70bb5847329e53f0aaa20fbb4a506a5a1d1de66dd8": {
+      "workers": {
+        "app/(admin)/master-dokumen/page": {
+          "moduleId": 98265,
+          "async": false,
+          "exportedName": "getMasterSatuanListAction",
+          "filename": "src/features/master-satuan/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/master-dokumen/page": "action-browser"
+      },
+      "exportedName": "getMasterSatuanListAction",
+      "filename": "src/features/master-satuan/actions.ts"
+    },
     "70648f592d909446ad874ae75c84e896d41b79d240": {
       "workers": {
         "app/(admin)/master-dokumen/page": {
-          "moduleId": 22117,
+          "moduleId": 98265,
           "async": false,
           "exportedName": "getPerusahaanListAction",
           "filename": "src/features/perusahaan/actions.ts"
@@ -123,7 +138,7 @@
     "703bcc44be9f9b51f00c5ce7cdb0e95a23d72a0b7a": {
       "workers": {
         "app/(admin)/master-dokumen/page": {
-          "moduleId": 22117,
+          "moduleId": 98265,
           "async": false,
           "exportedName": "getBidangListAction",
           "filename": "src/features/bidang/actions.ts"
@@ -135,10 +150,40 @@
       "exportedName": "getBidangListAction",
       "filename": "src/features/bidang/actions.ts"
     },
+    "00dab9939a402d095d3c8e73abb07ec67170b22e45": {
+      "workers": {
+        "app/(admin)/master-dokumen/page": {
+          "moduleId": 98265,
+          "async": false,
+          "exportedName": "getAllKakOptionsAction",
+          "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/master-dokumen/page": "action-browser"
+      },
+      "exportedName": "getAllKakOptionsAction",
+      "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+    },
+    "404c1beae1174cce2d828a4459b8b4011380eae52e": {
+      "workers": {
+        "app/(admin)/master-dokumen/page": {
+          "moduleId": 98265,
+          "async": false,
+          "exportedName": "getKerangkaAcuanKerjaByIdAction",
+          "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/master-dokumen/page": "action-browser"
+      },
+      "exportedName": "getKerangkaAcuanKerjaByIdAction",
+      "filename": "src/features/kerangka-acuan-kerja/actions.ts"
+    },
     "405d1536b831ea9e8fed47ae910f76ccf051755662": {
       "workers": {
         "app/(admin)/master-dokumen/page": {
-          "moduleId": 22117,
+          "moduleId": 98265,
           "async": false,
           "exportedName": "getKwitansiByMasterDokumenIdAction",
           "filename": "src/features/kwitansi/actions.ts"
@@ -153,7 +198,7 @@
     "4033164618a1be43cfcd46a465d0f8ebdb8e54b029": {
       "workers": {
         "app/(admin)/master-dokumen/page": {
-          "moduleId": 22117,
+          "moduleId": 98265,
           "async": false,
           "exportedName": "getFakturWithDetailsAction",
           "filename": "src/features/faktur/actions.ts"

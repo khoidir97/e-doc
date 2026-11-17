@@ -1,0 +1,86 @@
+module.exports=[55217,a=>{"use strict";var b=a.i(37936),c=a.i(18558),d=a.i(5246),e=a.i(95289),f=a.i(61469);class g{static async findByKakId(a){await (0,f.initDatabase)();let[b]=await f.default.query(`SELECT s.*, 
+              p.pgw_nama AS ppk_nama, 
+              p.pgw_nip AS ppk_nip, 
+              p.pgw_jabatan AS ppk_jabatan
+       FROM spesifikasi_teknis s
+       LEFT JOIN pegawai p ON s.spt_spt_ppk_pgw_id = p.pgw_id
+       WHERE s.spt_kak_id = ? AND s.spt_deleted_at IS NULL
+       LIMIT 1`,[a]);if(0===b.length)return{spesifikasiTeknis:null,detailTeknis:[],detailJumlah:[],detailPelakuUsaha:[]};let c=b[0],d=c.spt_id,[e]=await f.default.query(`SELECT dpst_id, dspt_spt_id, dspt_item_barang_jasa, dspt_spesifikasi
+       FROM detail_spesifikasi_teknis
+       WHERE dspt_spt_id = ? AND dspt_deleted_at IS NULL
+       ORDER BY dpst_id ASC`,[d]),[g]=await f.default.query(`SELECT d.dspj_id, d.dpsj_spt_id, d.dspj_item_barang_jasa, d.dspj_jumlah, d.dspj_satuan_id,
+              s.st_nama
+       FROM detail_spesifikasi_jumlah d
+       LEFT JOIN satuan s ON d.dspj_satuan_id = s.st_id
+       WHERE d.dpsj_spt_id = ? AND d.dspj_deleted_at IS NULL
+       ORDER BY d.dspj_id ASC`,[d]),[h]=await f.default.query(`SELECT dpu_id, dpu_spt_id, dpu_item, dpu_nama_pelaku_usaha_potensial, dpu_link_katalog, dpu_harga, dpu_evaluasi_berdasarkan_parameter
+       FROM detail_daftar_pelaku_usaha
+       WHERE dpu_spt_id = ? AND dpu_deleted_at IS NULL
+       ORDER BY dpu_id ASC`,[d]);return{spesifikasiTeknis:c,detailTeknis:e,detailJumlah:g,detailPelakuUsaha:h}}static async findById(a){await (0,f.initDatabase)();let[b]=await f.default.query(`SELECT s.*, 
+              p.pgw_nama AS ppk_nama, 
+              p.pgw_nip AS ppk_nip, 
+              p.pgw_jabatan AS ppk_jabatan
+       FROM spesifikasi_teknis s
+       LEFT JOIN pegawai p ON s.spt_spt_ppk_pgw_id = p.pgw_id
+       WHERE s.spt_id = ? AND s.spt_deleted_at IS NULL
+       LIMIT 1`,[a]);if(0===b.length)return{spesifikasiTeknis:null,detailTeknis:[],detailJumlah:[],detailPelakuUsaha:[]};let c=b[0],[d]=await f.default.query(`SELECT dpst_id, dspt_spt_id, dspt_item_barang_jasa, dspt_spesifikasi
+       FROM detail_spesifikasi_teknis
+       WHERE dspt_spt_id = ? AND dspt_deleted_at IS NULL
+       ORDER BY dpst_id ASC`,[a]),[e]=await f.default.query(`SELECT d.dspj_id, d.dpsj_spt_id, d.dspj_item_barang_jasa, d.dspj_jumlah, d.dspj_satuan_id,
+              s.st_nama
+       FROM detail_spesifikasi_jumlah d
+       LEFT JOIN satuan s ON d.dspj_satuan_id = s.st_id
+       WHERE d.dpsj_spt_id = ? AND d.dspj_deleted_at IS NULL
+       ORDER BY d.dspj_id ASC`,[a]),[g]=await f.default.query(`SELECT dpu_id, dpu_spt_id, dpu_item, dpu_nama_pelaku_usaha_potensial, dpu_link_katalog, dpu_harga, dpu_evaluasi_berdasarkan_parameter
+       FROM detail_daftar_pelaku_usaha
+       WHERE dpu_spt_id = ? AND dpu_deleted_at IS NULL
+       ORDER BY dpu_id ASC`,[a]);return{spesifikasiTeknis:c,detailTeknis:d,detailJumlah:e,detailPelakuUsaha:g}}static async getKakOptions(){await (0,f.initDatabase)();let[a]=await f.default.query(`SELECT 
+         k.kak_id,
+         k.kak_master_dokumen_id,
+         COALESCE(k.kak_pekerjaan, m.mdk_pekerjaan, m.mdk_uraian_belanja) AS kak_pekerjaan,
+         COALESCE(k.kak_program, m.mdk_program) AS kak_program,
+         COALESCE(k.kak_kegiatan, m.mdk_kegiatan) AS kak_kegiatan,
+         k.kak_metode_pemilihan,
+         COALESCE(k.kak_tahun_anggaran, '2026') AS kak_tahun_anggaran,
+         m.mdk_uraian_belanja,
+         m.mdk_pekerjaan,
+         COALESCE(m.mdk_pagu_anggaran, 0) AS mdk_pagu_anggaran,
+         CASE WHEN s.spt_id IS NOT NULL THEN 1 ELSE 0 END AS has_spesifikasi_teknis
+       FROM kerangka_acuan_kerja k
+       LEFT JOIN master_dokumen m ON k.kak_master_dokumen_id = m.mdk_id
+       LEFT JOIN spesifikasi_teknis s ON k.kak_id = s.spt_kak_id AND s.spt_deleted_at IS NULL
+       WHERE k.kak_deleted_at IS NULL
+       ORDER BY k.kak_id DESC`);return a}static async getSatuanList(){await (0,f.initDatabase)();let[a]=await f.default.query("SELECT st_id, st_nama FROM satuan WHERE st_deleted_at IS NULL ORDER BY st_nama ASC");return a}static async getPegawaiList(){await (0,f.initDatabase)();let[a]=await f.default.query("SELECT pgw_id, pgw_nama, pgw_nip, pgw_jabatan FROM pegawai WHERE pgw_deleted_at IS NULL ORDER BY pgw_nama ASC");return a}static async save(a,b){await (0,f.initDatabase)();let c=await f.default.getConnection();try{await c.beginTransaction();let d=a.spt_id?Number(a.spt_id):null;if(!d&&a.spt_kak_id){let[b]=await c.query("SELECT spt_id FROM spesifikasi_teknis WHERE spt_kak_id = ? AND spt_deleted_at IS NULL LIMIT 1",[a.spt_kak_id]);b.length>0&&(d=b[0].spt_id)}if(d)await c.query(`UPDATE spesifikasi_teknis SET
+            spt_kak_id = ?,
+            spt_paket_pengadaan = ?,
+            spt_satuan_kerja = ?,
+            spt_spt_ppk_pgw_id = ?,
+            spd_id_rup = ?,
+            spt_nama_barang_type = ?,
+            spt_identifikasi_tkdn = ?,
+            spt_prioritas_penggunaan = ?,
+            spt_spesifikasi_jumlah = ?,
+            spt_spesifikasi_waktu_pelaksanaan = ?,
+            spt_spesifikasi_waktu_lokasi_kedatangan = ?,
+            spt_spesifikasi_pelayanan = ?,
+            spt_spesifikasi_lokasi = ?,
+            spt_rencana_poin_negosiasi_teknis = ?,
+            spt_nama_pelaku_usaha = ?,
+            spt_link_katalog = ?,
+            spt_updated_by = ?,
+            spt_updated_at = NOW()
+          WHERE spt_id = ?`,[a.spt_kak_id,a.spt_paket_pengadaan||null,a.spt_satuan_kerja||null,a.spt_spt_ppk_pgw_id||null,a.spd_id_rup||null,a.spt_nama_barang_type||null,a.spt_identifikasi_tkdn||null,a.spt_prioritas_penggunaan||null,a.spt_spesifikasi_jumlah||null,a.spt_spesifikasi_waktu_pelaksanaan||null,a.spt_spesifikasi_waktu_lokasi_kedatangan||null,a.spt_spesifikasi_pelayanan||null,a.spt_spesifikasi_lokasi||null,a.spt_rencana_poin_negosiasi_teknis||null,a.spt_nama_pelaku_usaha||null,a.spt_link_katalog||null,b??null,d]);else{let[e]=await c.query(`INSERT INTO spesifikasi_teknis
+            (spt_kak_id, spt_paket_pengadaan, spt_satuan_kerja, spt_spt_ppk_pgw_id, spd_id_rup,
+             spt_nama_barang_type, spt_identifikasi_tkdn, spt_prioritas_penggunaan, spt_spesifikasi_jumlah,
+             spt_spesifikasi_waktu_pelaksanaan, spt_spesifikasi_waktu_lokasi_kedatangan, spt_spesifikasi_pelayanan,
+             spt_spesifikasi_lokasi, spt_rencana_poin_negosiasi_teknis, spt_nama_pelaku_usaha, spt_link_katalog,
+             spt_created_by, spt_created_at)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())`,[a.spt_kak_id,a.spt_paket_pengadaan||null,a.spt_satuan_kerja||null,a.spt_spt_ppk_pgw_id||null,a.spd_id_rup||null,a.spt_nama_barang_type||null,a.spt_identifikasi_tkdn||null,a.spt_prioritas_penggunaan||null,a.spt_spesifikasi_jumlah||null,a.spt_spesifikasi_waktu_pelaksanaan||null,a.spt_spesifikasi_waktu_lokasi_kedatangan||null,a.spt_spesifikasi_pelayanan||null,a.spt_spesifikasi_lokasi||null,a.spt_rencana_poin_negosiasi_teknis||null,a.spt_nama_pelaku_usaha||null,a.spt_link_katalog||null,b??null]);d=e.insertId}if(!d)throw Error("Gagal menyimpan Header Dokumen Spesifikasi Teknis.");if(await c.query("UPDATE detail_spesifikasi_teknis SET dspt_deleted_at = NOW(), dspt_deleted_by = ? WHERE dspt_spt_id = ? AND dspt_deleted_at IS NULL",[b??null,d]),a.detailTeknis&&a.detailTeknis.length>0)for(let e of a.detailTeknis)(e.dspt_item_barang_jasa||e.dspt_spesifikasi)&&await c.query(`INSERT INTO detail_spesifikasi_teknis
+              (dspt_spt_id, dspt_item_barang_jasa, dspt_spesifikasi, dspt_created_by, dpst_created_at)
+             VALUES (?, ?, ?, ?, NOW())`,[d,e.dspt_item_barang_jasa||"",e.dspt_spesifikasi||"",b??null]);if(await c.query("UPDATE detail_spesifikasi_jumlah SET dspj_deleted_at = NOW(), dspj_deleted_by = ? WHERE dpsj_spt_id = ? AND dspj_deleted_at IS NULL",[b??null,d]),a.detailJumlah&&a.detailJumlah.length>0)for(let e of a.detailJumlah)e.dspj_item_barang_jasa&&await c.query(`INSERT INTO detail_spesifikasi_jumlah
+              (dpsj_spt_id, dspj_item_barang_jasa, dspj_jumlah, dspj_satuan_id, dspj_created_by, dspj_created_at)
+             VALUES (?, ?, ?, ?, ?, NOW())`,[d,e.dspj_item_barang_jasa||"",Number(e.dspj_jumlah)||0,e.dspj_satuan_id?Number(e.dspj_satuan_id):null,b??null]);if(await c.query("UPDATE detail_daftar_pelaku_usaha SET dpu_deleted_at = NOW(), dpu_deleted_by = ? WHERE dpu_spt_id = ? AND dpu_deleted_at IS NULL",[b??null,d]),a.detailPelakuUsaha&&a.detailPelakuUsaha.length>0)for(let e of a.detailPelakuUsaha)(e.dpu_item||e.dpu_nama_pelaku_usaha_potensial)&&await c.query(`INSERT INTO detail_daftar_pelaku_usaha
+              (dpu_spt_id, dpu_item, dpu_nama_pelaku_usaha_potensial, dpu_link_katalog, dpu_harga, dpu_evaluasi_berdasarkan_parameter, dpu_created_by, dpu_created_at)
+             VALUES (?, ?, ?, ?, ?, ?, ?, NOW())`,[d,e.dpu_item||"",e.dpu_nama_pelaku_usaha_potensial||"",e.dpu_link_katalog||"",Number(e.dpu_harga)||0,e.dpu_evaluasi_berdasarkan_parameter||"",b??null]);return await c.commit(),d}catch(a){throw await c.rollback(),a}finally{c.release()}}static async delete(a,b){return await (0,f.initDatabase)(),await f.default.query("UPDATE spesifikasi_teknis SET spt_deleted_at = NOW(), spt_deleted_by = ? WHERE spt_id = ?",[b??null,a]),await f.default.query("UPDATE detail_spesifikasi_teknis SET dspt_deleted_at = NOW(), dspt_deleted_by = ? WHERE dspt_spt_id = ?",[b??null,a]),await f.default.query("UPDATE detail_spesifikasi_jumlah SET dspj_deleted_at = NOW(), dspj_deleted_by = ? WHERE dpsj_spt_id = ?",[b??null,a]),await f.default.query("UPDATE detail_daftar_pelaku_usaha SET dpu_deleted_at = NOW(), dpu_deleted_by = ? WHERE dpu_spt_id = ?",[b??null,a]),!0}}var h=a.i(14084),i=a.i(3334),j=a.i(24016),k=a.i(79562);class l{static async getByKakId(a){let{spesifikasiTeknis:b,detailTeknis:c,detailJumlah:d,detailPelakuUsaha:e}=await g.findByKakId(a),f=await h.KerangkaAcuanKerjaRepository.findById(a),l=null;f?.kak_master_dokumen_id&&(l=await i.MasterDokumenRepository.findById(f.kak_master_dokumen_id));let m=null,n=b?.spt_spt_ppk_pgw_id||f?.kak_ppk_pgw_id||l?.mdk_nama_pejabat_id;n&&(m=await j.PegawaiRepository.findById(n));let o=await k.PermohonanRepository.findByKakId(a),p=c,q=d;if(!b||0===c.length&&0===d.length){let b=await h.KerangkaAcuanKerjaRepository.getSpesifikasiTeknisByKakId(a),c=await h.KerangkaAcuanKerjaRepository.getPerkiraanBiayaByKakId(a);if(0===p.length&&b&&b.length>0&&(p=b.map(a=>({dspt_item_barang_jasa:a.kst_uraian||"",dspt_spesifikasi:a.kst_spesifikasi||""}))),0===q.length&&c&&c.length>0&&(q=c.map(a=>({dspj_item_barang_jasa:a.kpb_uraian||"",dspj_jumlah:a.kpb_volume||1,dspj_satuan_id:null,st_nama:String(l?.st_nama||l?.mdk_satuan||"Unit")}))),0===p.length&&l?.mdk_item_barang)try{let a="string"==typeof l.mdk_item_barang?JSON.parse(l.mdk_item_barang):l.mdk_item_barang;Array.isArray(a)&&a.length>0&&(p=a.map(a=>({dspt_item_barang_jasa:a.NAMA_STANDAR_HARGA||a.nama_standar_harga||"",dspt_spesifikasi:a.SPESIFIKASI||a.spesifikasi||""})),0===q.length&&(q=a.map(a=>({dspj_item_barang_jasa:a.NAMA_STANDAR_HARGA||a.nama_standar_harga||"",dspj_jumlah:Number(a.KOOFISIEN||a.koefisien)||1,dspj_satuan_id:null,st_nama:a.SATUAN||a.satuan||"Unit"}))))}catch{}}return{spesifikasiTeknis:b,detailTeknis:p,detailJumlah:q,detailPelakuUsaha:e,kak:f,masterDokumen:l,ppkPegawai:m,pmhKodeRup:o?.pmh_kode_rup||null}}static async getById(a){let{spesifikasiTeknis:b}=await g.findById(a);return b?await this.getByKakId(b.spt_kak_id):{spesifikasiTeknis:null,detailTeknis:[],detailJumlah:[],detailPelakuUsaha:[],kak:null,masterDokumen:null,ppkPegawai:null}}static async getKakOptions(){return await g.getKakOptions()}static async getSatuanList(){return await g.getSatuanList()}static async getPegawaiList(){return await g.getPegawaiList()}static async save(a,b){return await g.save(a,b)}static async delete(a,b){return await g.delete(a,b)}}var m=a.i(53112);let n=m.z.object({dpst_id:m.z.coerce.number().optional(),dspt_spt_id:m.z.coerce.number().optional(),dspt_item_barang_jasa:m.z.string().default(""),dspt_spesifikasi:m.z.string().default("")}),o=m.z.object({dspj_id:m.z.coerce.number().optional(),dpsj_spt_id:m.z.coerce.number().optional(),dspj_item_barang_jasa:m.z.string().default(""),dspj_jumlah:m.z.coerce.number().default(0),dspj_satuan_id:m.z.coerce.number().nullable().optional(),st_nama:m.z.string().nullable().optional()}),p=m.z.object({dpu_id:m.z.coerce.number().optional(),dpu_spt_id:m.z.coerce.number().optional(),dpu_item:m.z.string().default(""),dpu_nama_pelaku_usaha_potensial:m.z.string().default(""),dpu_link_katalog:m.z.string().default(""),dpu_harga:m.z.coerce.number().default(0),dpu_evaluasi_berdasarkan_parameter:m.z.string().default("")}),q=m.z.object({spt_id:m.z.coerce.number().nullable().optional(),spt_kak_id:m.z.coerce.number().positive("Dokumen Kerangka Acuan Kerja (KAK) harus dipilih"),spt_paket_pengadaan:m.z.string().nullable().optional(),spt_satuan_kerja:m.z.string().nullable().optional(),spt_spt_ppk_pgw_id:m.z.coerce.number().nullable().optional(),spd_id_rup:m.z.string().nullable().optional(),spt_nama_barang_type:m.z.string().nullable().optional(),spt_identifikasi_tkdn:m.z.string().nullable().optional(),spt_prioritas_penggunaan:m.z.string().nullable().optional(),spt_spesifikasi_jumlah:m.z.string().nullable().optional(),spt_spesifikasi_waktu_pelaksanaan:m.z.string().nullable().optional(),spt_spesifikasi_waktu_lokasi_kedatangan:m.z.string().nullable().optional(),spt_spesifikasi_pelayanan:m.z.string().nullable().optional(),spt_spesifikasi_lokasi:m.z.string().nullable().optional(),spt_rencana_poin_negosiasi_teknis:m.z.string().nullable().optional(),spt_nama_pelaku_usaha:m.z.string().nullable().optional(),spt_link_katalog:m.z.string().nullable().optional(),detailTeknis:m.z.array(n).default([]),detailJumlah:m.z.array(o).default([]),detailPelakuUsaha:m.z.array(p).default([])});async function r(){try{let a=await (0,d.cookies)(),b=a.get("token")?.value;if(!b)return null;let c=await (0,e.verifyToken)(b);return c?c.pgw_id:null}catch{return null}}async function s(a){try{let b=await l.getByKakId(a);return{success:!0,message:"Berhasil memuat data Spesifikasi Teknis",data:b}}catch(a){return{success:!1,message:a.message||"Gagal memuat data Spesifikasi Teknis",data:{spesifikasiTeknis:null,detailTeknis:[],detailJumlah:[],detailPelakuUsaha:[],kak:null,masterDokumen:null,ppkPegawai:null}}}}async function t(a){try{let b=await l.getById(a);return{success:!0,message:"Berhasil memuat data Spesifikasi Teknis",data:b}}catch(a){return{success:!1,message:a.message||"Gagal memuat data Spesifikasi Teknis",data:{spesifikasiTeknis:null,detailTeknis:[],detailJumlah:[],detailPelakuUsaha:[],kak:null,masterDokumen:null,ppkPegawai:null}}}}async function u(){try{let a=await l.getKakOptions();return{success:!0,message:"Berhasil mengambil opsi KAK",data:a}}catch(a){return{success:!1,message:a.message||"Gagal mengambil opsi KAK",data:[]}}}async function v(){try{let a=await l.getSatuanList();return{success:!0,message:"Berhasil mengambil data satuan",data:a}}catch(a){return{success:!1,message:a.message||"Gagal mengambil data satuan",data:[]}}}async function w(){try{let a=await l.getPegawaiList();return{success:!0,message:"Berhasil mengambil data pegawai",data:a}}catch(a){return{success:!1,message:a.message||"Gagal mengambil data pegawai",data:[]}}}async function x(a){try{let b=q.safeParse(a);if(!b.success){let a=b.error.flatten().fieldErrors,c=Object.values(a).flat()[0]||"Validasi gagal, silakan periksa input Anda.";return{success:!1,message:c}}let d=await r(),e=await l.save(a,d);return(0,c.revalidatePath)("/spesifikasi-teknis"),(0,c.revalidatePath)(`/spesifikasi-teknis/print/${e}`),(0,c.revalidatePath)(`/spesifikasi-teknis/print/kak-${a.spt_kak_id}`),{success:!0,message:"Dokumen Spesifikasi Teknis berhasil disimpan.",data:{sptId:e}}}catch(a){return{success:!1,message:a.message||"Gagal menyimpan Dokumen Spesifikasi Teknis."}}}async function y(a){try{let b=await r();return await l.delete(a,b),(0,c.revalidatePath)("/spesifikasi-teknis"),{success:!0,message:"Dokumen Spesifikasi Teknis berhasil dihapus."}}catch(a){return{success:!1,message:a.message||"Gagal menghapus Dokumen Spesifikasi Teknis."}}}(0,a.i(13095).ensureServerEntryExports)([s,t,u,v,w,x,y]),(0,b.registerServerReference)(s,"40fe1b315391bf52507cd3cd63df20ee7d171d3dc0",null),(0,b.registerServerReference)(t,"408711927da1a43e5e6a2c504eef0fa4bd2f3c1eb4",null),(0,b.registerServerReference)(u,"008d455f519e6008f4ce790f8eae3e0c9780731387",null),(0,b.registerServerReference)(v,"00da86f32b23a1eba8e64b9cfe43871051d54d398e",null),(0,b.registerServerReference)(w,"005e3bdd5744cb10f099bf2b562f9392df0b5972be",null),(0,b.registerServerReference)(x,"4059dc7df1426cc15584d7d768c13a7ef137c61cd9",null),(0,b.registerServerReference)(y,"4026dcab582cf83423014f6244207c8c2ff159afa2",null),a.s(["deleteSpesifikasiTeknisAction",()=>y,"getKakOptionsForSptAction",()=>u,"getPegawaiListForSptAction",()=>w,"getSatuanListForSptAction",()=>v,"getSpesifikasiTeknisByIdAction",()=>t,"getSpesifikasiTeknisByKakIdAction",()=>s,"saveSpesifikasiTeknisAction",()=>x],55217)}];
+
+//# sourceMappingURL=src_features_spesifikasi-teknis_actions_ts_45bab6ef._.js.map

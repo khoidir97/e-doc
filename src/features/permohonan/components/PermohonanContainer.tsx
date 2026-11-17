@@ -146,7 +146,7 @@ export const PermohonanContainer: React.FC<PermohonanContainerProps> = ({
       const tahun = kak?.kak_tahun_anggaran || '2026';
       const defaultPaket = kak?.kak_pekerjaan || kak?.kak_rekening || masterDokumen?.mdk_pekerjaan || masterDokumen?.mdk_uraian_belanja || '';
       const defaultMetode = kak?.kak_metode_pemilihan || 'e-purchasing melalui e katalog v.6';
-      const defaultPagu = Number(masterDokumen?.mdk_pagu_anggaran) || totalHps || totalBiayaKak || 0;
+      const defaultPagu = Number(kak?.kak_pagu_anggaran) || Number(masterDokumen?.mdk_pagu_anggaran) || totalHps || totalBiayaKak || 0;
       const defaultHps = totalHps || totalBiayaKak || 0;
       const defaultPpkId = kak?.kak_ppk_pgw_id || masterDokumen?.mdk_nama_pejabat_id || null;
 

@@ -64,10 +64,21 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
 
   // Rincian Objek (Item Belanja dari Api-RO)
   const [rincianObjekList, setRincianObjekList] = useState<RincianObjek[]>([]);
+  const [savedKakItemObjects, setSavedKakItemObjects] = useState<RincianObjek[]>([]);
   const [loadingRincianObjek, setLoadingRincianObjek] = useState(false);
   const [selectedKodeStandarHarga, setSelectedKodeStandarHarga] = useState<string[]>([]);
   const [searchRincianKeyword, setSearchRincianKeyword] = useState('');
   const [appliedNotice, setAppliedNotice] = useState<string | null>(null);
+
+  const parseKakItemBelanja = (raw: any): RincianObjek[] => {
+    if (!raw) return [];
+    try {
+      const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
+      return Array.isArray(parsed) ? parsed : [];
+    } catch {
+      return [];
+    }
+  };
 
   // Status & Notifications
   const [loadingOptions, setLoadingOptions] = useState(true);
@@ -90,6 +101,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
   const currentYear = new Date().getFullYear().toString();
   const [kakPekerjaan, setKakPekerjaan] = useState('');
   const [kakTahunAnggaran, setKakTahunAnggaran] = useState(currentYear);
+  const [kakPaguAnggaran, setKakPaguAnggaran] = useState<number>(0);
   const [kakPpkPgwId, setKakPpkPgwId] = useState<number | null>(null);
   const [pegawaiList, setPegawaiList] = useState<
     { pgw_id: number; pgw_nama: string; pgw_nip: string; pgw_jabatan: string }[]
@@ -295,7 +307,6 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
   useEffect(() => {
     if (selectedMode !== 'manual' || !kakKodeSubKegiatan || !kakKodeRekening) {
       setRincianObjekList([]);
-      setSelectedKodeStandarHarga([]);
       return;
     }
 
@@ -348,6 +359,19 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
           currentMaster?.mdk_apbd?.match(/\b(20\d\d)\b/)?.[1] ||
           currentYear
         );
+        const totalBiayaSaved = res.data.kakDetails.perkiraanBiayaList.reduce(
+          (acc, c) => acc + (Number(c.kpb_jumlah) || 0),
+          0
+        );
+        setKakPaguAnggaran(
+          Number(kak.kak_pagu_anggaran) ||
+            Number(currentMaster?.mdk_pagu_anggaran) ||
+            totalBiayaSaved ||
+            0
+        );
+        const savedItems = parseKakItemBelanja(kak.kak_item_belanja || currentMaster?.mdk_item_barang);
+        setSavedKakItemObjects(savedItems);
+        setSelectedKodeStandarHarga(savedItems.map((it) => it.KODE_STANDAR_HARGA).filter(Boolean));
         setKakPpkPgwId(kak.kak_ppk_pgw_id || currentMaster?.mdk_nama_pejabat_id || null);
 
         setLatarBelakang(kak.kak_latar_belakang || '');
@@ -398,6 +422,10 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
           setKakKodeRekening(currentMaster.mdk_rekening_belanja || '');
           setKakPekerjaan(namaPekerjaan);
           setKakTahunAnggaran(tahunAnggaran);
+          setKakPaguAnggaran(Number(currentMaster.mdk_pagu_anggaran) || 0);
+          const masterItems = parseKakItemBelanja(currentMaster.mdk_item_barang);
+          setSavedKakItemObjects(masterItems);
+          setSelectedKodeStandarHarga(masterItems.map((it) => it.KODE_STANDAR_HARGA).filter(Boolean));
           setKakPpkPgwId(defaultPpkId);
 
           const defaults = getSmartDefaults({
@@ -478,6 +506,14 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
         setKakKodeRekening(kak.kak_kode_rekening || '');
         setKakPekerjaan(kak.kak_pekerjaan || '');
         setKakTahunAnggaran(kak.kak_tahun_anggaran || currentYear);
+        const totalBiayaSaved = res.data.kakDetails.perkiraanBiayaList.reduce(
+          (acc, c) => acc + (Number(c.kpb_jumlah) || 0),
+          0
+        );
+        setKakPaguAnggaran(Number(kak.kak_pagu_anggaran) || totalBiayaSaved || 0);
+        const savedItems = parseKakItemBelanja(kak.kak_item_belanja);
+        setSavedKakItemObjects(savedItems);
+        setSelectedKodeStandarHarga(savedItems.map((it) => it.KODE_STANDAR_HARGA).filter(Boolean));
         setKakPpkPgwId(kak.kak_ppk_pgw_id || null);
 
         setLatarBelakang(kak.kak_latar_belakang || '');
@@ -527,6 +563,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
     setKakKodeRekening('');
     setKakPekerjaan('');
     setKakTahunAnggaran(currentYear);
+    setKakPaguAnggaran(0);
     setKakPpkPgwId(null);
 
     const defaults = getSmartDefaults({
@@ -549,6 +586,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
     setPerkiraanBiayaList([{ kpb_uraian: '', kpb_volume: 1, kpb_harga: 0, kpb_jumlah: 0 }]);
     setSpesifikasiTeknisList([{ kst_uraian: '', kst_spesifikasi: '' }]);
     setSelectedKodeStandarHarga([]);
+    setSavedKakItemObjects([]);
     setRincianObjekList([]);
   };
 
@@ -602,9 +640,11 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
     setPullingHps(false);
   };
 
+  const effectiveRincianList = rincianObjekList.length > 0 ? rincianObjekList : savedKakItemObjects;
+
   // Terapkan item terpilih dari Api-RO ke Form KAK
   const applySelectedRincianItems = () => {
-    const selectedItems = rincianObjekList.filter((item) =>
+    const selectedItems = effectiveRincianList.filter((item) =>
       selectedKodeStandarHarga.includes(item.KODE_STANDAR_HARGA)
     );
     if (selectedItems.length === 0) return;
@@ -614,11 +654,13 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
     // const pekerjaanText = namaList.join(', ');
     // setKakPekerjaan(pekerjaanText);
 
-    // 2. Set Tabel Perkiraan Biaya
+    // 2. Set Tabel Perkiraan Biaya & Pagu Anggaran otomatis dari item checklist
+    let totalChecked = 0;
     const rows: DetailKakPerkiraanBiaya[] = selectedItems.map((item) => {
       const vol = Number(item.KOOFISIEN) || 1;
       const harga = Number(item.HARGA_SATUAN) || 0;
       const jumlah = Number(item.PAGU_TOTAL) || vol * harga;
+      totalChecked += jumlah;
       return {
         kpb_uraian: item.NAMA_STANDAR_HARGA,
         kpb_volume: vol,
@@ -627,6 +669,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
       };
     });
     setPerkiraanBiayaList(rows);
+    setKakPaguAnggaran(totalChecked);
 
     // 3. Set Tabel Spesifikasi Teknis
     const specRows: DetailKakSpesifikasiTeknis[] = selectedItems.map((item) => ({
@@ -703,6 +746,9 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
     }
 
     setSaving(true);
+    const checkedItemObjects = effectiveRincianList.filter((item) =>
+      selectedKodeStandarHarga.includes(item.KODE_STANDAR_HARGA)
+    );
     const payload: SaveKakPayload = {
       kak_id: kakId || null,
       kak_master_dokumen_id: selectedMode === 'master' && selectedMdkId ? Number(selectedMdkId) : null,
@@ -716,6 +762,8 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
       kak_kode_rekening: kakKodeRekening || null, // sama dengan kode rekening belanja
       kak_pekerjaan: kakPekerjaan || null,
       kak_tahun_anggaran: kakTahunAnggaran || null,
+      kak_pagu_anggaran: Number(kakPaguAnggaran) || 0,
+      kak_item_belanja: checkedItemObjects,
       kak_ppk_pgw_id: kakPpkPgwId ? Number(kakPpkPgwId) : null,
       kak_latar_belakang: latarBelakang,
       kak_maksud_dan_tujuan: maksudDanTujuan,
@@ -777,7 +825,7 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
   const terbilangBiaya = terbilang(totalBiaya);
 
   // Filtered Rincian Objek list
-  const filteredRincianList = rincianObjekList.filter((item) => {
+  const filteredRincianList = effectiveRincianList.filter((item) => {
     if (!searchRincianKeyword.trim()) return true;
     const term = searchRincianKeyword.toLowerCase();
     return (
@@ -787,18 +835,34 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
     );
   });
 
+  const computeTotalCheckedRincian = (kodeList: string[]) => {
+    return effectiveRincianList
+      .filter((item) => kodeList.includes(item.KODE_STANDAR_HARGA))
+      .reduce((acc, item) => {
+        const vol = Number(item.KOOFISIEN) || 1;
+        const harga = Number(item.HARGA_SATUAN) || 0;
+        const jumlah = Number(item.PAGU_TOTAL) || vol * harga;
+        return acc + jumlah;
+      }, 0);
+  };
+
   const toggleSelectAllRincian = () => {
-    if (selectedKodeStandarHarga.length === rincianObjekList.length) {
+    if (selectedKodeStandarHarga.length === effectiveRincianList.length) {
       setSelectedKodeStandarHarga([]);
+      setKakPaguAnggaran(0);
     } else {
-      setSelectedKodeStandarHarga(rincianObjekList.map((item) => item.KODE_STANDAR_HARGA));
+      const allKodes = effectiveRincianList.map((item) => item.KODE_STANDAR_HARGA);
+      setSelectedKodeStandarHarga(allKodes);
+      setKakPaguAnggaran(computeTotalCheckedRincian(allKodes));
     }
   };
 
   const toggleSelectRincianItem = (kode: string) => {
-    setSelectedKodeStandarHarga((prev) =>
-      prev.includes(kode) ? prev.filter((k) => k !== kode) : [...prev, kode]
-    );
+    setSelectedKodeStandarHarga((prev) => {
+      const next = prev.includes(kode) ? prev.filter((k) => k !== kode) : [...prev, kode];
+      setKakPaguAnggaran(computeTotalCheckedRincian(next));
+      return next;
+    });
   };
 
   // Pastikan nilai tersimpan selalu tampil di select walaupun list API belum/tidak memuatnya
@@ -1342,8 +1406,26 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                   />
                 </div>
 
-                {/* 7. Pejabat Pembuat Komitmen (PPK) */}
-                <div className="md:col-span-2">
+                {/* 7. Pagu Anggaran */}
+                <div>
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Pagu Anggaran
+                  </label>
+                  <RupiahInput
+                    value={kakPaguAnggaran}
+                    onChange={(val) => setKakPaguAnggaran(Number(val) || 0)}
+                    placeholder="Masukkan nilai pagu anggaran..."
+                    className="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 text-xs font-mono font-semibold focus:ring-1 focus:ring-brand-500 focus:outline-none"
+                  />
+                  {kakPaguAnggaran > 0 && (
+                    <p className="mt-1 text-[11px] text-gray-500 dark:text-gray-400 italic">
+                      ({terbilang(kakPaguAnggaran)} Rupiah)
+                    </p>
+                  )}
+                </div>
+
+                {/* 8. Pejabat Pembuat Komitmen (PPK) */}
+                <div>
                   <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">
                     Nama Pejabat Pembuat Komitmen (PPK)
                   </label>
@@ -1370,18 +1452,18 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                         Item Barang Belanja (Standar Harga dari Api-RO):
                       </span>
                       <span className="text-[11px] px-2 py-0.5 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
-                        {rincianObjekList.length} item
+                        {effectiveRincianList.length} item
                       </span>
                     </div>
 
-                    {rincianObjekList.length > 0 && (
+                    {effectiveRincianList.length > 0 && (
                       <div className="flex items-center gap-3">
                         <button
                           type="button"
                           onClick={toggleSelectAllRincian}
                           className="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:underline cursor-pointer"
                         >
-                          {selectedKodeStandarHarga.length === rincianObjekList.length
+                          {selectedKodeStandarHarga.length === effectiveRincianList.length
                             ? 'Batalkan Semua'
                             : 'Pilih Semua'}
                         </button>
@@ -1417,13 +1499,13 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                       <div className="w-5 h-5 border-2 border-brand-500 border-t-transparent rounded-full animate-spin mx-auto mb-1.5" />
                       Mengambil item rincian objek dari server BPKAD...
                     </div>
-                  ) : rincianObjekList.length === 0 ? (
+                  ) : effectiveRincianList.length === 0 ? (
                     <div className="py-3 text-center text-xs text-gray-400 italic">
                       Tidak ada data item rincian standar harga pada rekening belanja ini. Anda dapat mengetik rincian secara langsung di tabel biaya di bawah.
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      {rincianObjekList.length > 3 && (
+                      {effectiveRincianList.length > 3 && (
                         <input
                           type="text"
                           value={searchRincianKeyword}
@@ -1588,6 +1670,16 @@ export const KerangkaAcuanKerjaContainer: React.FC<KerangkaAcuanKerjaContainerPr
                   </span>
                   <p className="font-semibold text-gray-900 dark:text-white leading-snug">
                     Tahun {kakTahunAnggaran || currentYear}
+                  </p>
+                </div>
+
+                {/* Pagu Anggaran */}
+                <div>
+                  <span className="text-gray-400 dark:text-gray-500 font-semibold block text-[10px] uppercase tracking-wider mb-0.5">
+                    Pagu Anggaran
+                  </span>
+                  <p className="font-bold text-emerald-600 dark:text-emerald-400 leading-snug">
+                    {formatRupiah(kakPaguAnggaran)}
                   </p>
                 </div>
 

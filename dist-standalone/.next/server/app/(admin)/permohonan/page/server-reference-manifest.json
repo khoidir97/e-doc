@@ -1,0 +1,65 @@
+{
+  "node": {
+    "0091e5c81211cf4cdf11c42b43b467084eb8ca29e4": {
+      "workers": {
+        "app/(admin)/permohonan/page": {
+          "moduleId": 26241,
+          "async": false,
+          "exportedName": "getKakOptionsForPermohonanAction",
+          "filename": "src/features/permohonan/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/permohonan/page": "action-browser"
+      },
+      "exportedName": "getKakOptionsForPermohonanAction",
+      "filename": "src/features/permohonan/actions.ts"
+    },
+    "401d07aaab947cca2911086ab4a6f9a5d9b30209b6": {
+      "workers": {
+        "app/(admin)/permohonan/page": {
+          "moduleId": 26241,
+          "async": false,
+          "exportedName": "getPermohonanByKakIdAction",
+          "filename": "src/features/permohonan/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/permohonan/page": "action-browser"
+      },
+      "exportedName": "getPermohonanByKakIdAction",
+      "filename": "src/features/permohonan/actions.ts"
+    },
+    "4038dc9830e0404cac09fae2fbe971f12ee30def31": {
+      "workers": {
+        "app/(admin)/permohonan/page": {
+          "moduleId": 26241,
+          "async": false,
+          "exportedName": "savePermohonanAction",
+          "filename": "src/features/permohonan/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/permohonan/page": "action-browser"
+      },
+      "exportedName": "savePermohonanAction",
+      "filename": "src/features/permohonan/actions.ts"
+    },
+    "0049c447004670830005a9075f5624b3f3739518ac": {
+      "workers": {
+        "app/(admin)/permohonan/page": {
+          "moduleId": 26241,
+          "async": false,
+          "exportedName": "getPegawaiListForPermohonanAction",
+          "filename": "src/features/permohonan/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/permohonan/page": "action-browser"
+      },
+      "exportedName": "getPegawaiListForPermohonanAction",
+      "filename": "src/features/permohonan/actions.ts"
+    }
+  },
+  "edge": {}
+}

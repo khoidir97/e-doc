@@ -27,6 +27,8 @@ export const saveKakSchema = z.object({
   kak_kode_rekening: z.string().nullable().optional(),
   kak_pekerjaan: z.string().nullable().optional(),
   kak_tahun_anggaran: z.string().nullable().optional(),
+  kak_pagu_anggaran: z.coerce.number().nullable().optional(),
+  kak_item_belanja: z.any().optional(),
   kak_ppk_pgw_id: z.coerce.number().nullable().optional(),
   kak_latar_belakang: z.string().nullable().optional(),
   kak_maksud_dan_tujuan: z.string().nullable().optional(),

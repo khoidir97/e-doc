@@ -1,0 +1,35 @@
+{
+  "node": {
+    "409cf44276995621d3824a9bb159292ecf37399724": {
+      "workers": {
+        "app/permohonan/print/[id]/page": {
+          "moduleId": 69666,
+          "async": false,
+          "exportedName": "getPermohonanByIdAction",
+          "filename": "src/features/permohonan/actions.ts"
+        }
+      },
+      "layer": {
+        "app/permohonan/print/[id]/page": "action-browser"
+      },
+      "exportedName": "getPermohonanByIdAction",
+      "filename": "src/features/permohonan/actions.ts"
+    },
+    "401d07aaab947cca2911086ab4a6f9a5d9b30209b6": {
+      "workers": {
+        "app/permohonan/print/[id]/page": {
+          "moduleId": 69666,
+          "async": false,
+          "exportedName": "getPermohonanByKakIdAction",
+          "filename": "src/features/permohonan/actions.ts"
+        }
+      },
+      "layer": {
+        "app/permohonan/print/[id]/page": "action-browser"
+      },
+      "exportedName": "getPermohonanByKakIdAction",
+      "filename": "src/features/permohonan/actions.ts"
+    }
+  },
+  "edge": {}
+}

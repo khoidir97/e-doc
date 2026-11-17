@@ -1,0 +1,95 @@
+{
+  "node": {
+    "008d455f519e6008f4ce790f8eae3e0c9780731387": {
+      "workers": {
+        "app/(admin)/spesifikasi-teknis/page": {
+          "moduleId": 15514,
+          "async": false,
+          "exportedName": "getKakOptionsForSptAction",
+          "filename": "src/features/spesifikasi-teknis/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/spesifikasi-teknis/page": "action-browser"
+      },
+      "exportedName": "getKakOptionsForSptAction",
+      "filename": "src/features/spesifikasi-teknis/actions.ts"
+    },
+    "40fe1b315391bf52507cd3cd63df20ee7d171d3dc0": {
+      "workers": {
+        "app/(admin)/spesifikasi-teknis/page": {
+          "moduleId": 15514,
+          "async": false,
+          "exportedName": "getSpesifikasiTeknisByKakIdAction",
+          "filename": "src/features/spesifikasi-teknis/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/spesifikasi-teknis/page": "action-browser"
+      },
+      "exportedName": "getSpesifikasiTeknisByKakIdAction",
+      "filename": "src/features/spesifikasi-teknis/actions.ts"
+    },
+    "00da86f32b23a1eba8e64b9cfe43871051d54d398e": {
+      "workers": {
+        "app/(admin)/spesifikasi-teknis/page": {
+          "moduleId": 15514,
+          "async": false,
+          "exportedName": "getSatuanListForSptAction",
+          "filename": "src/features/spesifikasi-teknis/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/spesifikasi-teknis/page": "action-browser"
+      },
+      "exportedName": "getSatuanListForSptAction",
+      "filename": "src/features/spesifikasi-teknis/actions.ts"
+    },
+    "005e3bdd5744cb10f099bf2b562f9392df0b5972be": {
+      "workers": {
+        "app/(admin)/spesifikasi-teknis/page": {
+          "moduleId": 15514,
+          "async": false,
+          "exportedName": "getPegawaiListForSptAction",
+          "filename": "src/features/spesifikasi-teknis/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/spesifikasi-teknis/page": "action-browser"
+      },
+      "exportedName": "getPegawaiListForSptAction",
+      "filename": "src/features/spesifikasi-teknis/actions.ts"
+    },
+    "4059dc7df1426cc15584d7d768c13a7ef137c61cd9": {
+      "workers": {
+        "app/(admin)/spesifikasi-teknis/page": {
+          "moduleId": 15514,
+          "async": false,
+          "exportedName": "saveSpesifikasiTeknisAction",
+          "filename": "src/features/spesifikasi-teknis/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/spesifikasi-teknis/page": "action-browser"
+      },
+      "exportedName": "saveSpesifikasiTeknisAction",
+      "filename": "src/features/spesifikasi-teknis/actions.ts"
+    },
+    "4026dcab582cf83423014f6244207c8c2ff159afa2": {
+      "workers": {
+        "app/(admin)/spesifikasi-teknis/page": {
+          "moduleId": 15514,
+          "async": false,
+          "exportedName": "deleteSpesifikasiTeknisAction",
+          "filename": "src/features/spesifikasi-teknis/actions.ts"
+        }
+      },
+      "layer": {
+        "app/(admin)/spesifikasi-teknis/page": "action-browser"
+      },
+      "exportedName": "deleteSpesifikasiTeknisAction",
+      "filename": "src/features/spesifikasi-teknis/actions.ts"
+    }
+  },
+  "edge": {}
+}

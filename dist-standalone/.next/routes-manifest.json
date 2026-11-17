@@ -46,12 +46,28 @@
       "namedRegex": "^/faktur/print/(?<nxtPid>[^/]+?)(?:/)?$"
     },
     {
+      "page": "/harga-perkiraan-sendiri/penetapan/[id]",
+      "regex": "^/harga\\-perkiraan\\-sendiri/penetapan/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/harga\\-perkiraan\\-sendiri/penetapan/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
       "page": "/harga-perkiraan-sendiri/print/[id]",
       "regex": "^/harga\\-perkiraan\\-sendiri/print/([^/]+?)(?:/)?$",
       "routeKeys": {
         "nxtPid": "nxtPid"
       },
       "namedRegex": "^/harga\\-perkiraan\\-sendiri/print/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/kerangka-acuan-kerja/print/[id]",
+      "regex": "^/kerangka\\-acuan\\-kerja/print/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/kerangka\\-acuan\\-kerja/print/(?<nxtPid>[^/]+?)(?:/)?$"
     },
     {
       "page": "/kwitansi/print/[id]",
@@ -102,12 +118,28 @@
       "namedRegex": "^/perhitungan\\-paket/print/(?<nxtPid>[^/]+?)(?:/)?$"
     },
     {
+      "page": "/permohonan/print/[id]",
+      "regex": "^/permohonan/print/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/permohonan/print/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
       "page": "/rencana-anggaran-biaya/print/[id]",
       "regex": "^/rencana\\-anggaran\\-biaya/print/([^/]+?)(?:/)?$",
       "routeKeys": {
         "nxtPid": "nxtPid"
       },
       "namedRegex": "^/rencana\\-anggaran\\-biaya/print/(?<nxtPid>[^/]+?)(?:/)?$"
+    },
+    {
+      "page": "/spesifikasi-teknis/print/[id]",
+      "regex": "^/spesifikasi\\-teknis/print/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/spesifikasi\\-teknis/print/(?<nxtPid>[^/]+?)(?:/)?$"
     },
     {
       "page": "/survey/print/[id]",
@@ -264,6 +296,12 @@
       "namedRegex": "^/images(?:/)?$"
     },
     {
+      "page": "/kerangka-acuan-kerja",
+      "regex": "^/kerangka\\-acuan\\-kerja(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/kerangka\\-acuan\\-kerja(?:/)?$"
+    },
+    {
       "page": "/kwitansi",
       "regex": "^/kwitansi(?:/)?$",
       "routeKeys": {},
@@ -318,6 +356,12 @@
       "namedRegex": "^/perhitungan\\-paket(?:/)?$"
     },
     {
+      "page": "/permohonan",
+      "regex": "^/permohonan(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/permohonan(?:/)?$"
+    },
+    {
       "page": "/perusahaan",
       "regex": "^/perusahaan(?:/)?$",
       "routeKeys": {},
@@ -346,6 +390,12 @@
       "regex": "^/signup(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/signup(?:/)?$"
+    },
+    {
+      "page": "/spesifikasi-teknis",
+      "regex": "^/spesifikasi\\-teknis(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/spesifikasi\\-teknis(?:/)?$"
     },
     {
       "page": "/survey",

@@ -329,8 +329,8 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
   const normalizedWinnerName = sptNamaPelakuUsaha.trim().toLowerCase();
   const winnerIndex = normalizedWinnerName
     ? detailPelakuUsaha.findIndex(
-        (v) => v.dpu_nama_pelaku_usaha_potensial.trim().toLowerCase() === normalizedWinnerName
-      )
+      (v) => v.dpu_nama_pelaku_usaha_potensial.trim().toLowerCase() === normalizedWinnerName
+    )
     : -1;
   const hasWinner = winnerIndex !== -1;
 
@@ -654,7 +654,7 @@ export const SpesifikasiTeknisContainer: React.FC<SpesifikasiTeknisContainerProp
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500 dark:text-gray-400">Pagu Anggaran:</span>
-              <span className="font-semibold text-blue-600 dark:text-blue-400">{formatRupiah(selectedMasterDokumen?.mdk_pagu_anggaran || 0)}</span>
+              <span className="font-semibold text-blue-600 dark:text-blue-400">{formatRupiah(selectedKak?.kak_pagu_anggaran || 0)}</span>
             </div>
           </div>
         </div>

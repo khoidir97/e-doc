@@ -382,7 +382,6 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
   useEffect(() => {
     if (!isOpen || !mdkKodeSubKegiatan || !mdkRekeningBelanja) {
       setRincianObjekList([]);
-      setSelectedKodeStandarHarga([]);
       return;
     }
 
@@ -393,6 +392,15 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
         const data = await BpkadApiService.getRincianObjek(mdkKodeSubKegiatan, mdkRekeningBelanja);
         if (!isMounted) return;
         setRincianObjekList(data);
+
+        // Jika sudah ada item yang terpilih dari KAK (savedItemObjects), pertahankan pilihannya
+        if (savedItemObjects.length > 0) {
+          const savedCodes = savedItemObjects.map((item: any) => item.KODE_STANDAR_HARGA).filter(Boolean);
+          if (savedCodes.length > 0) {
+            setSelectedKodeStandarHarga(savedCodes);
+            return;
+          }
+        }
 
         // Pre-select items: prioritize mdk_item_barang if exists
         if (initialData?.mdk_item_barang) {
@@ -475,7 +483,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
         const namaProg = kak?.kak_program || mdkFromKak?.mdk_program || kakItem?.kak_program || '';
         const kodeKeg = kak?.kak_kode_kegiatan || mdkFromKak?.mdk_kode_kegiatan || kakItem?.kak_kode_kegiatan || '';
         const namaKeg = kak?.kak_kegiatan || mdkFromKak?.mdk_kegiatan || kakItem?.kak_kegiatan || '';
-        const kodeSubKeg = mdkFromKak?.mdk_kode_sub_kegiatan || kakItem?.kak_kode_sub_kegiatan || '';
+        const kodeSubKeg = kak?.kak_kode_sub_kegiatan || mdkFromKak?.mdk_kode_sub_kegiatan || kakItem?.kak_kode_sub_kegiatan || '';
         const namaSubKeg = kak?.kak_sub_kegiatan || mdkFromKak?.mdk_sub_kegiatan || kakItem?.kak_sub_kegiatan || '';
         const kodeRek = kak?.kak_kode_rekening || mdkFromKak?.mdk_rekening_belanja || kakItem?.kak_kode_rekening || '';
         const namaRek = kak?.kak_rekening || mdkFromKak?.mdk_uraian_belanja || kakItem?.kak_rekening || '';
@@ -492,6 +500,7 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
         if (kodeRek) setMdkRekeningBelanja(kodeRek);
         if (namaRek) setMdkUraianBelanja(namaRek);
         if (namaPekerjaan && !mdkPekerjaan) setMdkPekerjaan(namaPekerjaan);
+        if (kak?.kak_ppk_pgw_id) setMdkNamaPejabatId(kak.kak_ppk_pgw_id);
         if (tahunAnggaran) {
           setMdkApbd(
             tahunAnggaran.startsWith('APBD')
@@ -516,17 +525,36 @@ export const MasterDokumenFormModal: React.FC<MasterDokumenFormModalProps> = ({
 
         // Item Barang & Pagu Anggaran
         let itemObjectsToSet: any[] = [];
-        let totalPagu = 0;
+        let totalPagu = Number(kak?.kak_pagu_anggaran) || 0;
 
-        // Cek jika master dokumen dari KAK memiliki mdk_item_barang
-        if (mdkFromKak?.mdk_item_barang) {
+        // 1. Prioritaskan kak_item_belanja dari KAK
+        if (kak?.kak_item_belanja) {
+          try {
+            const parsed = typeof kak.kak_item_belanja === 'string'
+              ? JSON.parse(kak.kak_item_belanja)
+              : kak.kak_item_belanja;
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              itemObjectsToSet = parsed;
+              if (!totalPagu) {
+                totalPagu = parsed.reduce((sum: number, it: any) => sum + (Number(it.PAGU_TOTAL) || 0), 0);
+              }
+            }
+          } catch (e) {
+            console.error('Error parsing kak_item_belanja from KAK:', e);
+          }
+        }
+
+        // 2. Fallback: cek jika master dokumen dari KAK memiliki mdk_item_barang
+        if (itemObjectsToSet.length === 0 && mdkFromKak?.mdk_item_barang) {
           try {
             const parsed = typeof mdkFromKak.mdk_item_barang === 'string'
               ? JSON.parse(mdkFromKak.mdk_item_barang)
               : mdkFromKak.mdk_item_barang;
             if (Array.isArray(parsed) && parsed.length > 0) {
               itemObjectsToSet = parsed;
-              totalPagu = parsed.reduce((sum: number, it: any) => sum + (Number(it.PAGU_TOTAL) || 0), 0);
+              if (!totalPagu) {
+                totalPagu = parsed.reduce((sum: number, it: any) => sum + (Number(it.PAGU_TOTAL) || 0), 0);
+              }
             }
           } catch (e) {
             console.error('Error parsing mdk_item_barang from KAK:', e);
