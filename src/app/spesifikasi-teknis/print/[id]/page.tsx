@@ -83,7 +83,64 @@ export default function SpesifikasiTeknisPrintPage({
   }
 
   return (
-    <div className="min-h-screen bg-neutral-100 print:bg-white text-black py-6 print:py-0">
+    <div className="spt-print min-h-screen bg-neutral-100 print:bg-white text-black py-6 print:py-0">
+      <style jsx global>{`
+        /* Font dokumen cetak Spesifikasi Teknis: Arial 12pt */
+        .spt-print .spt-print-sheet,
+        .spt-print .spt-print-sheet * {
+          font-family: Arial, Helvetica, sans-serif !important;
+        }
+        .spt-print .spt-print-sheet :is(p, td, th, li, span, div, a, strong, b, em, i, u, label):not(.kop-surat, .kop-surat *) {
+          font-size: 12pt !important;
+          line-height: 1.5;
+        }
+        .spt-print .spt-print-sheet :is(h1, h2, h3, h4):not(.kop-surat *) {
+          font-size: 12pt !important;
+          font-weight: 700;
+        }
+
+        /* Ukuran kertas A4 */
+        @media print {
+          @page {
+            size: A4 portrait;
+            margin: 15mm 20mm 15mm 20mm;
+          }
+          html, body {
+            background: white !important;
+            margin: 0 !important;
+            padding: 0 !important;
+          }
+          .spt-print .spt-print-sheet,
+          .spt-print .spt-document-root {
+            width: 100% !important;
+            max-width: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            box-shadow: none !important;
+          }
+          /* min-h 1050px melebihi tinggi area cetak A4 (267mm) sehingga memunculkan halaman kosong */
+          .spt-print .spt-page {
+            min-height: 0 !important;
+            padding-top: 0 !important;
+          }
+          .spt-print .spt-page:last-child {
+            break-after: auto !important;
+            page-break-after: auto !important;
+          }
+        }
+
+        /* Tampilan layar: lembar selebar kertas A4 */
+        @media screen {
+          .spt-print .spt-print-sheet {
+            width: 210mm;
+            max-width: 100%;
+          }
+          .spt-print .spt-document-root {
+            max-width: none;
+            padding: 20mm;
+          }
+        }
+      `}</style>
       {/* Floating Action Bar (Hidden when printing) */}
       <div className="max-w-4xl mx-auto mb-4 px-4 flex items-center justify-between print:hidden">
         <div className="flex items-center gap-2">
@@ -112,7 +169,7 @@ export default function SpesifikasiTeknisPrintPage({
       </div>
 
       {/* Render Document Sheet */}
-      <div className="shadow-lg print:shadow-none bg-white max-w-4xl mx-auto print:max-w-none print:w-full">
+      <div className="spt-print-sheet shadow-lg print:shadow-none bg-white mx-auto print:max-w-none print:w-full">
         <SpesifikasiTeknisSheet
           spesifikasiTeknis={data.spesifikasiTeknis || {}}
           detailTeknis={data.detailTeknis}

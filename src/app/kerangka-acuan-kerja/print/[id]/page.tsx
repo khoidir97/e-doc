@@ -221,6 +221,7 @@ export default function KerangkaAcuanKerjaPrintPage({ params }: { params: Promis
         .kak-content * {
           font-size: 12pt !important;
           line-height: 1.5;
+          font-family: "Arial"
         }
         .kak-sheet .kak-title {
           font-size: 14pt !important;

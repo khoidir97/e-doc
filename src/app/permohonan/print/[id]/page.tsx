@@ -207,6 +207,8 @@ export default function PermohonanPrintPage({ params }: { params: Promise<{ id: 
         .pmh-content p {
           margin-bottom: 0.45rem !important;
           line-height: 1.6 !important;
+           font-size: 12pt !important;
+          font-family: "Arial"
         }
         .pmh-content li {
           margin-bottom: 0.2rem !important;
@@ -215,7 +217,7 @@ export default function PermohonanPrintPage({ params }: { params: Promise<{ id: 
       `}</style>
 
       {/* Lembar Dokumen Nota Dinas */}
-      <div className="mx-auto max-w-[210mm] min-h-[297mm] bg-white text-black p-8 sm:p-12 shadow-xl print:shadow-none print:m-0 print:p-0 leading-relaxed text-[13px] flex flex-col justify-between">
+      <div className="mx-auto w-[210mm] max-w-full min-h-[297mm] bg-white text-black p-[20mm] shadow-xl print:shadow-none print:m-0 print:p-0 print:w-full print:max-w-none print:min-h-0 leading-relaxed text-[13px] flex flex-col justify-between">
         <div className="space-y-4">
           {/* 1. KOP SURAT BPKAD */}
           <KopSuratBpkad />

@@ -12,7 +12,7 @@ export const KopSuratBpkad: React.FC<KopSuratBpkadProps> = ({
   showLogo = true,
 }) => {
   return (
-    <div className={`w-full text-black font-sans mb-4 ${className}`}>
+    <div className={`kop-surat w-full text-black font-sans mb-4 ${className}`}>
       <div className="flex items-center justify-between gap-3 pb-2 border-b-4 border-double border-black">
         {/* Logo Pemko Pekanbaru (Kiri) */}
         {showLogo ? (
