@@ -116,6 +116,21 @@ export default function HargaPerkiraanSendiriPrintPage({ params }: { params: Pro
               margin: 0;
             }
           }
+          td {
+            font-size: 11pt !important;
+            line-height: 1.5;
+            font-family: "Arial"
+          }
+          th {
+            font-size: 11pt !important;
+            line-height: 1.5;
+            font-family: "Arial"
+          }
+          .hps-content {
+            font-size: 11pt !important;
+            line-height: 1.0;
+            font-family: "Arial"
+          } 
         `}</style>
 
         {/* Kop Surat BPKAD */}
@@ -236,7 +251,7 @@ export default function HargaPerkiraanSendiriPrintPage({ params }: { params: Pro
         </div>
 
         {/* Below Table: Terbilang & Signature */}
-        <div className="mt-6 space-y-6">
+        <div className="mt-6 space-y-6 hps-content">
           <div className="text-xs">
             <span className="font-semibold block mb-0.5">Terbilang :</span>
             <p className="italic font-bold text-sm text-gray-900 tracking-wide bg-gray-50/80 p-2.5 rounded border border-gray-200 inline-block">
@@ -247,7 +262,7 @@ export default function HargaPerkiraanSendiriPrintPage({ params }: { params: Pro
           {/* Signature Block */}
           <div className="pt-6 grid grid-cols-2 gap-8 text-xs break-inside-avoid">
             <div></div>
-            <div className="text-center space-y-16">
+            <div className="text-center space-y-16 hps-content">
               <div>
                 <p className="font-bold uppercase">{labelPejabat}</p>
                 <p className="font-bold uppercase">Badan Pengelola Keuangan dan Aset Daerah</p>

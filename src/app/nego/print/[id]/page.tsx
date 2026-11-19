@@ -129,6 +129,21 @@ export default function NegoPrintPage({ params }: { params: Promise<{ id: string
               margin: 0;
             }
           }
+          td {
+            font-size: 11pt !important;
+            line-height: 1.5;
+            font-family: "Arial"
+          }
+            th {
+            font-size: 11pt !important;
+            line-height: 1.0;
+            font-family: "Arial"
+          }
+          .nego-content{
+            font-size: 11pt !important;
+            line-height0 1.5;
+            font-family: "Arial"
+          }
         `}</style>
 
         {/* Title */}
@@ -242,25 +257,25 @@ export default function NegoPrintPage({ params }: { params: Promise<{ id: string
             ].map(({ label, hps, pnw, nego, bold }) => (
               <tr key={label} className={`border-t border-black ${bold ? 'bg-gray-50' : ''}`}>
                 <td colSpan={4} className="border-none"></td>
-                <td className={`border border-black px-1 py-1 text-right font-mono ${bold ? 'font-extrabold' : 'font-bold'}`}>{formatRupiah(hps)}</td>
                 <td className="border border-black px-1 py-1 text-right font-bold text-[9px] uppercase">{label}</td>
+                <td className={`border border-black px-1 py-1 text-right font-mono ${bold ? 'font-extrabold' : 'font-bold'}`}>{formatRupiah(hps)}</td>
+                <td className="border border-black px-1 py-1"></td>
                 <td className={`border border-black px-1 py-1 text-right font-mono ${bold ? 'font-extrabold' : 'font-bold'}`}>{formatRupiah(pnw)}</td>
                 <td className="border border-black px-1 py-1"></td>
                 <td className={`border border-black px-1 py-1 text-right font-mono ${bold ? 'font-extrabold' : 'font-bold'}`}>{formatRupiah(nego)}</td>
-                <td className="border border-black px-1 py-1"></td>
               </tr>
             ))}
           </tbody>
         </table>
 
         {/* Terbilang */}
-        <div className="mb-4 text-[9px]">
+        <div className="mb-4 text-[9px] nego-content">
           <span className="font-semibold">Terbilang : </span>
           <span className="italic font-bold">{terbilangNego || 'Nol Rupiah'}</span>
         </div>
 
         {/* Tanggal dan Tanda Tangan */}
-        <div className="mt-2">
+        <div className="mt-2 nego-content">
           <div className="text-right text-[9px] mb-4">{tanggalDokumen}</div>
 
           <div className="grid grid-cols-2 gap-4 text-[9px]">
@@ -269,7 +284,7 @@ export default function NegoPrintPage({ params }: { params: Promise<{ id: string
               <p className="font-semibold">Setuju Dilaksanakan :</p>
               <p className="font-bold uppercase">PENYEDIA JASA</p>
               <p className="font-bold uppercase">{namaPerusahaan}</p>
-              <br /><br /><br /><br /><br /><br /><br /><br />
+              <br /><br /><br /><br />
               <div className="mt-12 pt-2 border-b border-black w-48"></div>
               <p className="font-bold underline uppercase">{namaPimpinanPerusahaan}</p>
               <p>{jabatanPimpinanPerusahaan}</p>
@@ -280,7 +295,7 @@ export default function NegoPrintPage({ params }: { params: Promise<{ id: string
               <p className="font-bold uppercase">PEJABAT PENGADAAN BARANG DAN JASA</p>
               <p className="font-bold uppercase">DI LINGKUNGAN BADAN PENGELOLA KEUANGAN</p>
               <p className="font-bold uppercase">DAN ASET DAERAH KOTA PEKANBARU</p>
-              <br /><br /><br /><br /><br /><br /><br /><br />
+              <br /><br /><br /><br />
               <div className="mt-12 pt-2 border-b border-black w-48"></div>
               <p className="font-bold underline uppercase">{namaPejabatPengadaan}</p>
               <p>NIP: {nipPejabatPengadaan}</p>

@@ -125,6 +125,16 @@ export default function PenetapanHpsPrintPage({ params }: { params: Promise<{ id
             margin: 12mm 15mm 15mm 15mm;
           }
         }
+          td {
+            font-size: 11pt !important;
+            line-height: 1.5;
+            font-family: "Arial"
+          }
+            .penetapan-content{
+              font-size: 11pt !important;
+              line-height: 1.5;
+              font-family: "Arial"
+            }
       `}</style>
 
       {/* ======================================================== */}
@@ -139,7 +149,7 @@ export default function PenetapanHpsPrintPage({ params }: { params: Promise<{ id
           <h2 className="font-extrabold text-sm sm:text-base underline tracking-wider uppercase">
             PENETAPAN HARGA PERKIRAAN SENDIRI (HPS)
           </h2>
-          <div className="text-xs mt-1 flex items-center justify-center gap-1">
+          <div className="text-xs mt-1 flex items-center justify-center gap-1 penetapan-content">
             <span>Nomor :</span>
             <input
               type="text"
@@ -159,7 +169,7 @@ export default function PenetapanHpsPrintPage({ params }: { params: Promise<{ id
         </div>
 
         {/* Paragraf Pembuka */}
-        <p className="text-justify leading-relaxed mb-3">
+        <p className="text-justify leading-relaxed mb-3 penetapan-content">
           Sehubungan dengan pelaksanaan {masterDokumen.mdk_uraian_belanja || 'Belanja Modal Peralatan Jaringan Kantor'} Pada Badan Pengelola Keuangan dan Aset Daerah (BPKAD) Kota Pekanbaru, dalam rangka pelaksanaan {apbdTahun}, maka perlu ditetapkan Harga Perkiraan Sendiri (HPS) bagi proses pelaksanaan :
         </p>
 
@@ -209,15 +219,15 @@ export default function PenetapanHpsPrintPage({ params }: { params: Promise<{ id
         </div>
 
         {/* Paragraf Penjelasan */}
-        <p className="text-justify leading-relaxed mb-3">
+        <p className="text-justify leading-relaxed mb-3 penetapan-content">
           Adapun Rincian HPS Pekerjaan tersebut terlampir sebagaimana pada lampiran Harga Perkiraan Sendiri (HPS) ini.
         </p>
 
-        <p className="text-justify leading-relaxed mb-3">
+        <p className="text-justify leading-relaxed mb-3 penetapan-content">
           Dengan diterbitkannya surat penetapan Harga Perkiraan Sendiri (HPS) ini, maka {masterDokumen.mdk_nama_pejabat_pengadaan ? `Pejabat Pengadaan ${masterDokumen.mdk_nama_pejabat_pengadaan}` : 'Pejabat Pengadaan Badan Pengelola Keuangan dan Aset Daerah Kota Pekanbaru'} yang ditunjuk untuk melakukan pemesanan terhadap pekerjaan tersebut.
         </p>
 
-        <p className="text-justify leading-relaxed mb-6">
+        <p className="text-justify leading-relaxed mb-6 penetapan-content">
           Surat Penetapan ini mulai berlaku sejak tanggal ditetapkan dengan ketentuan bahwa segala sesuatunya yang akan diperbaiki kembali sebagaimana mestinya apabila dikemudian hari ternyata terdapat kekeliruan dalam penetapan ini.
         </p>
 
@@ -395,7 +405,7 @@ export default function PenetapanHpsPrintPage({ params }: { params: Promise<{ id
         {/* Blok Tanda Tangan Lampiran */}
         <div className="pt-4 flex justify-end">
           <div className="w-80 text-left text-[12px] space-y-1">
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 penetapan-content">
               <span>Pekanbaru,</span>
               <input
                 type="text"
@@ -411,13 +421,13 @@ export default function PenetapanHpsPrintPage({ params }: { params: Promise<{ id
                 className="border-b border-gray-400 focus:outline-none print:border-none print:w-auto"
               />
             </div>
-            <div className="pt-2">
+            <div className="pt-2 penetapan-content">
               <p className="font-semibold">{labelKpaPpk}</p>
               <p className="font-normal">Selaku</p>
               <p className="font-semibold">Pejabat Pembuat Komitmen (PPK)</p>
               <p className="font-semibold">BPKAD Kota Pekanbaru</p>
             </div>
-            <div className="pt-20">
+            <div className="pt-20 penetapan-content">
               <p className="font-bold underline uppercase text-sm">
                 {masterDokumen.mdk_nama_pejabat || 'DANIEL PERDANA, SE'}
               </p>

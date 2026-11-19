@@ -64,8 +64,8 @@ export default function KwitansiPrintPage({
         negoJumlah && negoJumlah > 0
           ? negoJumlah
           : pakDibayar && pakDibayar > 0
-          ? pakDibayar
-          : masterDokumen?.mdk_pagu_anggaran;
+            ? pakDibayar
+            : masterDokumen?.mdk_pagu_anggaran;
       return [
         {
           noBukuKas: '',
@@ -93,10 +93,10 @@ export default function KwitansiPrintPage({
         kwt.kwt_uang_sejumlah && Number(kwt.kwt_uang_sejumlah) > 0
           ? kwt.kwt_uang_sejumlah
           : negoJumlah && negoJumlah > 0
-          ? negoJumlah
-          : pakDibayar && pakDibayar > 0
-          ? pakDibayar
-          : masterDokumen?.mdk_pagu_anggaran;
+            ? negoJumlah
+            : pakDibayar && pakDibayar > 0
+              ? pakDibayar
+              : masterDokumen?.mdk_pagu_anggaran;
 
       const d1 = kwt.kwt_tanggal_lunas_dibayar ? new Date(kwt.kwt_tanggal_lunas_dibayar as string) : null;
       const d2 = kwt.kwt_tanggal_terima_uang ? new Date(kwt.kwt_tanggal_terima_uang as string) : null;
@@ -179,15 +179,19 @@ export default function KwitansiPrintPage({
             margin: 0;
           }
         }
+          td {
+            font-size: 11pt !important;
+            line-height: 1.5;
+            font-family: "Arial"
+          }
       `}</style>
 
       {/* A4 Page Container — 1 kwitansi per halaman/kertas */}
       {pageChunks.map((sheet, pageIndex) => (
         <div
           key={pageIndex}
-          className={`mx-auto bg-white text-black shadow-xl print:shadow-none print:m-0 print:p-0 flex flex-col justify-start ${
-            pageIndex < pageChunks.length - 1 ? 'page-break-after mb-8' : ''
-          }`}
+          className={`mx-auto bg-white text-black shadow-xl print:shadow-none print:m-0 print:p-0 flex flex-col justify-start ${pageIndex < pageChunks.length - 1 ? 'page-break-after mb-8' : ''
+            }`}
           style={{
             width: '210mm',
             minHeight: '297mm',

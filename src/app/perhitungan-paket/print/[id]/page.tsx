@@ -145,6 +145,11 @@ export default function PerhitunganPaketPrintPage({ params }: { params: Promise<
             .print\\:hidden { display: none !important; }
             @page { size: A4 portrait; margin: 0; }
           }
+          td {
+            font-size: 11pt !important;
+            line-height: 1.5;
+            font-family: "Arial"
+          }
         `}</style>
 
         {/* Title */}

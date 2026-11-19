@@ -189,7 +189,16 @@ export default function PermohonanPrintPage({ params }: { params: Promise<{ id: 
             margin: 15mm 20mm 15mm 20mm;
           }
         }
-
+        td {
+            font-size: 11pt !important;
+            line-height: 1.5;
+            font-family: "Arial";
+          }
+        .ttd {
+            font-size: 11pt !important;
+            line-height: 1.0;
+            font-family: "Arial";
+          }
         .pmh-content ul {
           list-style-type: disc !important;
           margin-left: 1.35rem !important;
@@ -207,7 +216,7 @@ export default function PermohonanPrintPage({ params }: { params: Promise<{ id: 
         .pmh-content p {
           margin-bottom: 0.45rem !important;
           line-height: 1.6 !important;
-           font-size: 12pt !important;
+           font-size: 11pt !important;
           font-family: "Arial"
         }
         .pmh-content li {
@@ -347,8 +356,8 @@ export default function PermohonanPrintPage({ params }: { params: Promise<{ id: 
         </div>
 
         {/* 7. TANDA TANGAN PPK */}
-        <div className="avoid-break pt-8 flex justify-end">
-          <div className="w-80 text-left text-[12px] space-y-1">
+        <div className="avoid-break  flex justify-end ttd">
+          <div className="w-50 text-left text-[12px] space-y-1">
             <div>Pekanbaru, {tanggalSuratIndo}</div>
             <div>
               <p className="font-semibold">{jabatanPpk}</p>

@@ -93,11 +93,43 @@ export default function FakturPrintPage({ params }: { params: Promise<{ id: stri
           </button>
         </div>
       </div>
+      <style jsx global>{`
+          @media print {
+            html, body {
+              background: white !important;
+              color: black !important;
+              margin: 0 !important;
+              padding: 0 !important;
+            }
+            .print\\:hidden {
+              display: none !important;
+            }
+            @page {
+              size: A4 portrait;
+              margin: 0;
+            }
+          }
+          td {
+            font-size: 11pt !important;
+            line-height: 1.5;
+            font-family: "Arial"
+          }
+          th {
+            font-size: 11pt !important;
+            line-height: 1.5;
+            font-family: "Arial"
+          }
+          .faktur-content{
+            font-size: 11pt !important;
+            line-height: 1.5;
+            font-family: "Arial"
+          }
+        `}</style>
 
       {/* Sheet Printable Document */}
       <div className="bg-white p-8 max-w-[210mm] mx-auto text-black font-sans text-[12px] leading-relaxed shadow-lg print:shadow-none print:max-w-none print:w-full">
         {/* Title & Document Number */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-6 faktur-content">
           <h1 className="font-bold text-[14px] uppercase tracking-wider border-b-2 border-black inline-block pb-0.5">
             FAKTUR PESANAN
           </h1>
@@ -237,7 +269,7 @@ export default function FakturPrintPage({ params }: { params: Promise<{ id: stri
         </table>
 
         {/* Signatures Section */}
-        <div className="grid grid-cols-2 gap-8 text-[11px] mt-8 page-break-inside-avoid">
+        <div className="grid grid-cols-2 gap-8 text-[11px] mt-8 page-break-inside-avoid faktur-content">
           {/* Left Side: Penyedia / Rekanan */}
           <div className="text-center space-y-1">
             <div>Penyedia,</div>

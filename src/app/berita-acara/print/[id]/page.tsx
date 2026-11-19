@@ -107,6 +107,11 @@ export default function BeritaAcaraPrintPage({ params }: { params: Promise<{ id:
                   margin: 0;
                 }
               }
+            td {
+                font-size: 11pt !important;
+                line-height: 1.5;
+                font-family: "Arial"
+            }
             `}</style>
 
             {/* Berita Acara Sheet */}

@@ -92,6 +92,7 @@ export default function RencanaAnggaranBiayaPrintPage({ params }: { params: Prom
         </button>
       </div>
 
+
       {/* Printable Document Container (A4 / Excel style) */}
       <div className="mx-auto max-w-[210mm] bg-white text-black p-8 sm:p-12 shadow-xl print:shadow-none print:m-0 print:p-[15mm] font-serif leading-relaxed text-xs">
         <style jsx global>{`
@@ -110,6 +111,21 @@ export default function RencanaAnggaranBiayaPrintPage({ params }: { params: Prom
               margin: 0;
             }
           }
+          td {
+            font-size: 11pt !important;
+            line-height: 1.5;
+            font-family: "Arial"
+          }
+            th {
+            font-size: 11pt !important;
+            line-height: 1.5;
+            font-family: "Arial"
+          }
+         .judul{
+            font-size: 12pt !important;
+            line-height: 1.5;
+            font-family: "Arial"
+          }
         `}</style>
 
         {/* Kop Surat BPKAD Kota Pekanbaru */}
@@ -117,7 +133,7 @@ export default function RencanaAnggaranBiayaPrintPage({ params }: { params: Prom
 
         {/* Title */}
         <div className="text-center my-6">
-          <h2 className="font-extrabold text-base underline tracking-wider uppercase">RENCANA ANGGARAN BIAYA</h2>
+          <h2 className="font-extrabold text-base underline tracking-wider uppercase judul">RENCANA ANGGARAN BIAYA</h2>
         </div>
 
         {/* Metadata Header Table */}
@@ -222,7 +238,7 @@ export default function RencanaAnggaranBiayaPrintPage({ params }: { params: Prom
           <div className="pt-6 grid grid-cols-2 gap-8 text-xs break-inside-avoid">
             <div></div>
             <div className="text-center space-y-16">
-              <div>
+              <div className="td">
                 <p className="font-bold uppercase">{masterDokumen.bdg_nama || masterDokumen.mdk_bagian || 'Sekretaris BPKAD'}</p>
                 <p className="font-bold uppercase">PENGELOLA KEUANGAN DAN ASET DAERAH</p>
                 <p className="font-bold uppercase">KOTA PEKANBARU</p>

@@ -121,6 +121,21 @@ export default function PenawaranPrintPage({ params }: { params: Promise<{ id: s
               margin: 0;
             }
           }
+          td {
+            font-size: 11pt !important;
+            line-height: 1.5;
+            font-family: "Arial"
+          }
+          th {
+            font-size: 11pt !important;
+            line-height: 1.5;
+            font-family: "Arial"
+          }
+          .pnw-content{
+            font-size: 11pt !important;
+            line-height: 1.5;
+            font-family: "Arial"
+          }
         `}</style>
 
         {/* Kop Perusahaan */}
@@ -244,7 +259,7 @@ export default function PenawaranPrintPage({ params }: { params: Promise<{ id: s
         </div>
 
         {/* Below Table: Terbilang & Signature */}
-        <div className="mt-6 space-y-6">
+        <div className="mt-6 space-y-6 pnw-content">
           <div className="text-xs">
             <span className="font-semibold block mb-0.5">Terbilang :</span>
             <p className="italic font-bold text-sm text-gray-900 tracking-wide bg-gray-50/80 p-2.5 rounded border border-gray-200 inline-block">
@@ -253,14 +268,14 @@ export default function PenawaranPrintPage({ params }: { params: Promise<{ id: s
           </div>
 
           {/* Signature Block (Penyedia / Perusahaan) */}
-          <div className="pt-6 grid grid-cols-2 gap-8 text-xs break-inside-avoid">
+          <div className="pt-6 grid grid-cols-2 gap-8 text-xs break-inside-avoid pnw-content">
             <div></div>
             <div className="text-center space-y-16">
               <div>
                 <p className="font-medium">Hormat kami,</p>
                 <p className="font-bold uppercase mt-0.5">{namaPerusahaan}</p>
               </div>
-              <br /><br /><br /><br /><br /><br />
+              <br /><br />
               <div>
                 <p className="font-bold underline uppercase text-sm">{namaPimpinanPerusahaan || '....................................................'}</p>
                 <p className="text-[11px] font-medium mt-0.5">{jabatanPimpinanPerusahaan}</p>

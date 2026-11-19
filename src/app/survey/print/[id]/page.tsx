@@ -138,13 +138,23 @@ export default function SurveyPrintPage({ params }: { params: Promise<{ id: stri
               margin: 0;
             }
           }
+          td {
+            font-size: 11pt !important;
+            line-height: 1.5;
+            font-family: "Arial"
+          }
+          .survey-content{
+            font-size: 11pt !important;
+            line-height: 1.5;
+            font-family: "Arial"
+          }
         `}</style>
 
         {/* Kop Surat BPKAD Kota Pekanbaru */}
         <KopSuratBpkad />
 
         {/* Judul Dokumen */}
-        <div className="text-center my-4">
+        <div className="text-center my-4 survey-content">
           <h3 className="font-extrabold text-sm underline tracking-wider uppercase">BERITA ACARA SURVEI HARGA</h3>
           <p className="text-xs font-medium mt-0.5">
             Nomor : {header?.srv_nomor ? header.srv_nomor : '...................................................'}
@@ -152,7 +162,7 @@ export default function SurveyPrintPage({ params }: { params: Promise<{ id: stri
         </div>
 
         {/* Paragraf Pembuka */}
-        <div className="mt-6 space-y-2 text-xs">
+        <div className="mt-6 space-y-2 survey-content">
           <p className="text-justify leading-relaxed">
             Sehubungan dengan proses pengadaan Barang / jasa Pemerintah pada Dinas Penanaman Modal dan Pelayanan Terpadu Satu Pintu Kota Pekanbaru, dengan rincian sebagai berikut :
           </p>
@@ -243,14 +253,14 @@ export default function SurveyPrintPage({ params }: { params: Promise<{ id: stri
         </p>
 
         {/* Tanda Tangan Section */}
-        <div className="mt-8 grid grid-cols-2 gap-8 text-xs break-inside-avoid">
+        <div className="mt-8 grid grid-cols-2 gap-8 text-xs break-inside-avoid survey-content">
           {/* Pihak Yang Disurvei */}
           <div className="text-center space-y-16">
             <div>
               <p className="font-bold uppercase">PIHAK YANG DISURVEI</p>
               <p className="font-bold uppercase mt-1">{namaPerusahaan !== '-' ? namaPerusahaan : ''}</p>
             </div>
-            <br /><br /><br /><br /><br /><br />
+            <br /><br />
             <div>
               <p className="font-bold underline uppercase">{namaPimpinanPerusahaan || '....................................................'}</p>
               <p className="text-[11px]">{jabatanPimpinanPerusahaan}</p>
@@ -263,7 +273,7 @@ export default function SurveyPrintPage({ params }: { params: Promise<{ id: stri
               <p className="font-bold uppercase">PIHAK YG MENSURVEI</p>
               <p className="font-semibold">Pejabat Pelaksana Teknis Kegiatan,</p>
             </div>
-            <br /><br /><br /><br /><br /><br />
+            <br /><br />
             <div>
               <p className="font-bold underline uppercase">{masterDokumen?.mdk_nama_pptk || '...................................................'}</p>
               <p className="text-[11px]">NIP. {masterDokumen?.mdk_nip_pptk || '...................................................'}</p>
@@ -278,7 +288,7 @@ export default function SurveyPrintPage({ params }: { params: Promise<{ id: stri
             <p className="font-bold">Pejabat Pengadaan Barang dan Jasa</p>
             <p className="text-[11px]">dilingkungan DPMPTSP Kota Pekanbaru</p>
           </div>
-          <br /><br /><br /><br /><br /><br />
+          <br /><br />
           <div>
             <p className="font-bold underline uppercase">{masterDokumen?.mdk_nama_pejabat_pengadaan || '...................................................'}</p>
             <p className="text-[11px]">NIP. {masterDokumen?.mdk_nip_pejabat_pengadaan || '...................................................'}</p>
