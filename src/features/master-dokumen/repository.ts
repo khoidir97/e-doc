@@ -182,14 +182,14 @@ export class MasterDokumenRepository {
     );
 
     const newMdkId = result.insertId;
-    if (input.mdk_kak_id && newMdkId) {
-      await pool.query(
-        `UPDATE kerangka_acuan_kerja 
-         SET kak_master_dokumen_id = ? 
-         WHERE kak_id = ? AND (kak_master_dokumen_id IS NULL OR kak_master_dokumen_id = 0)`,
-        [newMdkId, Number(input.mdk_kak_id)]
-      );
-    }
+    // if (input.mdk_kak_id && newMdkId) {
+    //   await pool.query(
+    //     `UPDATE kerangka_acuan_kerja 
+    //      SET kak_master_dokumen_id = ? 
+    //      WHERE kak_id = ? AND (kak_master_dokumen_id IS NULL OR kak_master_dokumen_id = 0)`,
+    //     [newMdkId, Number(input.mdk_kak_id)]
+    //   );
+    // }
 
     return newMdkId;
   }
@@ -260,14 +260,14 @@ export class MasterDokumenRepository {
       ]
     );
 
-    if (input.mdk_kak_id && input.mdk_id) {
-      await pool.query(
-        `UPDATE kerangka_acuan_kerja 
-         SET kak_master_dokumen_id = ? 
-         WHERE kak_id = ? AND (kak_master_dokumen_id IS NULL OR kak_master_dokumen_id = 0)`,
-        [input.mdk_id, Number(input.mdk_kak_id)]
-      );
-    }
+    // if (input.mdk_kak_id && input.mdk_id) {
+    //   await pool.query(
+    //     `UPDATE kerangka_acuan_kerja 
+    //      SET kak_master_dokumen_id = ? 
+    //      WHERE kak_id = ? AND (kak_master_dokumen_id IS NULL OR kak_master_dokumen_id = 0)`,
+    //     [input.mdk_id, Number(input.mdk_kak_id)]
+    //   );
+    // }
     return result.affectedRows > 0;
   }
 
